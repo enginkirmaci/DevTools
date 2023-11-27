@@ -1,17 +1,14 @@
-﻿using System;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
-using DryIoc;
+﻿using DryIoc;
 using FileAndFolderDialog.Abstractions;
 using FileAndFolderDialog.Wpf;
 using Prism.DryIoc;
 using Prism.Ioc;
-using Prism.Mvvm;
 using Serilog;
-using Tools.Services;
-using Tools.Views;
+using Tools.Library.Entities;
+using Tools.Library.Extensions;
+using Tools.Views.Pages;
+using Tools.Views.Windows;
+using Wpf.Ui;
 
 namespace Tools;
 
@@ -21,8 +18,45 @@ namespace Tools;
 public partial class App
 {
     public static IContainer AppContainer { get; set; }
+    public static Assembly Assembly => Assembly.GetExecutingAssembly();
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override Window CreateShell()
+    {
+        var applicationWindow = Container.Resolve<MainWindow>();
+        return applicationWindow;
+    }
+
+    //protected override void ConfigureViewModelLocator()
+    //{
+    //    base.ConfigureViewModelLocator();
+
+    //    ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver((viewType) =>
+    //    {
+    //        var viewName = viewType.FullName;
+    //        var viewAssemblyName = viewType.GetTypeInfo().Assembly.FullName;
+    //        var viewModelName = $"{viewName.Replace(".Views.", ".ViewModels.")}Model, {viewAssemblyName}";
+    //        return Type.GetType(viewModelName);
+    //    });
+    //}
+
+    protected override void RegisterTypes(IContainerRegistry containerRegistry)
+    {
+        containerRegistry.RegisterSingleton<IWindow, MainWindow>();
+
+        containerRegistry.RegisterForNavigation<DashboardPage>();
+
+        containerRegistry.AddTransientFromNamespace("Tools.Views", Assembly);
+        containerRegistry.AddTransientFromNamespace("Tools.ViewModels", Assembly);
+
+        containerRegistry.RegisterSingleton<INavigationService, NavigationService>();
+        containerRegistry.RegisterSingleton<ISnackbarService, SnackbarService>();
+        containerRegistry.RegisterSingleton<IContentDialogService, ContentDialogService>();
+        containerRegistry.RegisterScoped<IFolderDialogService, FolderDialogService>();
+
+        AppContainer = containerRegistry.GetContainer();
+    }
+
+    private void OnStartup(object sender, StartupEventArgs e)
     {
         Log.Logger = new LoggerConfiguration()
                    .MinimumLevel.Debug()
@@ -53,8 +87,24 @@ public partial class App
         //else
 
         Log.Logger.Information("VideoOverlay Started");
+    }
 
-        base.OnStartup(e);
+    /// <summary>
+    /// Occurs when the application is closing.
+    /// </summary>
+    private void OnExit(object sender, ExitEventArgs e)
+    {
+        if (Container != null)
+        {
+            //var snapServiceContainer = Container.Resolve<ISnapService>();
+            //if (snapServiceContainer != null)
+            //{
+            //    snapServiceContainer.Release();
+            //    NotifyIcon.Dispose();
+            //}
+        }
+
+        Log.Logger.Information("VideoOverlay Exited");
     }
 
     private void RegisterGlobalExceptionHandling(ILogger log)
@@ -99,50 +149,5 @@ public partial class App
     {
         log.Error(args.Exception, args.Exception.Message);
         args.SetObserved();
-    }
-
-    protected override Window CreateShell()
-    {
-        var applicationWindow = Container.Resolve<ShellWindow>();
-        return applicationWindow;
-    }
-
-    protected override void ConfigureViewModelLocator()
-    {
-        base.ConfigureViewModelLocator();
-
-        ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver((viewType) =>
-        {
-            var viewName = viewType.FullName;
-            var viewAssemblyName = viewType.GetTypeInfo().Assembly.FullName;
-            var viewModelName = $"{viewName.Replace(".Views.", ".ViewModels.")}Model, {viewAssemblyName}";
-            return Type.GetType(viewModelName);
-        });
-    }
-
-    protected override void RegisterTypes(IContainerRegistry containerRegistry)
-    {
-        containerRegistry.RegisterForNavigation<HomeView>();
-
-        containerRegistry.RegisterSingleton<INavigationService, NavigationService>();
-        containerRegistry.RegisterScoped<IFolderDialogService, FolderDialogService>();
-        AppContainer = containerRegistry.GetContainer();
-    }
-
-    protected override void OnExit(ExitEventArgs e)
-    {
-        base.OnExit(e);
-
-        if (Container != null)
-        {
-            //var snapServiceContainer = Container.Resolve<ISnapService>();
-            //if (snapServiceContainer != null)
-            //{
-            //    snapServiceContainer.Release();
-            //    NotifyIcon.Dispose();
-            //}
-        }
-
-        Log.Logger.Information("VideoOverlay Exited");
     }
 }

@@ -7,24 +7,24 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\HomeView.xaml.cs">
+    <Compile Update="Views\Pages\NugetLocalPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\NugetLocalView.xaml.cs">
+    <Compile Update="Views\Pages\DashboardPage.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\ShellWindow.xaml.cs">
+    <Compile Update="Views\Windows\MainWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="Views\HomeView.xaml">
+    <Page Update="Views\Pages\NugetLocalPage.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\NugetLocalView.xaml">
+    <Page Update="Views\Pages\DashboardPage.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\ShellWindow.xaml">
+    <Page Update="Views\Windows\MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

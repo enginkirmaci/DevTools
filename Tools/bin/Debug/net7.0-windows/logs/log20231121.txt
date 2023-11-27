@@ -1,2 +1,0 @@
-2023-11-21 15:51:31.546 +03:00 [INF] VideoOverlay Started
-2023-11-21 15:57:58.951 +03:00 [INF] VideoOverlay Exited

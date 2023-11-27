@@ -1,34 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>AnyCPU;x64</Platforms>
+		<!--<SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>-->
+		<Platforms>AnyCPU;x64</Platforms> 
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Tools.Library\Tools.Library.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Assets\**" />
+	  <Compile Remove="ViewModels\DesignTime\**" />
+	  <EmbeddedResource Remove="Assets\**" />
+	  <EmbeddedResource Remove="ViewModels\DesignTime\**" />
+	  <None Remove="Assets\**" />
+	  <None Remove="ViewModels\DesignTime\**" />
+	  <Page Remove="Assets\**" />
+	  <Page Remove="ViewModels\DesignTime\**" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Assets\" />
-    <Folder Include="ViewModels\DesignTime\" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Tools.Library\Tools.Library.csproj" />
+	</ItemGroup>
 
-	<ItemGroup> 
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77" />
 		<PackageReference Include="Prism.DryIoc" Version="8.1.97" />
 		<PackageReference Include="Serilog" Version="2.12.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
 		<PackageReference Include="FileAndFolderDialog.Wpf" Version="1.0.1.1" />
+		<PackageReference Include="WPF-UI" Version="3.0.0-preview.11" />
+		<PackageReference Include="WPF-UI.Tray" Version="3.0.0-preview.11" />
 	</ItemGroup>
-	
-  <ItemGroup>
-    <Reference Include="Wpf.Ui">
-      <HintPath>..\thirdparty\wpfui\Wpf.Ui.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
 </Project>

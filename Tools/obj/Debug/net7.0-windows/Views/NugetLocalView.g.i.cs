@@ -40,6 +40,7 @@ using System.Windows.Shell;
 using Wpf.Ui;
 using Wpf.Ui.Common;
 using Wpf.Ui.Controls;
+using Wpf.Ui.Controls.Navigation;
 using Wpf.Ui.Converters;
 using Wpf.Ui.Markup;
 using Wpf.Ui.ValidationRules;
@@ -59,13 +60,13 @@ namespace Tools.Views {
         /// InitializeComponent
         /// </summary>
         [System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "7.0.11.0")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "8.0.0.0")]
         public void InitializeComponent() {
             if (_contentLoaded) {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/Tools;component/views/nugetlocalview.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/Tools;V1.0.0.0;component/views/nugetlocalview.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\Views\NugetLocalView.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
@@ -75,7 +76,7 @@ namespace Tools.Views {
         }
         
         [System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "7.0.11.0")]
+        [System.CodeDom.Compiler.GeneratedCodeAttribute("PresentationBuildTasks", "8.0.0.0")]
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Never)]
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]

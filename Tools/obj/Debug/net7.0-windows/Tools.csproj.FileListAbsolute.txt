@@ -39,3 +39,7 @@ C:\enginkirmaci\Repos\Tools\Tools\obj\Debug\net7.0-windows\Views\NugetLocalView.
 C:\enginkirmaci\Repos\Tools\Tools\obj\Debug\net7.0-windows\Views\NugetLocalView.g.cs
 C:\enginkirmaci\Repos\Tools\Tools\bin\Debug\net7.0-windows\FileAndFolderDialog.Abstractions.dll
 C:\enginkirmaci\Repos\Tools\Tools\bin\Debug\net7.0-windows\FileAndFolderDialog.Wpf.dll
+X:\DevTools\Tools\obj\Debug\net7.0-windows\Tools.csproj.AssemblyReference.cache
+X:\DevTools\Tools\obj\Debug\net7.0-windows\App.baml
+X:\DevTools\Tools\obj\Debug\net7.0-windows\App.g.cs
+X:\DevTools\Tools\obj\Debug\net7.0-windows\Tools_MarkupCompile.cache
