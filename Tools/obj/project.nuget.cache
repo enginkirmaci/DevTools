@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "dgSpecHash": "tvs/erkrODb1VQbDFpcrZfpIjE6YDXc0nPjp45QqaDKibyXUZjA+G/3pvf7cL2S/ZGHQc0ZxQlLZO+6VG+oNcQ==",
+  "success": false,
+  "projectFilePath": "C:\\enginkirmaci\\Repos\\Tools\\Tools\\Tools.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Failed to retrieve information about 'FileAndFolderDialog.Abstractions' from remote source 'https://scorenexus.isbank/repository/nuget-hosted/FindPackagesById()?id='FileAndFolderDialog.Abstractions'&semVerLevel=2.0.0'.",
+      "libraryId": "FileAndFolderDialog.Abstractions"
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Failed to retrieve information about 'FileAndFolderDialog.Abstractions' from remote source 'https://scorenexus.isbank/repository/nuget.org-proxy/FindPackagesById()?id='FileAndFolderDialog.Abstractions'&semVerLevel=2.0.0'.",
+      "libraryId": "FileAndFolderDialog.Abstractions"
+    }
+  ]
+}
