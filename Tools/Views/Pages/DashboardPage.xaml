@@ -1,11 +1,11 @@
 ﻿<Page
     x:Class="Tools.Views.Pages.DashboardPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Tools.Views.Pages"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:Tools.Views.Pages"
     Title="Dashboard Page"
     Margin="0,32,0,0"
     d:DataContext="{d:DesignInstance local:DashboardPage,
@@ -80,11 +80,6 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!--<Image
-                        Width="60"
-                        Margin="24,0,0,0"
-                        Source="pack://application:,,,/Assets/WinUiGallery/Button.png" />-->
-
                     <ui:SymbolIcon
                         Width="60"
                         Margin="24,0,0,0"
@@ -109,14 +104,14 @@
                 </Grid>
             </ui:CardAction>
 
-            <!--<ui:CardAction
+            <ui:CardAction
                 Grid.Row="0"
                 Grid.Column="1"
-                Margin="4,0,4,0"
+                Margin="0,0,4,0"
                 Padding="0"
                 VerticalAlignment="Stretch"
                 Command="{Binding ViewModel.CardClickCommand, Mode=OneWay}"
-                CommandParameter="DialogsAndFlyouts"
+                CommandParameter="HostFileProxy"
                 IsChevronVisible="False">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -124,12 +119,11 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-            -->
-            <!--<Image
+                    <ui:SymbolIcon
                         Width="60"
                         Margin="24,0,0,0"
-                        Source="pack://application:,,,/Assets/WinUiGallery/Flyout.png" />-->
-            <!--
+                        FontSize="48"
+                        Symbol="VirtualNetwork20" />
 
                     <StackPanel
                         Grid.Column="1"
@@ -138,56 +132,16 @@
                         <ui:TextBlock
                             Margin="0"
                             FontTypography="BodyStrong"
-                            Text="Dialogs &amp; Flyouts"
+                            Text="Host File Proxy"
                             TextWrapping="WrapWithOverflow" />
-                        <ui:TextBlock
+                        <!--<ui:TextBlock
                             Appearance="Secondary"
                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="Contextual notifications."
-                            TextWrapping="WrapWithOverflow" />
+                            Text="copy new nuget packages to destination"
+                            TextWrapping="WrapWithOverflow" />-->
                     </StackPanel>
                 </Grid>
             </ui:CardAction>
-
-            <ui:CardAction
-                Grid.Row="0"
-                Grid.Column="2"
-                Margin="4,0,4,0"
-                Padding="0"
-                VerticalAlignment="Stretch"
-                Command="{Binding ViewModel.CardClickCommand, Mode=OneWay}"
-                CommandParameter="Navigation"
-                IsChevronVisible="False">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-            -->
-            <!--<Image
-                        Width="60"
-                        Margin="24,0,0,0"
-                        Source="pack://application:,,,/Assets/WinUiGallery/MenuBar.png" />-->
-            <!--
-
-                    <StackPanel
-                        Grid.Column="1"
-                        Margin="24"
-                        VerticalAlignment="Center">
-                        <ui:TextBlock
-                            Margin="0"
-                            FontTypography="BodyStrong"
-                            Text="Navigation"
-                            TextWrapping="WrapWithOverflow" />
-                        <ui:TextBlock
-                            Appearance="Secondary"
-                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                            Text="Managing the displayed pages."
-                            TextWrapping="WrapWithOverflow" />
-                    </StackPanel>
-                </Grid>
-            </ui:CardAction>-->
         </Grid>
     </Grid>
 </Page>

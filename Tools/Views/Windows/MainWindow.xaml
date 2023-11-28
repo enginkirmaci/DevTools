@@ -73,6 +73,11 @@
                         <ui:SymbolIcon Symbol="BoxMultipleArrowRight20" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="Host File Proxy" TargetPageType="{x:Type pages:HostFileProxyPage}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="VirtualNetwork20" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
         </ui:NavigationView>
 
@@ -93,7 +98,7 @@
             FocusOnLeftClick="True"
             Icon="pack://application:,,,/Assets/logo.png"
             MenuOnRightClick="True"
-            TooltipText="WPF UI Gallery">
+            TooltipText="{Binding ViewModel.ApplicationTitle, Mode=OneWay}">
             <!--<tray:NotifyIcon.Menu>
         <ContextMenu ItemsSource="{Binding ViewModel.TrayMenuItems, Mode=OneWay}" />
     </tray:NotifyIcon.Menu>-->
