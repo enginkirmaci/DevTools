@@ -9,24 +9,17 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Platforms>AnyCPU;x64</Platforms>
 		<!--<SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>-->
-		<Platforms>AnyCPU;x64</Platforms> 
-		<ApplicationManifest>app.manifest</ApplicationManifest> 
+		<Platforms>AnyCPU;x64</Platforms>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ApplicationIcon>Assets\logo.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="ViewModels\DesignTime\**" />
-	  <EmbeddedResource Remove="ViewModels\DesignTime\**" />
-	  <None Remove="ViewModels\DesignTime\**" />
-	  <Page Remove="ViewModels\DesignTime\**" />
+		<None Remove="Assets\logo.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Assets\logo.png" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Content Include="Assets\logo.ico" />
+		<Content Include="Assets\logo.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -45,7 +38,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Resource Include="Assets\logo.png" />
+		<Resource Include="Assets\logo.png" />
 	</ItemGroup>
 
 </Project>

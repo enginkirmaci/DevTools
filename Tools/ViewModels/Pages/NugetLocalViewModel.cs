@@ -5,7 +5,7 @@ using Prism.Regions;
 
 namespace Tools.ViewModels.Pages;
 
-public class NugetLocalViewModel : BindableBase, INavigationAware
+public class NugetLocalViewModel : BindableBase
 {
     private readonly IFolderDialogService folderDialogService;
 
@@ -92,19 +92,5 @@ public class NugetLocalViewModel : BindableBase, INavigationAware
     public async Task InitializeAsync()
     {
         FileList = new ObservableCollection<string>();
-    }
-
-    public void OnNavigatedTo(NavigationContext navigationContext)
-    {
-        _ = InitializeAsync();
-    }
-
-    public bool IsNavigationTarget(NavigationContext navigationContext)
-    {
-        return true;
-    }
-
-    public void OnNavigatedFrom(NavigationContext navigationContext)
-    {
     }
 }
