@@ -1,32 +1,38 @@
 ﻿using FileAndFolderDialog.Abstractions;
 using Prism.Commands;
 using Prism.Mvvm;
-using Prism.Regions;
+using Wpf.Ui;
+using Wpf.Ui.Controls;
 
 namespace Tools.ViewModels.Pages;
 
 public class NugetLocalViewModel : BindableBase
 {
     private readonly IFolderDialogService folderDialogService;
-
+    private readonly ISnackbarService snackbarService;
     private FileSystemWatcher watcher;
     private ObservableCollection<string> fileList;
     private string watchFolder = "C:\\Repos\\STAKILPR\\Clearing.Common";
     private string copyFolder = "C:\\Repos\\STAKILPR\\Clearing.Common\\nuget";
     private bool watchStarted = false;
+    private int count = 0;
+    private DateTime lastChanges = DateTime.Now;
 
     public ObservableCollection<string> FileList { get => fileList; set => SetProperty(ref fileList, value); }
     public string WatchFolder { get => watchFolder; set => SetProperty(ref watchFolder, value); }
     public string CopyFolder { get => copyFolder; set => SetProperty(ref copyFolder, value); }
     public bool WatchStarted { get => watchStarted; set => SetProperty(ref watchStarted, value); }
+    public int Count { get => count; set => SetProperty(ref count, value); }
 
     public DelegateCommand<object> WatchChangesCommand { get; private set; }
     public DelegateCommand<string> TextboxClickCommand { get; private set; }
 
     public NugetLocalViewModel(
-           IFolderDialogService folderDialogService)
+           IFolderDialogService folderDialogService,
+           ISnackbarService snackbarService)
     {
         this.folderDialogService = folderDialogService;
+        this.snackbarService = snackbarService;
 
         _ = InitializeAsync();
 
@@ -85,6 +91,16 @@ public class NugetLocalViewModel : BindableBase
                 FileList.Insert(0, $"{e.FullPath} moved.");
 
                 Debug.WriteLine("File created: " + e.FullPath);
+
+                if (DateTime.Now < lastChanges.AddSeconds(30))
+                {
+                    Count++;
+                }
+                else
+                {
+                    Count = 1;
+                    lastChanges = DateTime.Now;
+                } 
             }
         }));
     }

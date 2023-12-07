@@ -19,11 +19,12 @@
     <Grid Margin="0,0,0,24" DataContext="{Binding ViewModel}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Border
-            Margin="0,0,0,24"
+            Margin="0,0,0,12"
             Padding="16"
             Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ui:ThemeResource CardStrokeColorDefaultBrush}"
@@ -108,14 +109,22 @@
             </Grid>
         </Border>
 
-        <Border
+
+        <ui:InfoBar
+            Title="Total packages moved (in 30 seconds):"
             Grid.Row="1"
+            Margin="0,0,0,12"
+            IsClosable="False"
+            IsOpen="True"
+            Message="{Binding Count}" />
+
+        <Border
+            Grid.Row="2"
             Padding="16"
             Background="{ui:ThemeResource CardBackgroundFillColorDefaultBrush}"
             BorderBrush="{ui:ThemeResource CardStrokeColorDefaultBrush}"
             BorderThickness="1"
             CornerRadius="8">
-            <!--<ScrollViewer >-->
             <ItemsControl ItemsSource="{Binding FileList}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
@@ -123,7 +132,6 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <!--</ScrollViewer>-->
         </Border>
     </Grid>
 </Page>
