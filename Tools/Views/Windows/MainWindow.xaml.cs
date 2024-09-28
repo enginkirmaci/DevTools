@@ -1,5 +1,4 @@
-﻿using System.Windows.Navigation;
-using Tools.Library.Entities;
+﻿using Tools.Library.Entities;
 using Tools.ViewModels.Windows;
 using Tools.Views.Pages;
 using Wpf.Ui;
@@ -8,9 +7,6 @@ using Wpf.Ui.Controls;
 
 namespace Tools.Views.Windows;
 
-/// <summary>
-/// Interaction logic for ShellWindow.xaml
-/// </summary>
 public partial class MainWindow : IWindow
 {
     private bool _isUserClosedPane;
@@ -43,7 +39,7 @@ public partial class MainWindow : IWindow
 
     private void MainWindowView_Loaded(object sender, RoutedEventArgs e)
     {
-        navigationService.Navigate(typeof(DashboardPage));
+        navigationService.Navigate(typeof(AIPlaygroundPage));
     }
 
     private void OnNavigationSelectionChanged(object sender, RoutedEventArgs e)
