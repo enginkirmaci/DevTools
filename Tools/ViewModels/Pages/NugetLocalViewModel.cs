@@ -2,7 +2,6 @@
 using Prism.Commands;
 using Prism.Mvvm;
 using Wpf.Ui;
-using Wpf.Ui.Controls;
 
 namespace Tools.ViewModels.Pages;
 
@@ -92,7 +91,7 @@ public class NugetLocalViewModel : BindableBase
 
                 Debug.WriteLine("File created: " + e.FullPath);
 
-                if (DateTime.Now < lastChanges.AddSeconds(30))
+                if (DateTime.Now < lastChanges.AddSeconds(60))
                 {
                     Count++;
                 }
@@ -100,7 +99,7 @@ public class NugetLocalViewModel : BindableBase
                 {
                     Count = 1;
                     lastChanges = DateTime.Now;
-                } 
+                }
             }
         }));
     }

@@ -32,14 +32,14 @@ public partial class MainWindow : IWindow
 
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         navigationService.SetNavigationControl(NavigationView);
-        contentDialogService.SetContentPresenter(RootContentDialog);
+        contentDialogService.SetDialogHost(RootContentDialog);
 
         NavigationView.SetServiceProvider(serviceProvider);
     }
 
     private void MainWindowView_Loaded(object sender, RoutedEventArgs e)
     {
-        navigationService.Navigate(typeof(FormattersPage));
+        navigationService.Navigate(App.DefaultPage);
     }
 
     private void OnNavigationSelectionChanged(object sender, RoutedEventArgs e)

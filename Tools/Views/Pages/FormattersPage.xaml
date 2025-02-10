@@ -16,15 +16,14 @@
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     mc:Ignorable="d">
 
-    <Grid Margin="0,0,0,24"
-          DataContext="{Binding ViewModel}">
+    <Grid Margin="0,0,0,24" DataContext="{Binding ViewModel}">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Border
@@ -39,35 +38,29 @@
                     Margin="0,4"
                     Content="Base64 Encode"
                     GroupName="Operation"
-                    IsChecked="{Binding IsBase64EncodeSelected}"/>
+                    IsChecked="{Binding IsBase64EncodeSelected}" />
                 <RadioButton
                     Margin="0,4"
                     Content="Base64 Decode"
                     GroupName="Operation"
-                    IsChecked="{Binding IsBase64DecodeSelected}"/>
+                    IsChecked="{Binding IsBase64DecodeSelected}" />
                 <RadioButton
                     Margin="0,4"
                     Content="Snake Case"
                     GroupName="Operation"
-                    IsChecked="{Binding IsSnakeCaseSelected}"/>
+                    IsChecked="{Binding IsSnakeCaseSelected}" />
                 <RadioButton
                     Margin="0,4"
                     Content="Pascal Case"
                     GroupName="Operation"
-                    IsChecked="{Binding IsPascalCaseSelected}"/>
-
-                <ui:Button
-                    Margin="0,8,0,0"
-                    Command="{Binding ConvertCommand}"
-                    Content="Convert"
-                    Icon="{ui:SymbolIcon ArrowSwap24}"/>
+                    IsChecked="{Binding IsPascalCaseSelected}" />
             </StackPanel>
         </Border>
 
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Border
@@ -79,12 +72,13 @@
                 CornerRadius="8">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Label VerticalAlignment="Center">Input Text</Label>
@@ -93,7 +87,13 @@
                         Margin="8"
                         AcceptsReturn="True"
                         Text="{Binding InputText}"
-                        TextWrapping="Wrap"/>
+                        TextWrapping="Wrap" />
+
+                    <ui:Button
+                        Grid.Column="2"
+                        Command="{Binding ConvertCommand}"
+                        Content="Convert"
+                        Icon="{ui:SymbolIcon ArrowSwap24}" />
                 </Grid>
             </Border>
 
@@ -109,18 +109,17 @@
                         <DataTemplate>
                             <Grid Margin="0,6">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center"
-                                           Text="{Binding}"/>
+                                <TextBlock VerticalAlignment="Center" Text="{Binding}" />
                                 <ui:Button
                                     Grid.Column="1"
                                     Margin="8,0,0,0"
                                     Command="{Binding DataContext.CopyToClipboardCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding}"
                                     Content="Copy"
-                                    Icon="{ui:SymbolIcon Clipboard24}"/>
+                                    Icon="{ui:SymbolIcon Clipboard24}" />
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

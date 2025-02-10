@@ -1,13 +1,13 @@
 ﻿<ui:FluentWindow
     x:Class="Tools.Views.Windows.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Tools.Views.Windows"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:Tools.Views.Pages"
-    xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:local="clr-namespace:Tools.Views.Windows"
     x:Name="MainWindowView"
     Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
     Width="1450"
@@ -78,7 +78,10 @@
                         <ui:SymbolIcon Symbol="Code24" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="Host File Proxy" TargetPageType="{x:Type pages:HostFileProxyPage}">
+                <ui:NavigationViewItem
+                    Content="Host File Proxy"
+                    TargetPageType="{x:Type pages:HostFileProxyPage}"
+                    Visibility="Collapsed">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="VirtualNetwork20" />
                     </ui:NavigationViewItem.Icon>

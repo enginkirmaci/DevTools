@@ -1,16 +1,27 @@
 using Prism.Commands;
 using Prism.Mvvm;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
 using Tools.Library.Formatters;
-using System.Windows;
 
 namespace Tools.ViewModels.Pages
 {
     public class EFToolsPageViewModel : BindableBase
     {
+        private const string Template = @"
+public class {TABLENAME}Repository : QueryableRepository<{TABLENAME}, DbContext>, I{TABLENAME}Repository
+{
+    public {TABLENAME}Repository(DbContext context) : base(context)
+    {
+    }
+}
+
+public interface I{TABLENAME}Repository : IQueryableRepository<{TABLENAME}>
+{
+}";
+
         private string _sqlInput;
         private string _cSharpOutput;
+        private string _repositoryOutput;
+        private string _repositoryTemplate;
 
         public string SqlInput
         {
@@ -24,13 +35,29 @@ namespace Tools.ViewModels.Pages
             set => SetProperty(ref _cSharpOutput, value);
         }
 
+        public string RepositoryOutput
+        {
+            get => _repositoryOutput;
+            set => SetProperty(ref _repositoryOutput, value);
+        }
+
+        public string RepositoryTemplate
+        {
+            get => _repositoryTemplate;
+            set => SetProperty(ref _repositoryTemplate, value);
+        }
+
         public ICommand ConvertSqlCommand { get; }
         public ICommand CopyToClipboardCommand { get; }
+        public ICommand CopyRepositoryToClipboardCommand { get; }
 
         public EFToolsPageViewModel()
         {
             ConvertSqlCommand = new DelegateCommand(OnConvertSqlCommand);
             CopyToClipboardCommand = new DelegateCommand(OnCopyToClipboardCommand);
+            CopyRepositoryToClipboardCommand = new DelegateCommand(OnCopyRepositoryToClipboardCommand);
+
+            RepositoryTemplate = Template;
         }
 
         private void OnConvertSqlCommand()
@@ -38,6 +65,8 @@ namespace Tools.ViewModels.Pages
             try
             {
                 CSharpOutput = SqlToCSharpFormatter.FormatCreateTableToClass(SqlInput);
+                var tableName = SqlToCSharpFormatter.GetTableName(SqlInput);
+                RepositoryOutput = GenerateRepositoryCode(tableName);
             }
             catch (Exception ex)
             {
@@ -51,6 +80,19 @@ namespace Tools.ViewModels.Pages
             {
                 Clipboard.SetText(CSharpOutput);
             }
+        }
+
+        private void OnCopyRepositoryToClipboardCommand()
+        {
+            if (!string.IsNullOrEmpty(RepositoryOutput))
+            {
+                Clipboard.SetText(RepositoryOutput);
+            }
+        }
+
+        private string GenerateRepositoryCode(string className)
+        {
+            return RepositoryTemplate.Replace("{TABLENAME}", className);
         }
     }
 }

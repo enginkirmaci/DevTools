@@ -6,6 +6,7 @@ using Prism.Ioc;
 using Serilog;
 using Tools.Library.Entities;
 using Tools.Library.Extensions;
+using Tools.Views.Pages;
 using Tools.Views.Windows;
 using Wpf.Ui;
 
@@ -18,6 +19,7 @@ public partial class App
 {
     public static IContainer AppContainer { get; set; }
     public static Assembly Assembly => Assembly.GetExecutingAssembly();
+    public static Type DefaultPage => typeof(DashboardPage);
 
     protected override Window CreateShell()
     {
