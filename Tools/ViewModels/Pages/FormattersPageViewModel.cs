@@ -2,10 +2,12 @@ using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Tools.Library.Extensions;
 
 namespace Tools.ViewModels.Pages
 {
@@ -15,6 +17,8 @@ namespace Tools.ViewModels.Pages
         private string _outputText;
         private bool _isBase64EncodeSelected = true;
         private bool _isBase64DecodeSelected;
+        private bool _isSnakeCaseSelected;
+        private bool _isPascalCaseSelected;
         private ObservableCollection<string> _history;
 
         public string InputText
@@ -39,6 +43,18 @@ namespace Tools.ViewModels.Pages
         {
             get => _isBase64DecodeSelected;
             set => SetProperty(ref _isBase64DecodeSelected, value);
+        }
+
+        public bool IsSnakeCaseSelected
+        {
+            get => _isSnakeCaseSelected;
+            set => SetProperty(ref _isSnakeCaseSelected, value);
+        }
+
+        public bool IsPascalCaseSelected
+        {
+            get => _isPascalCaseSelected;
+            set => SetProperty(ref _isPascalCaseSelected, value);
         }
 
         public ObservableCollection<string> History
@@ -76,6 +92,14 @@ namespace Tools.ViewModels.Pages
                 {
                     var base64EncodedBytes = Convert.FromBase64String(InputText);
                     OutputText = Encoding.UTF8.GetString(base64EncodedBytes);
+                }
+                else if (IsSnakeCaseSelected)
+                {
+                    OutputText = InputText.ToSnakeCase().ToUpperInvariant();
+                }
+                else if (IsPascalCaseSelected)
+                {
+                    OutputText = InputText.ToPascalCase();
                 }
                 History.Add(OutputText);
                 InputText = string.Empty; // Clear input text after conversion
