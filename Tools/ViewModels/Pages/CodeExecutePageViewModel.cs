@@ -5,7 +5,7 @@ using Prism.Mvvm;
 
 namespace Tools.ViewModels.Pages
 {
-    public class ImmediateWindowPageViewModel : BindableBase
+    public class CodeExecutePageViewModel : BindableBase
     {
         private string _immediateInput;
         private string _immediateOutput;
@@ -24,7 +24,7 @@ namespace Tools.ViewModels.Pages
 
         public ICommand ExecuteCommand { get; }
 
-        public ImmediateWindowPageViewModel()
+        public CodeExecutePageViewModel()
         {
             ExecuteCommand = new DelegateCommand(OnExecuteCommand);
         }

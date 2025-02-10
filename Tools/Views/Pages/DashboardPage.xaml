@@ -222,6 +222,40 @@
                     </StackPanel>
                 </Grid>
             </ui:CardAction>
+
+            <ui:CardAction
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="0,4,4,0"
+                Padding="0"
+                VerticalAlignment="Stretch"
+                Command="{Binding ViewModel.CardClickCommand, Mode=OneWay}"
+                CommandParameter="CodeExecute"
+                IsChevronVisible="False">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <ui:SymbolIcon
+                        Width="60"
+                        Margin="24,0,0,0"
+                        FontSize="48"
+                        Symbol="Code24" />
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="24"
+                        VerticalAlignment="Center">
+                        <ui:TextBlock
+                            Margin="0"
+                            FontTypography="BodyStrong"
+                            Text="Code Execute"
+                            TextWrapping="WrapWithOverflow" />
+                    </StackPanel>
+                </Grid>
+            </ui:CardAction>
         </Grid>
     </Grid>
 </Page>

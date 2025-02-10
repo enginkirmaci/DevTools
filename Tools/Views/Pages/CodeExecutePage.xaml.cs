@@ -4,11 +4,11 @@ using Tools.ViewModels.Pages;
 
 namespace Tools.Views.Pages
 {
-    public partial class ImmediateWindowPage : Page
+    public partial class CodeExecutePage : Page
     {
-        public ImmediateWindowPageViewModel ViewModel { get; }
+        public CodeExecutePageViewModel ViewModel { get; }
 
-        public ImmediateWindowPage(ImmediateWindowPageViewModel viewModel)
+        public CodeExecutePage(CodeExecutePageViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = this;
