@@ -1,13 +1,13 @@
 ﻿<ui:FluentWindow
     x:Class="Tools.Views.Windows.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Tools.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:pages="clr-namespace:Tools.Views.Pages"
-    xmlns:local="clr-namespace:Tools.Views.Windows"
+    xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="MainWindowView"
     Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
     Width="1450"
@@ -68,14 +68,14 @@
                         <ui:SymbolIcon Symbol="Home24" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="AI Playground" TargetPageType="{x:Type pages:AIPlaygroundPage}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="BotSparkle24" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="Nuget Copy" TargetPageType="{x:Type pages:NugetLocalPage}">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="BoxMultipleArrowRight20" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="Formatters" TargetPageType="{x:Type pages:FormattersPage}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="Code24" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="Host File Proxy" TargetPageType="{x:Type pages:HostFileProxyPage}">

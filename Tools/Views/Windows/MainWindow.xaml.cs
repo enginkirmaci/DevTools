@@ -39,7 +39,7 @@ public partial class MainWindow : IWindow
 
     private void MainWindowView_Loaded(object sender, RoutedEventArgs e)
     {
-        navigationService.Navigate(typeof(AIPlaygroundPage));
+        navigationService.Navigate(typeof(FormattersPage));
     }
 
     private void OnNavigationSelectionChanged(object sender, RoutedEventArgs e)

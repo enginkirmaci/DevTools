@@ -43,10 +43,4 @@
 		<Resource Include="Assets\logo.png" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Compile Update="Views\Pages\AIPlaygroundPage.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	</ItemGroup>
-
 </Project>
