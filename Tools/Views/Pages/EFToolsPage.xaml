@@ -57,7 +57,11 @@
             Grid.Row="1"
             Grid.Column="1"
             Margin="10">
-            <TextBox Text="{Binding CSharpOutput}" TextWrapping="Wrap" />
+            <TextBox
+                AcceptsReturn="True"
+                Text="{Binding CSharpOutput}"
+                TextAlignment="Left"
+                TextWrapping="Wrap" />
             <ui:Button
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
@@ -78,7 +82,11 @@
             Grid.Row="2"
             Grid.Column="1"
             Margin="10">
-            <TextBox Text="{Binding RepositoryOutput}" TextWrapping="Wrap" />
+            <TextBox
+                AcceptsReturn="True"
+                Text="{Binding RepositoryOutput}"
+                TextAlignment="Left"
+                TextWrapping="Wrap" />
             <ui:Button
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
