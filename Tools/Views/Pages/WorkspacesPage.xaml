@@ -19,14 +19,23 @@
     <Grid Margin="0,0,0,24" DataContext="{Binding ViewModel}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock FontSize="20" Text="Platforms" />
+        <ui:TextBox
+            Grid.Row="0"
+            Margin="0,0,0,24"
+            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
 
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Platforms}">
+        <TextBlock
+            Grid.Row="1"
+            FontSize="20"
+            Text="Platforms" />
+
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding FilteredPlatforms}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <ui:CardAction
@@ -41,7 +50,7 @@
 
                             <StackPanel
                                 Grid.Column="0"
-                                Margin="24"
+                                Margin="24,16"
                                 VerticalAlignment="Center">
                                 <ui:TextBlock
                                     Margin="0,0,0,4"
@@ -89,12 +98,12 @@
         </ItemsControl>
 
         <TextBlock
-            Grid.Row="2"
+            Grid.Row="3"
             Margin="0,24,0,0"
             FontSize="20"
             Text="Projects" />
 
-        <ItemsControl Grid.Row="3" ItemsSource="{Binding Workspaces}">
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding FilteredWorkspaces}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <ui:CardAction
@@ -154,7 +163,6 @@
                                     CommandParameter="{Binding FolderPath}"
                                     Icon="{ui:SymbolIcon Folder24}"
                                     ToolTip="Explorer" />
-
                             </StackPanel>
                         </Grid>
                     </ui:CardAction>
