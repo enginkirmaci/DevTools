@@ -1,8 +1,6 @@
 using Prism.Commands;
 using Prism.Mvvm;
-using System.Collections.ObjectModel;
-using Tools.Library.Converters;
-using Wpf.Ui;
+using Tools.Library.Entities;
 
 namespace Tools.ViewModels.Pages;
 
@@ -10,14 +8,21 @@ public class WorkspacesViewModel : BindableBase
 {
     public DelegateCommand<string> OpenSolutionCommand { get; set; }
     public DelegateCommand<string> OpenFolderCommand { get; set; }
+    public DelegateCommand<string> OpenWithVSCodeCommand { get; set; }
 
     public ObservableCollection<WorkspaceItem> Workspaces { get; set; }
-    public string WorkspaceFolderPath { get; set; } = @"H:\ARCHIVE\Projects\_old";
+    public ObservableCollection<WorkspaceItem> Platforms { get; set; }
+
+    public string[] FolderPaths { get; set; } = new string[] {
+        @"C:\Repos\CLEARING",
+        @"C:\Repos\STAKILPR"
+    };
 
     public WorkspacesViewModel()
     {
         OpenSolutionCommand = new DelegateCommand<string>(OpenSolution);
-        OpenFolderCommand = new DelegateCommand<string>(OpenFolder); 
+        OpenFolderCommand = new DelegateCommand<string>(OpenFolder);
+        OpenWithVSCodeCommand = new DelegateCommand<string>(OpenWithVSCode);
 
         _ = InitializeAsync();
     }
@@ -25,21 +30,39 @@ public class WorkspacesViewModel : BindableBase
     public async Task InitializeAsync()
     {
         Workspaces = new ObservableCollection<WorkspaceItem>();
-        var directories = Directory.GetDirectories(WorkspaceFolderPath, "*.git", SearchOption.AllDirectories);
-        foreach (var dir in directories)
+        Platforms = new ObservableCollection<WorkspaceItem>();
+
+        foreach (var folderPath in FolderPaths)
         {
-            var solutionFiles = Directory.GetFiles(Path.GetDirectoryName(dir), "*.sln");
-            foreach (var solutionFile in solutionFiles)
+            var directories = Directory.GetDirectories(folderPath, "*.git", SearchOption.AllDirectories);
+            foreach (var dir in directories)
             {
-                Workspaces.Add(new WorkspaceItem
+                var solutionFiles = Directory.GetFiles(Path.GetDirectoryName(dir), "*.sln");
+                foreach (var solutionFile in solutionFiles)
                 {
-                    SolutionName = Path.GetFileNameWithoutExtension(solutionFile),
-                    FolderPath = Path.GetDirectoryName(solutionFile),
-                    SolutionPath = solutionFile
-                });
+                    Workspaces.Add(new WorkspaceItem
+                    {
+                        SolutionName = Path.GetFileNameWithoutExtension(solutionFile),
+                        FolderPath = Path.GetDirectoryName(solutionFile),
+                        SolutionPath = solutionFile
+                    });
+                }
+
+                if (dir.Contains("platform"))
+                {
+                    var platformDir = dir.Replace(".git", string.Empty);
+
+                    Platforms.Add(new WorkspaceItem
+                    {
+                        PlatformName = Path.GetFileName(platformDir.TrimEnd(Path.DirectorySeparatorChar)),
+                        FolderPath = platformDir
+                    });
+                }
             }
         }
+
         Workspaces = new ObservableCollection<WorkspaceItem>(Workspaces.OrderBy(w => w.SolutionName));
+        Platforms = new ObservableCollection<WorkspaceItem>(Platforms.OrderBy(p => p.PlatformName));
     }
 
     private void OpenSolution(string solutionPath)
@@ -49,10 +72,12 @@ public class WorkspacesViewModel : BindableBase
             return;
         }
 
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        Process.Start(new ProcessStartInfo
         {
             FileName = solutionPath,
-            UseShellExecute = true
+            UseShellExecute = true,
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden
         });
     }
 
@@ -63,17 +88,29 @@ public class WorkspacesViewModel : BindableBase
             return;
         }
 
-        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+        Process.Start(new ProcessStartInfo
         {
             FileName = folderPath,
-            UseShellExecute = true
+            UseShellExecute = true,
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden
         });
     }
-}
 
-public class WorkspaceItem
-{
-    public string SolutionName { get; set; }
-    public string FolderPath { get; set; }
-    public string SolutionPath { get; set; }
+    private void OpenWithVSCode(string folderPath)
+    {
+        if (string.IsNullOrWhiteSpace(folderPath))
+        {
+            return;
+        }
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = "code",
+            Arguments = folderPath,
+            UseShellExecute = true,
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden
+        });
+    }
 }
