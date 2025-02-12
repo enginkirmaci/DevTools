@@ -80,6 +80,11 @@
                         <ui:SymbolIcon Symbol="Home24" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
+                <ui:NavigationViewItem Content="Workspaces" TargetPageType="{x:Type pages:WorkspacesPage}">
+                    <ui:NavigationViewItem.Icon>
+                        <ui:SymbolIcon Symbol="AppFolder24" />
+                    </ui:NavigationViewItem.Icon>
+                </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="Nuget Copy" TargetPageType="{x:Type pages:NugetLocalPage}">
                     <ui:NavigationViewItem.Icon>
                         <ui:SymbolIcon Symbol="BoxMultipleArrowRight20" />
