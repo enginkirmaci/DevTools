@@ -23,6 +23,7 @@ public class WorkspacesViewModel : BindableBase
     public ObservableCollection<WorkspaceItem> FilteredPlatforms { get; set; }
 
     private static string _filterText;
+
     public string FilterText
     {
         get => _filterText;
@@ -118,9 +119,7 @@ public class WorkspacesViewModel : BindableBase
         Process.Start(new ProcessStartInfo
         {
             FileName = solutionPath,
-            UseShellExecute = true,
-            CreateNoWindow = true,
-            WindowStyle = ProcessWindowStyle.Hidden
+            UseShellExecute = true
         });
     }
 
@@ -134,9 +133,7 @@ public class WorkspacesViewModel : BindableBase
         Process.Start(new ProcessStartInfo
         {
             FileName = folderPath,
-            UseShellExecute = true,
-            CreateNoWindow = true,
-            WindowStyle = ProcessWindowStyle.Hidden
+            UseShellExecute = true
         });
     }
 
