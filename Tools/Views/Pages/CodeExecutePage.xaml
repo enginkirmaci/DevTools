@@ -29,11 +29,12 @@
             AcceptsReturn="True"
             Text="{Binding ImmediateInput}" />
 
-        <Button
+        <ui:Button
             Grid.Row="0"
             Margin="10"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
+            Appearance="Primary"
             Command="{Binding ExecuteCommand}"
             Content="Execute" />
 

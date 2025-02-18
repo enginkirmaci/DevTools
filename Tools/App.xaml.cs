@@ -58,7 +58,7 @@ public partial class App
     private void OnStartup(object sender, StartupEventArgs e)
     {
         Log.Logger = new LoggerConfiguration()
-                   .MinimumLevel.Debug()
+                   .MinimumLevel.Error()
                    .WriteTo.File("logs\\log.txt", rollingInterval: RollingInterval.Day)
                    .CreateLogger();
         RegisterGlobalExceptionHandling(Log.Logger);
@@ -85,7 +85,7 @@ public partial class App
         //}
         //else
 
-        Log.Logger.Information("VideoOverlay Started");
+        Log.Logger.Information("Dev Tools Started");
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public partial class App
             //}
         }
 
-        Log.Logger.Information("VideoOverlay Exited");
+        Log.Logger.Information("Dev Tools Exited");
     }
 
     private void RegisterGlobalExceptionHandling(ILogger log)
