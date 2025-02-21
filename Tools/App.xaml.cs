@@ -1,6 +1,4 @@
 ﻿using DryIoc;
-using FileAndFolderDialog.Abstractions;
-using FileAndFolderDialog.Wpf;
 using Prism.DryIoc;
 using Prism.Ioc;
 using Serilog;
@@ -50,7 +48,6 @@ public partial class App
         containerRegistry.RegisterSingleton<INavigationService, NavigationService>();
         containerRegistry.RegisterSingleton<ISnackbarService, SnackbarService>();
         containerRegistry.RegisterSingleton<IContentDialogService, ContentDialogService>();
-        containerRegistry.RegisterScoped<IFolderDialogService, FolderDialogService>();
 
         AppContainer = containerRegistry.GetContainer();
     }

@@ -1,4 +1,4 @@
-﻿using FileAndFolderDialog.Abstractions;
+﻿using Microsoft.Win32;
 using Prism.Commands;
 using Prism.Mvvm;
 using Wpf.Ui;
@@ -7,8 +7,8 @@ namespace Tools.ViewModels.Pages;
 
 public class NugetLocalViewModel : BindableBase
 {
-    private readonly IFolderDialogService folderDialogService;
     private readonly ISnackbarService snackbarService;
+
     private FileSystemWatcher watcher;
     private ObservableCollection<string> fileList;
     private string watchFolder = "C:\\Repos\\STAKILPR-V2\\Clearing.Common";
@@ -27,10 +27,8 @@ public class NugetLocalViewModel : BindableBase
     public DelegateCommand<string> TextboxClickCommand { get; private set; }
 
     public NugetLocalViewModel(
-           IFolderDialogService folderDialogService,
            ISnackbarService snackbarService)
     {
-        this.folderDialogService = folderDialogService;
         this.snackbarService = snackbarService;
 
         _ = InitializeAsync();
@@ -41,16 +39,20 @@ public class NugetLocalViewModel : BindableBase
 
     private void TextboxClickCommandMethod(string operation)
     {
-        var result = folderDialogService.ShowSelectFolderDialog(new SelectFolderOptions() { SelectedPath = watchFolder });
-        if (!string.IsNullOrEmpty(result))
+        var folderDialog = new OpenFolderDialog
+        {
+            InitialDirectory = watchFolder
+        };
+
+        if (folderDialog.ShowDialog() == true)
         {
             if (operation == "Watch")
             {
-                WatchFolder = result;
+                WatchFolder = folderDialog.FolderName;
             }
             else
             {
-                CopyFolder = result;
+                CopyFolder = folderDialog.FolderName;
             }
         }
     }
