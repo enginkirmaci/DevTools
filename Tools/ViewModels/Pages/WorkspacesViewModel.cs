@@ -1,13 +1,6 @@
 using Prism.Commands;
 using Prism.Mvvm;
 using Tools.Library.Entities;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.IO;
 
 namespace Tools.ViewModels.Pages;
 
@@ -36,7 +29,7 @@ public class WorkspacesViewModel : BindableBase
 
     public string[] FolderPaths { get; set; } = new string[] {
         @"C:\Repos\CLEARING",
-        @"C:\Repos\STAKILPR"
+        @"C:\Repos\STAKILPR-V2"
     };
 
     public WorkspacesViewModel()

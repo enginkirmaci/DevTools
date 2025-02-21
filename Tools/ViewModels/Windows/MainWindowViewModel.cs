@@ -1,4 +1,8 @@
-﻿using Prism.Mvvm;
+﻿using System.Collections;
+using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Serialization;
+using Prism.Mvvm;
 
 namespace Tools.ViewModels.Windows
 {

@@ -11,8 +11,8 @@ public class NugetLocalViewModel : BindableBase
     private readonly ISnackbarService snackbarService;
     private FileSystemWatcher watcher;
     private ObservableCollection<string> fileList;
-    private string watchFolder = "C:\\Repos\\STAKILPR\\Clearing.Common";
-    private string copyFolder = "C:\\Repos\\STAKILPR\\Clearing.Common\\nuget";
+    private string watchFolder = "C:\\Repos\\STAKILPR-V2\\Clearing.Common";
+    private string copyFolder = "C:\\Repos\\STAKILPR-V2\\Clearing.Common\\nuget";
     private bool watchStarted = false;
     private int count = 0;
     private DateTime lastChanges = DateTime.Now;
