@@ -59,11 +59,11 @@ public class WorkspacesViewModel : BindableBase
                 if (!Directory.Exists(folderPath))
                 {
                     Debug.WriteLine($"Warning: Workspace scan folder not found: {folderPath}");
-                    continue; // Skip non-existent folders
+                    continue;
                 }
                 try
                 {
-                    var directories = Directory.GetDirectories(folderPath, _workspaceSettings.GitFolderPattern, SearchOption.AllDirectories);
+                    var directories = GetAccessibleDirectoriesRecursively(folderPath, _workspaceSettings.GitFolderPattern);
                     foreach (var dir in directories)
                     {
                         var parentDir = Path.GetDirectoryName(dir);
@@ -80,12 +80,10 @@ public class WorkspacesViewModel : BindableBase
                             });
                         }
 
-                        // Use platform folder name from settings for comparison
                         if (dir.Contains(_workspaceSettings.PlatformFolderName, StringComparison.OrdinalIgnoreCase))
                         {
-                            // More robust removal of the git pattern part (e.g., ".git") from the directory path
-                            var platformDir = parentDir; // Start with the parent directory of the .git folder
-                            if (Directory.Exists(platformDir)) // Ensure the directory exists
+                            var platformDir = parentDir;
+                            if (Directory.Exists(platformDir))
                             {
                                 Platforms.Add(new WorkspaceItem
                                 {
@@ -94,14 +92,13 @@ public class WorkspacesViewModel : BindableBase
                                 });
                             }
                         }
-                    } // End of inner foreach (var dir...)
-                } // End of try block <-- CORRECT PLACEMENT
-                catch (Exception ex) // Catch potential exceptions during directory scanning
+                    }
+                }
+                catch (Exception ex)
                 {
                     Debug.WriteLine($"Error scanning folder {folderPath}: {ex.Message}");
-                    // Optionally notify the user via Snackbar or log more formally
                 }
-            } // End of outer foreach (var folderPath...)
+            }
 
             Workspaces = new ObservableCollection<WorkspaceItem>(Workspaces.OrderBy(w => w.SolutionName));
             Platforms = new ObservableCollection<WorkspaceItem>(Platforms.OrderBy(p => p.PlatformName));
@@ -126,6 +123,43 @@ public class WorkspacesViewModel : BindableBase
         }
         RaisePropertyChanged(nameof(FilteredWorkspaces));
         RaisePropertyChanged(nameof(FilteredPlatforms));
+    }
+
+    private IEnumerable<string> GetAccessibleDirectoriesRecursively(string rootPath, string searchPattern)
+    {
+        var foundDirectories = new List<string>();
+        try
+        {
+            foreach (var dir in Directory.EnumerateDirectories(rootPath, searchPattern, SearchOption.TopDirectoryOnly))
+            {
+                foundDirectories.Add(dir);
+            }
+
+            var excludedFolders = _workspaceSettings?.ExcludedFolders ?? Array.Empty<string>();
+
+            foreach (var subDir in Directory.EnumerateDirectories(rootPath))
+            {
+                var subDirName = Path.GetFileName(subDir);
+
+                if (subDirName.Equals(searchPattern, StringComparison.OrdinalIgnoreCase) ||
+                    excludedFolders.Any(excluded => excluded.Equals(subDir, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                foundDirectories.AddRange(GetAccessibleDirectoriesRecursively(subDir, searchPattern));
+            }
+        }
+        catch (UnauthorizedAccessException)
+        {
+            Debug.WriteLine($"Access denied to folder: {rootPath}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error accessing folder {rootPath}: {ex.Message}");
+        }
+
+        return foundDirectories;
     }
 
     private void OpenSolution(string solutionPath)

@@ -1,11 +1,11 @@
 <Page
     x:Class="Tools.Views.Pages.WorkspacesPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Tools.Views.Pages"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:Tools.Views.Pages"
     Title="Workspaces Page"
     d:DataContext="{d:DesignInstance local:WorkspacesPage,
                                      IsDesignTimeCreatable=True}"
@@ -33,7 +33,8 @@
         <TextBlock
             Grid.Row="1"
             FontSize="20"
-            Text="Platforms" />
+            Text="Platforms"
+            Visibility="{Binding FilteredPlatforms, Converter={StaticResource EqualVisibilityConverter}}" />
 
         <ItemsControl Grid.Row="2" ItemsSource="{Binding FilteredPlatforms}">
             <ItemsControl.ItemTemplate>
