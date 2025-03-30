@@ -1,13 +1,7 @@
 using Prism.Commands;
 using Prism.Mvvm;
 using Tools.Library.Entities;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.IO;
+using Tools.Library.Services; // Add using for SettingsService
 
 namespace Tools.ViewModels.Pages;
 
@@ -22,7 +16,9 @@ public class WorkspacesViewModel : BindableBase
     public ObservableCollection<WorkspaceItem> FilteredWorkspaces { get; set; }
     public ObservableCollection<WorkspaceItem> FilteredPlatforms { get; set; }
 
-    private static string _filterText;
+    private static string _filterText = string.Empty;
+    private readonly ISettingsService _settingsService;
+    private WorkspacesSettings _workspaceSettings;
 
     public string FilterText
     {
@@ -34,13 +30,10 @@ public class WorkspacesViewModel : BindableBase
         }
     }
 
-    public string[] FolderPaths { get; set; } = new string[] {
-        @"C:\Repos\CLEARING",
-        @"C:\Repos\STAKILPR"
-    };
-
-    public WorkspacesViewModel()
+    public WorkspacesViewModel(ISettingsService settingsService)
     {
+        _settingsService = settingsService;
+
         OpenSolutionCommand = new DelegateCommand<string>(OpenSolution);
         OpenFolderCommand = new DelegateCommand<string>(OpenFolder);
         OpenWithVSCodeCommand = new DelegateCommand<string>(OpenWithVSCode);
@@ -53,36 +46,62 @@ public class WorkspacesViewModel : BindableBase
 
     public async Task InitializeAsync()
     {
-        if (!Workspaces.Any() && !Platforms.Any())
+        var settings = _settingsService.GetSettings();
+        _workspaceSettings = settings.Workspaces ?? new WorkspacesSettings();
+
+        // Check if settings provide folders and if workspaces/platforms are empty
+        if (_workspaceSettings.WorkspaceScanFolders != null &&
+            _workspaceSettings.WorkspaceScanFolders.Any() &&
+            !Workspaces.Any() && !Platforms.Any())
         {
-            foreach (var folderPath in FolderPaths)
+            foreach (var folderPath in _workspaceSettings.WorkspaceScanFolders)
             {
-                var directories = Directory.GetDirectories(folderPath, "*.git", SearchOption.AllDirectories);
-                foreach (var dir in directories)
+                if (!Directory.Exists(folderPath))
                 {
-                    var solutionFiles = Directory.GetFiles(Path.GetDirectoryName(dir), "*.sln");
-                    foreach (var solutionFile in solutionFiles)
-                    {
-                        Workspaces.Add(new WorkspaceItem
-                        {
-                            SolutionName = Path.GetFileNameWithoutExtension(solutionFile),
-                            FolderPath = Path.GetDirectoryName(solutionFile),
-                            SolutionPath = solutionFile
-                        });
-                    }
-
-                    if (dir.Contains("platform"))
-                    {
-                        var platformDir = dir.Replace(".git", string.Empty);
-
-                        Platforms.Add(new WorkspaceItem
-                        {
-                            PlatformName = Path.GetFileName(platformDir.TrimEnd(Path.DirectorySeparatorChar)),
-                            FolderPath = platformDir
-                        });
-                    }
+                    Debug.WriteLine($"Warning: Workspace scan folder not found: {folderPath}");
+                    continue; // Skip non-existent folders
                 }
-            }
+                try
+                {
+                    var directories = Directory.GetDirectories(folderPath, _workspaceSettings.GitFolderPattern, SearchOption.AllDirectories);
+                    foreach (var dir in directories)
+                    {
+                        var parentDir = Path.GetDirectoryName(dir);
+                        if (parentDir == null) continue;
+
+                        var solutionFiles = Directory.GetFiles(parentDir, _workspaceSettings.SolutionFilePattern);
+                        foreach (var solutionFile in solutionFiles)
+                        {
+                            Workspaces.Add(new WorkspaceItem
+                            {
+                                SolutionName = Path.GetFileNameWithoutExtension(solutionFile),
+                                FolderPath = Path.GetDirectoryName(solutionFile),
+                                SolutionPath = solutionFile
+                            });
+                        }
+
+                        // Use platform folder name from settings for comparison
+                        if (dir.Contains(_workspaceSettings.PlatformFolderName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            // More robust removal of the git pattern part (e.g., ".git") from the directory path
+                            var platformDir = parentDir; // Start with the parent directory of the .git folder
+                            if (Directory.Exists(platformDir)) // Ensure the directory exists
+                            {
+                                Platforms.Add(new WorkspaceItem
+                                {
+                                    PlatformName = Path.GetFileName(platformDir.TrimEnd(Path.DirectorySeparatorChar)),
+                                    FolderPath = platformDir
+                                });
+                            }
+                        }
+                    } // End of inner foreach (var dir...)
+                } // End of try block <-- CORRECT PLACEMENT
+                catch (Exception ex) // Catch potential exceptions during directory scanning
+                {
+                    Debug.WriteLine($"Error scanning folder {folderPath}: {ex.Message}");
+                    // Optionally notify the user via Snackbar or log more formally
+                }
+            } // End of outer foreach (var folderPath...)
 
             Workspaces = new ObservableCollection<WorkspaceItem>(Workspaces.OrderBy(w => w.SolutionName));
             Platforms = new ObservableCollection<WorkspaceItem>(Platforms.OrderBy(p => p.PlatformName));
@@ -146,7 +165,7 @@ public class WorkspacesViewModel : BindableBase
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = "code",
+            FileName = _workspaceSettings.VSCodeExecutable,
             Arguments = folderPath,
             UseShellExecute = true,
             CreateNoWindow = true,

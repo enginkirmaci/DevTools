@@ -43,4 +43,10 @@
 		<Resource Include="Assets\logo.png" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="settings.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
 </Project>
