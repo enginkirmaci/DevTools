@@ -41,6 +41,7 @@
             Margin="6"
             HorizontalAlignment="Right"
             VerticalAlignment="Center"
+            Appearance="Primary"
             Command="{Binding ConvertSqlCommand}"
             Content="Convert to C#"
             Icon="{ui:SymbolIcon ArrowSwap24}" />

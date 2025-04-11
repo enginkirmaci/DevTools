@@ -91,6 +91,7 @@
 
                     <ui:Button
                         Grid.Column="2"
+                        Appearance="Primary"
                         Command="{Binding ConvertCommand}"
                         Content="Convert"
                         Icon="{ui:SymbolIcon ArrowSwap24}" />

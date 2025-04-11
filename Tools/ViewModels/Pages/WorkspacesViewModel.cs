@@ -1,6 +1,7 @@
 using Prism.Commands;
 using Prism.Mvvm;
 using Tools.Library.Entities;
+using Tools.Library.Services; // Add using for SettingsService
 
 namespace Tools.ViewModels.Pages;
 
@@ -15,7 +16,9 @@ public class WorkspacesViewModel : BindableBase
     public ObservableCollection<WorkspaceItem> FilteredWorkspaces { get; set; }
     public ObservableCollection<WorkspaceItem> FilteredPlatforms { get; set; }
 
-    private static string _filterText;
+    private static string _filterText = string.Empty;
+    private readonly ISettingsService _settingsService;
+    private WorkspacesSettings _workspaceSettings;
 
     public string FilterText
     {
@@ -27,13 +30,10 @@ public class WorkspacesViewModel : BindableBase
         }
     }
 
-    public string[] FolderPaths { get; set; } = new string[] {
-        @"C:\Repos\CLEARING",
-        @"C:\Repos\STAKILPR-V2"
-    };
-
-    public WorkspacesViewModel()
+    public WorkspacesViewModel(ISettingsService settingsService)
     {
+        _settingsService = settingsService;
+
         OpenSolutionCommand = new DelegateCommand<string>(OpenSolution);
         OpenFolderCommand = new DelegateCommand<string>(OpenFolder);
         OpenWithVSCodeCommand = new DelegateCommand<string>(OpenWithVSCode);
@@ -46,34 +46,57 @@ public class WorkspacesViewModel : BindableBase
 
     public async Task InitializeAsync()
     {
-        if (!Workspaces.Any() && !Platforms.Any())
+        var settings = _settingsService.GetSettings();
+        _workspaceSettings = settings.Workspaces ?? new WorkspacesSettings();
+
+        // Check if settings provide folders and if workspaces/platforms are empty
+        if (_workspaceSettings.WorkspaceScanFolders != null &&
+            _workspaceSettings.WorkspaceScanFolders.Any() &&
+            !Workspaces.Any() && !Platforms.Any())
         {
-            foreach (var folderPath in FolderPaths)
+            foreach (var folderPath in _workspaceSettings.WorkspaceScanFolders)
             {
-                var directories = Directory.GetDirectories(folderPath, "*.git", SearchOption.AllDirectories);
-                foreach (var dir in directories)
+                if (!Directory.Exists(folderPath))
                 {
-                    var solutionFiles = Directory.GetFiles(Path.GetDirectoryName(dir), "*.sln");
-                    foreach (var solutionFile in solutionFiles)
+                    Debug.WriteLine($"Warning: Workspace scan folder not found: {folderPath}");
+                    continue;
+                }
+                try
+                {
+                    var directories = GetAccessibleDirectoriesRecursively(folderPath, _workspaceSettings.GitFolderPattern);
+                    foreach (var dir in directories)
                     {
-                        Workspaces.Add(new WorkspaceItem
-                        {
-                            SolutionName = Path.GetFileNameWithoutExtension(solutionFile),
-                            FolderPath = Path.GetDirectoryName(solutionFile),
-                            SolutionPath = solutionFile
-                        });
-                    }
+                        var parentDir = Path.GetDirectoryName(dir);
+                        if (parentDir == null) continue;
 
-                    if (dir.Contains("platform"))
-                    {
-                        var platformDir = dir.Replace(".git", string.Empty);
-
-                        Platforms.Add(new WorkspaceItem
+                        var solutionFiles = Directory.GetFiles(parentDir, _workspaceSettings.SolutionFilePattern);
+                        foreach (var solutionFile in solutionFiles)
                         {
-                            PlatformName = Path.GetFileName(platformDir.TrimEnd(Path.DirectorySeparatorChar)),
-                            FolderPath = platformDir
-                        });
+                            Workspaces.Add(new WorkspaceItem
+                            {
+                                SolutionName = Path.GetFileNameWithoutExtension(solutionFile),
+                                FolderPath = Path.GetDirectoryName(solutionFile),
+                                SolutionPath = solutionFile
+                            });
+                        }
+
+                        if (dir.Contains(_workspaceSettings.PlatformFolderName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            var platformDir = parentDir;
+                            if (Directory.Exists(platformDir))
+                            {
+                                Platforms.Add(new WorkspaceItem
+                                {
+                                    PlatformName = Path.GetFileName(platformDir.TrimEnd(Path.DirectorySeparatorChar)),
+                                    FolderPath = platformDir
+                                });
+                            }
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error scanning folder {folderPath}: {ex.Message}");
                 }
             }
 
@@ -100,6 +123,43 @@ public class WorkspacesViewModel : BindableBase
         }
         RaisePropertyChanged(nameof(FilteredWorkspaces));
         RaisePropertyChanged(nameof(FilteredPlatforms));
+    }
+
+    private IEnumerable<string> GetAccessibleDirectoriesRecursively(string rootPath, string searchPattern)
+    {
+        var foundDirectories = new List<string>();
+        try
+        {
+            foreach (var dir in Directory.EnumerateDirectories(rootPath, searchPattern, SearchOption.TopDirectoryOnly))
+            {
+                foundDirectories.Add(dir);
+            }
+
+            var excludedFolders = _workspaceSettings?.ExcludedFolders ?? Array.Empty<string>();
+
+            foreach (var subDir in Directory.EnumerateDirectories(rootPath))
+            {
+                var subDirName = Path.GetFileName(subDir);
+
+                if (subDirName.Equals(searchPattern, StringComparison.OrdinalIgnoreCase) ||
+                    excludedFolders.Any(excluded => excluded.Equals(subDir, StringComparison.OrdinalIgnoreCase)))
+                {
+                    continue;
+                }
+
+                foundDirectories.AddRange(GetAccessibleDirectoriesRecursively(subDir, searchPattern));
+            }
+        }
+        catch (UnauthorizedAccessException)
+        {
+            Debug.WriteLine($"Access denied to folder: {rootPath}");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error accessing folder {rootPath}: {ex.Message}");
+        }
+
+        return foundDirectories;
     }
 
     private void OpenSolution(string solutionPath)
@@ -139,7 +199,7 @@ public class WorkspacesViewModel : BindableBase
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = "code",
+            FileName = _workspaceSettings.VSCodeExecutable,
             Arguments = folderPath,
             UseShellExecute = true,
             CreateNoWindow = true,

@@ -1,23 +1,13 @@
 using Prism.Commands;
 using Prism.Mvvm;
 using Tools.Library.Formatters;
+using Tools.Library.Services; // Add using for SettingsService
+using Tools.Library.Entities; // Add using for Settings Entities
 
 namespace Tools.ViewModels.Pages
 {
     public class EFToolsPageViewModel : BindableBase
     {
-        private const string Template = @"
-public class {TABLENAME}Repository : QueryableRepository<{TABLENAME}, DbContext>, I{TABLENAME}Repository
-{
-    public {TABLENAME}Repository(DbContext context) : base(context)
-    {
-    }
-}
-
-public interface I{TABLENAME}Repository : IQueryableRepository<{TABLENAME}>
-{
-}";
-
         private string _sqlInput;
         private string _cSharpOutput;
         private string _repositoryOutput;
@@ -51,13 +41,19 @@ public interface I{TABLENAME}Repository : IQueryableRepository<{TABLENAME}>
         public ICommand CopyToClipboardCommand { get; }
         public ICommand CopyRepositoryToClipboardCommand { get; }
 
-        public EFToolsPageViewModel()
+        private readonly ISettingsService _settingsService;
+
+        public EFToolsPageViewModel(ISettingsService settingsService)
         {
+            _settingsService = settingsService;
+
             ConvertSqlCommand = new DelegateCommand(OnConvertSqlCommand);
             CopyToClipboardCommand = new DelegateCommand(OnCopyToClipboardCommand);
             CopyRepositoryToClipboardCommand = new DelegateCommand(OnCopyRepositoryToClipboardCommand);
 
-            RepositoryTemplate = Template;
+            // Load template from settings, fallback to default
+            var settings = _settingsService.GetSettings();
+            RepositoryTemplate = settings.EFToolsPage.RepositoryTemplate;
         }
 
         private void OnConvertSqlCommand()

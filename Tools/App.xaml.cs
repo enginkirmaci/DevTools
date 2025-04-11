@@ -2,8 +2,8 @@
 using Prism.DryIoc;
 using Prism.Ioc;
 using Serilog;
-using Tools.Library.Entities;
 using Tools.Library.Extensions;
+using Tools.Library.Services; // Added using statement
 using Tools.Views.Pages;
 using Tools.Views.Windows;
 using Wpf.Ui;
@@ -13,10 +13,12 @@ namespace Tools;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App
+public partial class App : PrismApplication // Inherit from PrismApplication
 {
-    public static IContainer AppContainer { get; set; }
+    // Remove static AppContainer, PrismApplication provides Container
+    // public static IContainer AppContainer { get; set; }
     public static Assembly Assembly => Assembly.GetExecutingAssembly();
+
     public static Type DefaultPage => typeof(DashboardPage);
 
     protected override Window CreateShell()
@@ -40,7 +42,7 @@ public partial class App
 
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        containerRegistry.RegisterSingleton<IWindow, MainWindow>();
+        // containerRegistry.RegisterSingleton<IWindow, MainWindow>(); // Removed - MainWindow is resolved by CreateShell
 
         containerRegistry.AddTransientFromNamespace("Tools.Views", Assembly);
         containerRegistry.AddTransientFromNamespace("Tools.ViewModels", Assembly);
@@ -49,13 +51,16 @@ public partial class App
         containerRegistry.RegisterSingleton<ISnackbarService, SnackbarService>();
         containerRegistry.RegisterSingleton<IContentDialogService, ContentDialogService>();
 
-        AppContainer = containerRegistry.GetContainer();
+        // Register the new settings service
+        containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
+
+        // AppContainer = containerRegistry.GetContainer(); // Remove this, use Prism's Container
     }
 
     private void OnStartup(object sender, StartupEventArgs e)
     {
         Log.Logger = new LoggerConfiguration()
-                   .MinimumLevel.Debug()
+                   .MinimumLevel.Error()
                    .WriteTo.File("logs\\log.txt", rollingInterval: RollingInterval.Day)
                    .CreateLogger();
         RegisterGlobalExceptionHandling(Log.Logger);
@@ -82,7 +87,7 @@ public partial class App
         //}
         //else
 
-        Log.Logger.Information("VideoOverlay Started");
+        Log.Logger.Information("Dev Tools Started");
     }
 
     /// <summary>
@@ -90,9 +95,10 @@ public partial class App
     /// </summary>
     private void OnExit(object sender, ExitEventArgs e)
     {
+        // Use Prism's Container property directly
         if (Container != null)
         {
-            //var snapServiceContainer = Container.Resolve<ISnapService>();
+            //var snapServiceContainer = Container.Resolve<ISnapService>(); // Example usage
             //if (snapServiceContainer != null)
             //{
             //    snapServiceContainer.Release();
@@ -100,7 +106,7 @@ public partial class App
             //}
         }
 
-        Log.Logger.Information("VideoOverlay Exited");
+        Log.Logger.Information("Dev Tools Exited");
     }
 
     private void RegisterGlobalExceptionHandling(ILogger log)
