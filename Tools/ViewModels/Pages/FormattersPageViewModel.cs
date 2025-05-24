@@ -1,12 +1,5 @@
 using Prism.Commands;
 using Prism.Mvvm;
-using System;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using Tools.Library.Extensions;
 
 namespace Tools.ViewModels.Pages
@@ -83,24 +76,30 @@ namespace Tools.ViewModels.Pages
         {
             if (!string.IsNullOrEmpty(InputText))
             {
-                if (IsBase64EncodeSelected)
+                var lines = InputText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+
+                var output = new StringBuilder();
+                foreach (var line in lines)
                 {
-                    var plainTextBytes = Encoding.UTF8.GetBytes(InputText);
-                    OutputText = Convert.ToBase64String(plainTextBytes);
+                    if (IsBase64EncodeSelected)
+                    {
+                        output.AppendLine(Convert.ToBase64String(Encoding.UTF8.GetBytes(line)));
+                    }
+                    else if (IsBase64DecodeSelected)
+                    {
+                        output.AppendLine(Encoding.UTF8.GetString(Convert.FromBase64String(line)));
+                    }
+                    else if (IsSnakeCaseSelected)
+                    {
+                        output.AppendLine(line.ToSnakeCase().ToUpperInvariant());
+                    }
+                    else if (IsPascalCaseSelected)
+                    {
+                        output.AppendLine(line.ToPascalCase());
+                    }
                 }
-                else if (IsBase64DecodeSelected)
-                {
-                    var base64EncodedBytes = Convert.FromBase64String(InputText);
-                    OutputText = Encoding.UTF8.GetString(base64EncodedBytes);
-                }
-                else if (IsSnakeCaseSelected)
-                {
-                    OutputText = InputText.ToSnakeCase().ToUpperInvariant();
-                }
-                else if (IsPascalCaseSelected)
-                {
-                    OutputText = InputText.ToPascalCase();
-                }
+                OutputText = output.ToString();
+
                 History.Add(OutputText);
                 InputText = string.Empty; // Clear input text after conversion
             }

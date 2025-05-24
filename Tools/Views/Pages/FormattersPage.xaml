@@ -1,11 +1,11 @@
 <Page
     x:Class="Tools.Views.Pages.FormattersPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Tools.Views.Pages"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:Tools.Views.Pages"
     Title="Formatters Page"
     d:DataContext="{d:DesignInstance local:FormattersPage,
                                      IsDesignTimeCreatable=True}"
@@ -59,7 +59,7 @@
 
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="160" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -72,18 +72,11 @@
                 CornerRadius="8">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
 
-                    <Label VerticalAlignment="Center">Input Text</Label>
                     <ui:TextBox
-                        Grid.Column="1"
                         Margin="8"
                         AcceptsReturn="True"
                         Text="{Binding InputText}"
@@ -91,6 +84,7 @@
 
                     <ui:Button
                         Grid.Column="2"
+                        VerticalAlignment="Center"
                         Appearance="Primary"
                         Command="{Binding ConvertCommand}"
                         Content="Convert"

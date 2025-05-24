@@ -13,10 +13,8 @@ namespace Tools;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : PrismApplication // Inherit from PrismApplication
+public partial class App : PrismApplication
 {
-    // Remove static AppContainer, PrismApplication provides Container
-    // public static IContainer AppContainer { get; set; }
     public static Assembly Assembly => Assembly.GetExecutingAssembly();
 
     public static Type DefaultPage => typeof(DashboardPage);
@@ -27,23 +25,8 @@ public partial class App : PrismApplication // Inherit from PrismApplication
         return applicationWindow;
     }
 
-    //protected override void ConfigureViewModelLocator()
-    //{
-    //    base.ConfigureViewModelLocator();
-
-    //    ViewModelLocationProvider.SetDefaultViewTypeToViewModelTypeResolver((viewType) =>
-    //    {
-    //        var viewName = viewType.FullName;
-    //        var viewAssemblyName = viewType.GetTypeInfo().Assembly.FullName;
-    //        var viewModelName = $"{viewName.Replace(".Views.", ".ViewModels.")}Model, {viewAssemblyName}";
-    //        return Type.GetType(viewModelName);
-    //    });
-    //}
-
     protected override void RegisterTypes(IContainerRegistry containerRegistry)
     {
-        // containerRegistry.RegisterSingleton<IWindow, MainWindow>(); // Removed - MainWindow is resolved by CreateShell
-
         containerRegistry.AddTransientFromNamespace("Tools.Views", Assembly);
         containerRegistry.AddTransientFromNamespace("Tools.ViewModels", Assembly);
 
@@ -53,8 +36,6 @@ public partial class App : PrismApplication // Inherit from PrismApplication
 
         // Register the new settings service
         containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
-
-        // AppContainer = containerRegistry.GetContainer(); // Remove this, use Prism's Container
     }
 
     private void OnStartup(object sender, StartupEventArgs e)
@@ -64,28 +45,6 @@ public partial class App : PrismApplication // Inherit from PrismApplication
                    .WriteTo.File("logs\\log.txt", rollingInterval: RollingInterval.Day)
                    .CreateLogger();
         RegisterGlobalExceptionHandling(Log.Logger);
-
-        //if (SnapIt.Properties.Settings.Default.RunAsAdmin && !Dev.SkipRunAsAdmin)
-        //{
-        //    if (e.Args.Length > 0 && RunAsAdministrator.IsAdmin(e.Args))
-        //    {
-        //        if (!ApplicationInstance.RegisterSingleInstance())
-        //        {
-        //            NotifyIcon.ShowBalloonTip(3000, null, $"Only one instance of {Constants.AppName} can run at the same time.", ToolTipIcon.Warning);
-        //            NotifyIcon.Visible = true;
-
-        //            Shutdown();
-        //            return;
-        //        }
-        //    }
-        //    else if (!Dev.IsActive)
-        //    {
-        //        RunAsAdministrator.Run();
-        //        Shutdown();
-        //        return;
-        //    }
-        //}
-        //else
 
         Log.Logger.Information("Dev Tools Started");
     }
