@@ -41,19 +41,29 @@ public class WorkspacesViewModel : BindableBase
         FilteredWorkspaces = new ObservableCollection<WorkspaceItem>();
         FilteredPlatforms = new ObservableCollection<WorkspaceItem>();
 
-        _ = InitializeAsync();
+        // Do not block the UI thread; fire-and-forget async initialization
+        InitializeAsyncSafe();
+    }
+
+    // Helper to safely run async initialization without blocking UI thread
+    private async void InitializeAsyncSafe()
+    {
+        await InitializeAsync();
     }
 
     public async Task InitializeAsync()
     {
-        var settings = _settingsService.GetSettings();
+        // Offload blocking I/O to background thread
+        var settings = await Task.Run(() => _settingsService.GetSettings());
         _workspaceSettings = settings.Workspaces ?? new WorkspacesSettings();
 
-        // Check if settings provide folders and if workspaces/platforms are empty
         if (_workspaceSettings.WorkspaceScanFolders != null &&
             _workspaceSettings.WorkspaceScanFolders.Any() &&
             !Workspaces.Any() && !Platforms.Any())
         {
+            var workspaces = new List<WorkspaceItem>();
+            var platforms = new List<WorkspaceItem>();
+
             foreach (var folderPath in _workspaceSettings.WorkspaceScanFolders)
             {
                 if (!Directory.Exists(folderPath))
@@ -63,16 +73,25 @@ public class WorkspacesViewModel : BindableBase
                 }
                 try
                 {
-                    var directories = GetAccessibleDirectoriesRecursively(folderPath, _workspaceSettings.GitFolderPattern);
+                    // Offload directory scanning to background thread
+                    var directories = await Task.Run(() =>
+                        GetAccessibleDirectoriesRecursively(folderPath, _workspaceSettings.GitFolderPattern).ToList()
+                    );
                     foreach (var dir in directories)
                     {
                         var parentDir = Path.GetDirectoryName(dir);
                         if (parentDir == null) continue;
 
-                        var solutionFiles = Directory.GetFiles(parentDir, _workspaceSettings.SolutionFilePattern);
+                        string[] solutionFiles = Array.Empty<string>();
+                        // Offload file search to background thread
+                        await Task.Run(() =>
+                        {
+                            solutionFiles = Directory.GetFiles(parentDir, _workspaceSettings.SolutionFilePattern);
+                        });
+
                         foreach (var solutionFile in solutionFiles)
                         {
-                            Workspaces.Add(new WorkspaceItem
+                            workspaces.Add(new WorkspaceItem
                             {
                                 SolutionName = Path.GetFileNameWithoutExtension(solutionFile),
                                 FolderPath = Path.GetDirectoryName(solutionFile),
@@ -85,7 +104,7 @@ public class WorkspacesViewModel : BindableBase
                             var platformDir = parentDir;
                             if (Directory.Exists(platformDir))
                             {
-                                Platforms.Add(new WorkspaceItem
+                                platforms.Add(new WorkspaceItem
                                 {
                                     PlatformName = Path.GetFileName(platformDir.TrimEnd(Path.DirectorySeparatorChar)),
                                     FolderPath = platformDir
@@ -100,11 +119,18 @@ public class WorkspacesViewModel : BindableBase
                 }
             }
 
-            Workspaces = new ObservableCollection<WorkspaceItem>(Workspaces.OrderBy(w => w.SolutionName));
-            Platforms = new ObservableCollection<WorkspaceItem>(Platforms.OrderBy(p => p.PlatformName));
+            // Update collections on UI thread
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                Workspaces = new ObservableCollection<WorkspaceItem>(workspaces.OrderBy(w => w.SolutionName));
+                Platforms = new ObservableCollection<WorkspaceItem>(platforms.OrderBy(p => p.PlatformName));
+                ApplyFilter();
+            });
         }
-
-        ApplyFilter();
+        else
+        {
+            ApplyFilter();
+        }
     }
 
     private void ApplyFilter()
