@@ -2,7 +2,6 @@ using Prism.Commands;
 using Prism.Mvvm;
 using Tools.Library.Formatters;
 using Tools.Library.Services; // Add using for SettingsService
-using Tools.Library.Entities; // Add using for Settings Entities
 
 namespace Tools.ViewModels.Pages
 {
@@ -51,8 +50,13 @@ namespace Tools.ViewModels.Pages
             CopyToClipboardCommand = new DelegateCommand(OnCopyToClipboardCommand);
             CopyRepositoryToClipboardCommand = new DelegateCommand(OnCopyRepositoryToClipboardCommand);
 
+            _ = InitializeAsync();
+        }
+
+        public async Task InitializeAsync()
+        {
             // Load template from settings, fallback to default
-            var settings = _settingsService.GetSettings();
+            var settings = await _settingsService.GetSettingsAsync();
             RepositoryTemplate = settings.EFToolsPage.RepositoryTemplate;
         }
 

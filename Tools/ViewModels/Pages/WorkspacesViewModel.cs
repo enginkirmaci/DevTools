@@ -42,19 +42,15 @@ public class WorkspacesViewModel : BindableBase
         FilteredPlatforms = new ObservableCollection<WorkspaceItem>();
 
         // Do not block the UI thread; fire-and-forget async initialization
-        InitializeAsyncSafe();
+        _ = InitializeAsync();
     }
 
     // Helper to safely run async initialization without blocking UI thread
-    private async void InitializeAsyncSafe()
-    {
-        await InitializeAsync();
-    }
 
     public async Task InitializeAsync()
     {
         // Offload blocking I/O to background thread
-        var settings = await Task.Run(() => _settingsService.GetSettings());
+        var settings = await _settingsService.GetSettingsAsync();
         _workspaceSettings = settings.Workspaces ?? new WorkspacesSettings();
 
         if (_workspaceSettings.WorkspaceScanFolders != null &&
@@ -77,6 +73,7 @@ public class WorkspacesViewModel : BindableBase
                     var directories = await Task.Run(() =>
                         GetAccessibleDirectoriesRecursively(folderPath, _workspaceSettings.GitFolderPattern).ToList()
                     );
+
                     foreach (var dir in directories)
                     {
                         var parentDir = Path.GetDirectoryName(dir);

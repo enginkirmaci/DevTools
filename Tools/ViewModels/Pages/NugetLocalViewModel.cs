@@ -48,7 +48,7 @@ public class NugetLocalViewModel : BindableBase
     {
         FileList = new ObservableCollection<string>();
 
-        var settings = _settingsService.GetSettings();
+        var settings = await _settingsService.GetSettingsAsync();
         _nugetSettings = settings.NugetLocal ?? new NugetLocalSettings();
 
         WatchFolder = _nugetSettings.WatchFolder ?? string.Empty;
