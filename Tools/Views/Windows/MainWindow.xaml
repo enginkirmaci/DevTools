@@ -29,16 +29,16 @@
 
     <Grid>
 
-        <tray:NotifyIcon
+        <!--<tray:NotifyIcon
             Grid.Row="0"
             FocusOnLeftClick="True"
             Icon="pack://application:,,,/Assets/logo.png"
             MenuOnRightClick="True"
             TooltipText="{Binding ViewModel.ApplicationTitle, Mode=OneWay}">
-            <!--<tray:NotifyIcon.Menu>
+            <tray:NotifyIcon.Menu>
         <ContextMenu ItemsSource="{Binding ViewModel.TrayMenuItems, Mode=OneWay}" />
-    </tray:NotifyIcon.Menu>-->
-        </tray:NotifyIcon>
+    </tray:NotifyIcon.Menu>
+        </tray:NotifyIcon>-->
 
         <ui:NavigationView
             x:Name="NavigationView"
