@@ -5,8 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Tools.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:pages="clr-namespace:Tools.Views.Pages"
-    xmlns:tray="http://schemas.lepo.co/wpfui/2022/xaml/tray"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     x:Name="MainWindowView"
     Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
@@ -48,6 +46,7 @@
             FrameMargin="0"
             IsBackButtonVisible="Visible"
             IsPaneToggleVisible="True"
+            MenuItemsSource="{Binding ViewModel.MenuItems}"
             OpenPaneLength="310"
             PaneClosed="NavigationView_OnPaneClosed"
             PaneDisplayMode="Left"
@@ -73,46 +72,6 @@
                     <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
                 </Grid>
             </ui:NavigationView.ContentOverlay>
-            <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="Dashboard" TargetPageType="{x:Type pages:DashboardPage}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Home24" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="Workspaces" TargetPageType="{x:Type pages:WorkspacesPage}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="AppFolder24" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="Nuget Copy" TargetPageType="{x:Type pages:NugetLocalPage}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="BoxMultipleArrowRight20" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="Formatters" TargetPageType="{x:Type pages:FormattersPage}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="TextNumberFormat24" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem
-                    Content="Host File Proxy"
-                    TargetPageType="{x:Type pages:HostFileProxyPage}"
-                    Visibility="Collapsed">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="VirtualNetwork20" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="EF Tools" TargetPageType="{x:Type pages:EFToolsPage}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Database24" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="Code Execute" TargetPageType="{x:Type pages:CodeExecutePage}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Code24" />
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-            </ui:NavigationView.MenuItems>
         </ui:NavigationView>
 
         <ContentPresenter x:Name="RootContentDialog" Grid.Row="0" />

@@ -1,4 +1,6 @@
 using Tools.Library.Entities;
+using Tools.Views.Pages;
+using Wpf.Ui.Controls;
 
 namespace Tools.Provider;
 
@@ -14,7 +16,8 @@ public static class NavigationCollectionProvider
                 Subtitle = "Manage your workspaces",
                 Symbol = "AppFolder24",
                 Command = cardClickCommand,
-                CommandParameter = "Workspaces"
+                CommandParameter = "Workspaces",
+                TargetPageType = typeof(WorkspacesPage)
             },
             new NavigationItem
             {
@@ -22,7 +25,8 @@ public static class NavigationCollectionProvider
                 Subtitle = "copy new nuget packages to destination",
                 Symbol = "BoxMultipleArrowRight20",
                 Command = cardClickCommand,
-                CommandParameter = "NugetLocal"
+                CommandParameter = "NugetLocal",
+                TargetPageType = typeof(NugetLocalPage)
             },
             new NavigationItem
             {
@@ -30,7 +34,8 @@ public static class NavigationCollectionProvider
                 Subtitle = string.Empty,
                 Symbol = "TextNumberFormat24",
                 Command = cardClickCommand,
-                CommandParameter = "Formatters"
+                CommandParameter = "Formatters",
+                TargetPageType = typeof(FormattersPage)
             },
             new NavigationItem
             {
@@ -38,7 +43,8 @@ public static class NavigationCollectionProvider
                 Subtitle = "Entity Framework tools and utilities",
                 Symbol = "Database24",
                 Command = cardClickCommand,
-                CommandParameter = "EFTools"
+                CommandParameter = "EFTools",
+                TargetPageType = typeof(EFToolsPage)
             },
             new NavigationItem
             {
@@ -46,8 +52,34 @@ public static class NavigationCollectionProvider
                 Subtitle = string.Empty,
                 Symbol = "Code24",
                 Command = cardClickCommand,
-                CommandParameter = "CodeExecute"
+                CommandParameter = "CodeExecute",
+                TargetPageType = typeof(CodeExecutePage)
             }
         };
+    }
+
+    public static ObservableCollection<NavigationViewItem> GetNavigationViewItems()
+    {
+        var result = new ObservableCollection<NavigationViewItem>
+        {
+            new NavigationViewItem
+            {
+                Content = "Dashboard",
+                Icon = new SymbolIcon(SymbolRegular.Home24),
+                TargetPageType = typeof(DashboardPage)
+            }
+        };
+
+        foreach (NavigationItem item in GetNavigationItems(null))
+        {
+            result.Add(new NavigationViewItem
+            {
+                Content = item.Title,
+                Icon = new SymbolIcon((SymbolRegular)Enum.Parse(typeof(SymbolRegular), item.Symbol)),
+                TargetPageType = item.TargetPageType
+            });
+        }
+
+        return result;
     }
 }
