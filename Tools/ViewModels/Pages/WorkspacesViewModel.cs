@@ -1,7 +1,7 @@
 using Prism.Commands;
 using Prism.Mvvm;
 using Tools.Library.Entities;
-using Tools.Library.Services; // Add using for SettingsService
+using Tools.Library.Services;
 
 namespace Tools.ViewModels.Pages;
 
@@ -10,6 +10,7 @@ public class WorkspacesViewModel : BindableBase
     public DelegateCommand<string> OpenSolutionCommand { get; set; }
     public DelegateCommand<string> OpenFolderCommand { get; set; }
     public DelegateCommand<string> OpenWithVSCodeCommand { get; set; }
+    public DelegateCommand RefreshCommand { get; set; }
 
     public static ObservableCollection<WorkspaceItem> Workspaces { get; set; } = new ObservableCollection<WorkspaceItem>();
     public static ObservableCollection<WorkspaceItem> Platforms { get; set; } = new ObservableCollection<WorkspaceItem>();
@@ -37,6 +38,13 @@ public class WorkspacesViewModel : BindableBase
         OpenSolutionCommand = new DelegateCommand<string>(OpenSolution);
         OpenFolderCommand = new DelegateCommand<string>(OpenFolder);
         OpenWithVSCodeCommand = new DelegateCommand<string>(OpenWithVSCode);
+        RefreshCommand = new DelegateCommand(async () =>
+        {
+            Workspaces = new ObservableCollection<WorkspaceItem>();
+            Platforms = new ObservableCollection<WorkspaceItem>();
+
+            await InitializeAsync();
+        });
 
         FilteredWorkspaces = new ObservableCollection<WorkspaceItem>();
         FilteredPlatforms = new ObservableCollection<WorkspaceItem>();

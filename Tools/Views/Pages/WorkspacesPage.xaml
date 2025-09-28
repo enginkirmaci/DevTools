@@ -25,10 +25,26 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ui:TextBox
-            Grid.Row="0"
-            Margin="0,0,0,24"
-            Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
+        <!--  Grid with filter text box and refresh button  -->
+        <Grid Grid.Row="0" Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!--  TextBox with a margin to separate it from the button  -->
+            <ui:TextBox
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!--  Refresh button  -->
+            <ui:Button
+                Grid.Column="1"
+                Command="{Binding RefreshCommand}"
+                Icon="{ui:SymbolIcon ArrowClockwise24}"
+                ToolTip="Refresh workspaces" />
+        </Grid>
 
         <TextBlock Grid.Row="1" FontSize="20">
             <TextBlock.Text>
