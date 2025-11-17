@@ -4,6 +4,7 @@ using Prism.Ioc;
 using Serilog;
 using Tools.Library.Extensions;
 using Tools.Library.Services; // Added using statement
+using Tools.Services;
 using Tools.Views.Pages;
 using Tools.Views.Windows;
 using Wpf.Ui;
@@ -33,6 +34,7 @@ public partial class App : PrismApplication
         containerRegistry.RegisterSingleton<INavigationService, NavigationService>();
         containerRegistry.RegisterSingleton<ISnackbarService, SnackbarService>();
         containerRegistry.RegisterSingleton<IContentDialogService, ContentDialogService>();
+        containerRegistry.RegisterSingleton<IClipboardPasswordService, ClipboardPasswordService>();
 
         // Register the new settings service
         containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();

@@ -1,4 +1,5 @@
 ﻿using Tools.Library.Entities;
+using Tools.Services;
 using Tools.ViewModels.Windows;
 using Tools.Views.Pages;
 using Wpf.Ui;
@@ -20,7 +21,8 @@ public partial class MainWindow : IWindow
         INavigationService navigationService,
         IServiceProvider serviceProvider,
         ISnackbarService snackbarService,
-        IContentDialogService contentDialogService)
+        IContentDialogService contentDialogService,
+        IClipboardPasswordService clipboardPasswordService)
     {
         SystemThemeWatcher.Watch(this);
 
@@ -33,6 +35,8 @@ public partial class MainWindow : IWindow
         snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         navigationService.SetNavigationControl(NavigationView);
         contentDialogService.SetDialogHost(RootContentDialog);
+
+        clipboardPasswordService.RegisterHotKeys();
 
         NavigationView.SetServiceProvider(serviceProvider);
     }

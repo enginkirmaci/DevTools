@@ -39,6 +39,15 @@ public static class NavigationCollectionProvider
             },
             new NavigationItem
             {
+                Title = "Clipboard Password",
+                Subtitle = "Generate and copy passwords",
+                Symbol = "ClipboardPaste24",
+                Command = cardClickCommand,
+                CommandParameter = "ClipboardPassword",
+                TargetPageType = typeof(ClipboardPasswordPage)
+            },
+            new NavigationItem
+            {
                 Title = "EF Tools",
                 Subtitle = "Entity Framework tools and utilities",
                 Symbol = "Database24",
