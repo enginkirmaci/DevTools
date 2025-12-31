@@ -1,20 +1,20 @@
-﻿using Tools.ViewModels.Pages;
-using Wpf.Ui.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
+using Tools.ViewModels.Pages;
 
 namespace Tools.Views.Pages;
 
-/// <summary>
-/// Interaction logic for DashboardPage.xaml
-/// </summary>
-public partial class DashboardPage : INavigableView<DashboardViewModel>
+public sealed partial class DashboardPage : Page
 {
     public DashboardViewModel ViewModel { get; }
 
     public DashboardPage(DashboardViewModel viewModel)
     {
         ViewModel = viewModel;
-        DataContext = this;
+        this.InitializeComponent();
+    }
 
-        InitializeComponent();
+    private void GridView_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        // Navigation is handled through the command binding
     }
 }

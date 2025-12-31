@@ -1,116 +1,110 @@
-﻿using DryIoc;
-using Prism.DryIoc;
-using Prism.Ioc;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Serilog;
-using Tools.Library.Extensions;
-using Tools.Library.Services; // Added using statement
+using Tools.Library.Services;
 using Tools.Services;
+using Tools.ViewModels.Pages;
+using Tools.ViewModels.Windows;
 using Tools.Views.Pages;
 using Tools.Views.Windows;
-using Wpf.Ui;
 
 namespace Tools;
 
 /// <summary>
-/// Interaction logic for App.xaml
+/// Provides application-specific behavior to supplement the default Application class.
 /// </summary>
-public partial class App : PrismApplication
+public partial class App : Application
 {
-    public static Assembly Assembly => Assembly.GetExecutingAssembly();
-
+    public static IHost Host { get; private set; } = null!;
+    public static IServiceProvider Services => Host.Services;
     public static Type DefaultPage => typeof(DashboardPage);
 
-    protected override Window CreateShell()
+    private Window? _mainWindow;
+
+    /// <summary>
+    /// Initializes the singleton application object.
+    /// </summary>
+    public App()
     {
-        var applicationWindow = Container.Resolve<MainWindow>();
-        return applicationWindow;
-    }
+        this.InitializeComponent();
 
-    protected override void RegisterTypes(IContainerRegistry containerRegistry)
-    {
-        containerRegistry.AddTransientFromNamespace("Tools.Views", Assembly);
-        containerRegistry.AddTransientFromNamespace("Tools.ViewModels", Assembly);
-
-        containerRegistry.RegisterSingleton<INavigationService, NavigationService>();
-        containerRegistry.RegisterSingleton<ISnackbarService, SnackbarService>();
-        containerRegistry.RegisterSingleton<IContentDialogService, ContentDialogService>();
-        containerRegistry.RegisterSingleton<IClipboardPasswordService, ClipboardPasswordService>();
-
-        // Register the new settings service
-        containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
-    }
-
-    private void OnStartup(object sender, StartupEventArgs e)
-    {
+        // Configure Serilog
         Log.Logger = new LoggerConfiguration()
-                   .MinimumLevel.Error()
-                   .WriteTo.File("logs\\log.txt", rollingInterval: RollingInterval.Day)
-                   .CreateLogger();
-        RegisterGlobalExceptionHandling(Log.Logger);
+            .MinimumLevel.Error()
+            .WriteTo.File("logs\\log.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        // Build the host with DI
+        Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
+            .ConfigureServices((context, services) =>
+            {
+                ConfigureServices(services);
+            })
+            .Build();
 
         Log.Logger.Information("Dev Tools Started");
     }
 
+    private static void ConfigureServices(IServiceCollection services)
+    {
+        // Register Windows
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<MainWindowViewModel>();
+
+        // Register Pages
+        services.AddTransient<DashboardPage>();
+        services.AddTransient<DashboardViewModel>();
+        services.AddTransient<WorkspacesPage>();
+        services.AddTransient<WorkspacesViewModel>();
+        services.AddTransient<FormattersPage>();
+        services.AddTransient<FormattersPageViewModel>();
+        services.AddTransient<NugetLocalPage>();
+        services.AddTransient<NugetLocalViewModel>();
+        services.AddTransient<EFToolsPage>();
+        services.AddTransient<EFToolsPageViewModel>();
+        services.AddTransient<CodeExecutePage>();
+        services.AddTransient<CodeExecutePageViewModel>();
+        services.AddTransient<ClipboardPasswordPage>();
+        services.AddTransient<ClipboardPasswordPageViewModel>();
+        services.AddTransient<HostFileProxyPage>();
+        services.AddTransient<HostFileProxyViewModel>();
+
+        // Register Services
+        services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<IClipboardPasswordService, ClipboardPasswordService>();
+    }
+
     /// <summary>
-    /// Occurs when the application is closing.
+    /// Invoked when the application is launched.
     /// </summary>
-    private void OnExit(object sender, ExitEventArgs e)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        // Use Prism's Container property directly
-        if (Container != null)
-        {
-            //var snapServiceContainer = Container.Resolve<ISnapService>(); // Example usage
-            //if (snapServiceContainer != null)
-            //{
-            //    snapServiceContainer.Release();
-            //    NotifyIcon.Dispose();
-            //}
-        }
-
-        Log.Logger.Information("Dev Tools Exited");
+        _mainWindow = Services.GetRequiredService<MainWindow>();
+        _mainWindow.Activate();
     }
 
-    private void RegisterGlobalExceptionHandling(ILogger log)
+    public static TService GetService<TService>() where TService : class
     {
-        // this is the line you really want
-        AppDomain.CurrentDomain.UnhandledException +=
-            (sender, args) => CurrentDomainOnUnhandledException(args, log);
-
-        // optional: hooking up some more handlers
-        // remember that you need to hook up additional handlers when
-        // logging from other dispatchers, shedulers, or applications
-        DispatcherUnhandledException += (sender, args) => CurrentOnDispatcherUnhandledException(args, log);
-
-        Dispatcher.UnhandledException += (sender, args) => DispatcherOnUnhandledException(args, log);
-
-        TaskScheduler.UnobservedTaskException +=
-            (sender, args) => TaskSchedulerOnUnobservedTaskException(args, log);
+        return Services.GetRequiredService<TService>();
     }
 
-    private static void CurrentDomainOnUnhandledException(UnhandledExceptionEventArgs args, ILogger log)
+    public static Window MainWindow => ((App)Current)._mainWindow!;
+}
+
+/// <summary>
+/// Simple BooleanToVisibilityConverter for WinUI 3
+/// </summary>
+public class BooleanToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, string language)
     {
-        var exception = args.ExceptionObject as Exception;
-        var terminatingMessage = args.IsTerminating ? " The application is terminating." : string.Empty;
-        var exceptionMessage = exception?.Message ?? "An unmanaged exception occured.";
-        var message = string.Concat(exceptionMessage, terminatingMessage);
-        log.Error(exception, message);
+        return value is bool b && b ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    private static void CurrentOnDispatcherUnhandledException(DispatcherUnhandledExceptionEventArgs args, ILogger log)
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
-        log.Error(args.Exception, args.Exception.Message);
-        args.Handled = true;
-    }
-
-    private static void DispatcherOnUnhandledException(DispatcherUnhandledExceptionEventArgs args, ILogger log)
-    {
-        log.Error(args.Exception, args.Exception.Message);
-        args.Handled = true;
-    }
-
-    private static void TaskSchedulerOnUnobservedTaskException(UnobservedTaskExceptionEventArgs args, ILogger log)
-    {
-        log.Error(args.Exception, args.Exception.Message);
-        args.SetObserved();
+        return value is Visibility v && v == Visibility.Visible;
     }
 }

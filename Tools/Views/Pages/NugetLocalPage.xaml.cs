@@ -1,17 +1,15 @@
-﻿using Tools.ViewModels.Pages;
-using Wpf.Ui.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
+using Tools.ViewModels.Pages;
 
 namespace Tools.Views.Pages;
 
-public partial class NugetLocalPage : INavigableView<NugetLocalViewModel>
+public sealed partial class NugetLocalPage : Page
 {
     public NugetLocalViewModel ViewModel { get; }
 
     public NugetLocalPage(NugetLocalViewModel viewModel)
     {
         ViewModel = viewModel;
-        DataContext = this;
-
-        InitializeComponent();
+        this.InitializeComponent();
     }
 }

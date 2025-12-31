@@ -1,116 +1,89 @@
-using Prism.Commands;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Tools.Library.Extensions;
+using Windows.ApplicationModel.DataTransfer;
 
-namespace Tools.ViewModels.Pages
+namespace Tools.ViewModels.Pages;
+
+public partial class FormattersPageViewModel : ObservableObject
 {
-    public class FormattersPageViewModel : BindableBase
+    [ObservableProperty]
+    private string _inputText = string.Empty;
+
+    [ObservableProperty]
+    private string _outputText = string.Empty;
+
+    [ObservableProperty]
+    private bool _isBase64EncodeSelected = true;
+
+    [ObservableProperty]
+    private bool _isBase64DecodeSelected;
+
+    [ObservableProperty]
+    private bool _isSnakeCaseSelected;
+
+    [ObservableProperty]
+    private bool _isPascalCaseSelected;
+
+    [ObservableProperty]
+    private ObservableCollection<string> _history = new();
+
+    public IRelayCommand ConvertCommand { get; }
+    public IRelayCommand<string> CopyToClipboardCommand { get; }
+
+    public FormattersPageViewModel()
     {
-        private string _inputText;
-        private string _outputText;
-        private bool _isBase64EncodeSelected = true;
-        private bool _isBase64DecodeSelected;
-        private bool _isSnakeCaseSelected;
-        private bool _isPascalCaseSelected;
-        private ObservableCollection<string> _history;
+        ConvertCommand = new RelayCommand(OnConvert);
+        CopyToClipboardCommand = new RelayCommand<string>(OnCopyToClipboard);
+    }
 
-        public string InputText
+    private void OnConvert()
+    {
+        if (!string.IsNullOrEmpty(InputText))
         {
-            get => _inputText;
-            set => SetProperty(ref _inputText, value);
-        }
+            var lines = InputText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
-        public string OutputText
-        {
-            get => _outputText;
-            set => SetProperty(ref _outputText, value);
-        }
-
-        public bool IsBase64EncodeSelected
-        {
-            get => _isBase64EncodeSelected;
-            set => SetProperty(ref _isBase64EncodeSelected, value);
-        }
-
-        public bool IsBase64DecodeSelected
-        {
-            get => _isBase64DecodeSelected;
-            set => SetProperty(ref _isBase64DecodeSelected, value);
-        }
-
-        public bool IsSnakeCaseSelected
-        {
-            get => _isSnakeCaseSelected;
-            set => SetProperty(ref _isSnakeCaseSelected, value);
-        }
-
-        public bool IsPascalCaseSelected
-        {
-            get => _isPascalCaseSelected;
-            set => SetProperty(ref _isPascalCaseSelected, value);
-        }
-
-        public ObservableCollection<string> History
-        {
-            get => _history;
-            set => SetProperty(ref _history, value);
-        }
-
-        public ICommand ConvertCommand { get; }
-        public ICommand CopyToClipboardCommand { get; }
-
-        public FormattersPageViewModel()
-        {
-            _ = InitializeAsync();
-
-            ConvertCommand = new DelegateCommand(OnConvert);
-            CopyToClipboardCommand = new DelegateCommand<string>(OnCopyToClipboard);
-        }
-
-        public async Task InitializeAsync()
-        {
-            _history = new ObservableCollection<string>();
-        }
-
-        private void OnConvert()
-        {
-            if (!string.IsNullOrEmpty(InputText))
+            var output = new StringBuilder();
+            foreach (var line in lines)
             {
-                var lines = InputText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-
-                var output = new StringBuilder();
-                foreach (var line in lines)
+                if (IsBase64EncodeSelected)
                 {
-                    if (IsBase64EncodeSelected)
-                    {
-                        output.AppendLine(Convert.ToBase64String(Encoding.UTF8.GetBytes(line)));
-                    }
-                    else if (IsBase64DecodeSelected)
+                    output.AppendLine(Convert.ToBase64String(Encoding.UTF8.GetBytes(line)));
+                }
+                else if (IsBase64DecodeSelected)
+                {
+                    try
                     {
                         output.AppendLine(Encoding.UTF8.GetString(Convert.FromBase64String(line)));
                     }
-                    else if (IsSnakeCaseSelected)
+                    catch
                     {
-                        output.AppendLine(line.ToSnakeCase().ToUpperInvariant());
-                    }
-                    else if (IsPascalCaseSelected)
-                    {
-                        output.AppendLine(line.ToPascalCase());
+                        output.AppendLine($"[Invalid Base64: {line}]");
                     }
                 }
-                OutputText = output.ToString();
-
-                History.Add(OutputText);
-                InputText = string.Empty; // Clear input text after conversion
+                else if (IsSnakeCaseSelected)
+                {
+                    output.AppendLine(line.ToSnakeCase().ToUpperInvariant());
+                }
+                else if (IsPascalCaseSelected)
+                {
+                    output.AppendLine(line.ToPascalCase());
+                }
             }
+            OutputText = output.ToString();
+
+            History.Add(OutputText);
+            InputText = string.Empty;
         }
+    }
 
-        private void OnCopyToClipboard(string text)
+    private void OnCopyToClipboard(string? text)
+    {
+        if (!string.IsNullOrEmpty(text))
         {
-            if (!string.IsNullOrEmpty(text))
-            {
-                Clipboard.SetText(text);
-            }
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(text);
+            Clipboard.SetContent(dataPackage);
         }
     }
 }

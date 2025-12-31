@@ -1,18 +1,15 @@
-using System.Windows.Controls;
+using Microsoft.UI.Xaml.Controls;
 using Tools.ViewModels.Pages;
 
-namespace Tools.Views.Pages
+namespace Tools.Views.Pages;
+
+public sealed partial class FormattersPage : Page
 {
-    public partial class FormattersPage : Page
+    public FormattersPageViewModel ViewModel { get; }
+
+    public FormattersPage(FormattersPageViewModel viewModel)
     {
-        public FormattersPageViewModel ViewModel { get; }
-
-        public FormattersPage(FormattersPageViewModel viewModel)
-        {
-            ViewModel = viewModel;
-            DataContext = this;
-
-            InitializeComponent();
-        }
+        ViewModel = viewModel;
+        this.InitializeComponent();
     }
 }

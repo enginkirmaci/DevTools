@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Tools.ViewModels.Pages
+namespace Tools.ViewModels.Pages;
+
+public partial class HostFileProxyViewModel : ObservableObject
 {
-    public class HostFileProxyViewModel : BindableBase
-    {
-    }
+    // Placeholder ViewModel - functionality to be implemented
 }

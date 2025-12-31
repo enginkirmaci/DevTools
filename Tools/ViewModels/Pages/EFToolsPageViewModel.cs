@@ -1,98 +1,84 @@
-using Prism.Commands;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Tools.Library.Formatters;
-using Tools.Library.Services; // Add using for SettingsService
+using Tools.Library.Services;
+using Windows.ApplicationModel.DataTransfer;
 
-namespace Tools.ViewModels.Pages
+namespace Tools.ViewModels.Pages;
+
+public partial class EFToolsPageViewModel : ObservableObject
 {
-    public class EFToolsPageViewModel : BindableBase
+    [ObservableProperty]
+    private string _sqlInput = string.Empty;
+
+    [ObservableProperty]
+    private string _cSharpOutput = string.Empty;
+
+    [ObservableProperty]
+    private string _repositoryOutput = string.Empty;
+
+    [ObservableProperty]
+    private string _repositoryTemplate = string.Empty;
+
+    public IRelayCommand ConvertSqlCommand { get; }
+    public IRelayCommand CopyToClipboardCommand { get; }
+    public IRelayCommand CopyRepositoryToClipboardCommand { get; }
+
+    private readonly ISettingsService _settingsService;
+
+    public EFToolsPageViewModel(ISettingsService settingsService)
     {
-        private string _sqlInput;
-        private string _cSharpOutput;
-        private string _repositoryOutput;
-        private string _repositoryTemplate;
+        _settingsService = settingsService;
 
-        public string SqlInput
+        ConvertSqlCommand = new RelayCommand(OnConvertSqlCommand);
+        CopyToClipboardCommand = new RelayCommand(OnCopyToClipboardCommand);
+        CopyRepositoryToClipboardCommand = new RelayCommand(OnCopyRepositoryToClipboardCommand);
+
+        _ = InitializeAsync();
+    }
+
+    public async Task InitializeAsync()
+    {
+        var settings = await _settingsService.GetSettingsAsync();
+        RepositoryTemplate = settings.EFToolsPage?.RepositoryTemplate ?? string.Empty;
+    }
+
+    private void OnConvertSqlCommand()
+    {
+        try
         {
-            get => _sqlInput;
-            set => SetProperty(ref _sqlInput, value);
+            CSharpOutput = SqlToCSharpFormatter.FormatCreateTableToClass(SqlInput);
+            var tableName = SqlToCSharpFormatter.GetTableName(SqlInput);
+            RepositoryOutput = GenerateRepositoryCode(tableName);
         }
-
-        public string CSharpOutput
+        catch (Exception ex)
         {
-            get => _cSharpOutput;
-            set => SetProperty(ref _cSharpOutput, value);
+            CSharpOutput = $"Error: {ex.Message}";
         }
+    }
 
-        public string RepositoryOutput
+    private void OnCopyToClipboardCommand()
+    {
+        if (!string.IsNullOrEmpty(CSharpOutput))
         {
-            get => _repositoryOutput;
-            set => SetProperty(ref _repositoryOutput, value);
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(CSharpOutput);
+            Clipboard.SetContent(dataPackage);
         }
+    }
 
-        public string RepositoryTemplate
+    private void OnCopyRepositoryToClipboardCommand()
+    {
+        if (!string.IsNullOrEmpty(RepositoryOutput))
         {
-            get => _repositoryTemplate;
-            set => SetProperty(ref _repositoryTemplate, value);
+            var dataPackage = new DataPackage();
+            dataPackage.SetText(RepositoryOutput);
+            Clipboard.SetContent(dataPackage);
         }
+    }
 
-        public ICommand ConvertSqlCommand { get; }
-        public ICommand CopyToClipboardCommand { get; }
-        public ICommand CopyRepositoryToClipboardCommand { get; }
-
-        private readonly ISettingsService _settingsService;
-
-        public EFToolsPageViewModel(ISettingsService settingsService)
-        {
-            _settingsService = settingsService;
-
-            ConvertSqlCommand = new DelegateCommand(OnConvertSqlCommand);
-            CopyToClipboardCommand = new DelegateCommand(OnCopyToClipboardCommand);
-            CopyRepositoryToClipboardCommand = new DelegateCommand(OnCopyRepositoryToClipboardCommand);
-
-            _ = InitializeAsync();
-        }
-
-        public async Task InitializeAsync()
-        {
-            // Load template from settings, fallback to default
-            var settings = await _settingsService.GetSettingsAsync();
-            RepositoryTemplate = settings.EFToolsPage.RepositoryTemplate;
-        }
-
-        private void OnConvertSqlCommand()
-        {
-            try
-            {
-                CSharpOutput = SqlToCSharpFormatter.FormatCreateTableToClass(SqlInput);
-                var tableName = SqlToCSharpFormatter.GetTableName(SqlInput);
-                RepositoryOutput = GenerateRepositoryCode(tableName);
-            }
-            catch (Exception ex)
-            {
-                CSharpOutput = $"Error: {ex.Message}";
-            }
-        }
-
-        private void OnCopyToClipboardCommand()
-        {
-            if (!string.IsNullOrEmpty(CSharpOutput))
-            {
-                Clipboard.SetText(CSharpOutput);
-            }
-        }
-
-        private void OnCopyRepositoryToClipboardCommand()
-        {
-            if (!string.IsNullOrEmpty(RepositoryOutput))
-            {
-                Clipboard.SetText(RepositoryOutput);
-            }
-        }
-
-        private string GenerateRepositoryCode(string className)
-        {
-            return RepositoryTemplate.Replace("{TABLENAME}", className);
-        }
+    private string GenerateRepositoryCode(string className)
+    {
+        return RepositoryTemplate.Replace("{TABLENAME}", className);
     }
 }

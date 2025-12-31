@@ -1,20 +1,15 @@
+using Microsoft.UI.Xaml.Controls;
 using Tools.ViewModels.Pages;
-using Wpf.Ui.Controls;
 
 namespace Tools.Views.Pages;
 
-/// <summary>
-/// Interaction logic for WorkspacesPage.xaml
-/// </summary>
-public partial class WorkspacesPage : INavigableView<WorkspacesViewModel>
+public sealed partial class WorkspacesPage : Page
 {
     public WorkspacesViewModel ViewModel { get; }
 
     public WorkspacesPage(WorkspacesViewModel viewModel)
     {
         ViewModel = viewModel;
-        DataContext = this;
-
-        InitializeComponent();
+        this.InitializeComponent();
     }
 }

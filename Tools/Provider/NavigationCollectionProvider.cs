@@ -1,12 +1,12 @@
+using Microsoft.UI.Xaml.Controls;
 using Tools.Library.Entities;
 using Tools.Views.Pages;
-using Wpf.Ui.Controls;
 
 namespace Tools.Provider;
 
 public static class NavigationCollectionProvider
 {
-    public static ObservableCollection<NavigationItem> GetNavigationItems(ICommand cardClickCommand)
+    public static ObservableCollection<NavigationItem> GetNavigationItems(System.Windows.Input.ICommand? cardClickCommand)
     {
         return new ObservableCollection<NavigationItem>
         {
@@ -14,8 +14,8 @@ public static class NavigationCollectionProvider
             {
                 Title = "Workspaces",
                 Subtitle = "Manage your workspaces",
-                Symbol = "AppFolder24",
-                Command = cardClickCommand,
+                Symbol = "\uE8B7", // AppFolder24 equivalent
+                Command = cardClickCommand!,
                 CommandParameter = "Workspaces",
                 TargetPageType = typeof(WorkspacesPage)
             },
@@ -23,8 +23,8 @@ public static class NavigationCollectionProvider
             {
                 Title = "Nuget Local Copy",
                 Subtitle = "copy new nuget packages to destination",
-                Symbol = "BoxMultipleArrowRight20",
-                Command = cardClickCommand,
+                Symbol = "\uE8DE", // BoxMultipleArrowRight20 equivalent
+                Command = cardClickCommand!,
                 CommandParameter = "NugetLocal",
                 TargetPageType = typeof(NugetLocalPage)
             },
@@ -32,8 +32,8 @@ public static class NavigationCollectionProvider
             {
                 Title = "Formatters",
                 Subtitle = string.Empty,
-                Symbol = "TextNumberFormat24",
-                Command = cardClickCommand,
+                Symbol = "\uE8D2", // TextNumberFormat24 equivalent
+                Command = cardClickCommand!,
                 CommandParameter = "Formatters",
                 TargetPageType = typeof(FormattersPage)
             },
@@ -41,8 +41,8 @@ public static class NavigationCollectionProvider
             {
                 Title = "Clipboard Password",
                 Subtitle = "Generate and copy passwords",
-                Symbol = "ClipboardPaste24",
-                Command = cardClickCommand,
+                Symbol = "\uE77F", // ClipboardPaste24 equivalent
+                Command = cardClickCommand!,
                 CommandParameter = "ClipboardPassword",
                 TargetPageType = typeof(ClipboardPasswordPage)
             },
@@ -50,8 +50,8 @@ public static class NavigationCollectionProvider
             {
                 Title = "EF Tools",
                 Subtitle = "Entity Framework tools and utilities",
-                Symbol = "Database24",
-                Command = cardClickCommand,
+                Symbol = "\uEE94", // Database24 equivalent
+                Command = cardClickCommand!,
                 CommandParameter = "EFTools",
                 TargetPageType = typeof(EFToolsPage)
             },
@@ -59,8 +59,8 @@ public static class NavigationCollectionProvider
             {
                 Title = "Code Execute",
                 Subtitle = string.Empty,
-                Symbol = "Code24",
-                Command = cardClickCommand,
+                Symbol = "\uE943", // Code24 equivalent
+                Command = cardClickCommand!,
                 CommandParameter = "CodeExecute",
                 TargetPageType = typeof(CodeExecutePage)
             }
@@ -74,8 +74,8 @@ public static class NavigationCollectionProvider
             new NavigationViewItem
             {
                 Content = "Dashboard",
-                Icon = new SymbolIcon(SymbolRegular.Home24),
-                TargetPageType = typeof(DashboardPage)
+                Icon = new FontIcon { Glyph = "\uE80F" }, // Home24
+                Tag = "Dashboard"
             }
         };
 
@@ -84,8 +84,8 @@ public static class NavigationCollectionProvider
             result.Add(new NavigationViewItem
             {
                 Content = item.Title,
-                Icon = new SymbolIcon((SymbolRegular)Enum.Parse(typeof(SymbolRegular), item.Symbol)),
-                TargetPageType = item.TargetPageType
+                Icon = new FontIcon { Glyph = item.Symbol },
+                Tag = item.CommandParameter // Use Tag for navigation in WinUI 3
             });
         }
 

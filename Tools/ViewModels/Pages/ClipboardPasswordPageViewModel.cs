@@ -1,9 +1,9 @@
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Tools.ViewModels.Pages
+namespace Tools.ViewModels.Pages;
+
+public partial class ClipboardPasswordPageViewModel : ObservableObject
 {
-    public class ClipboardPasswordPageViewModel : BindableBase
-    {
-        // Add properties and logic for clipboard password functionality here
-    }
+    // This page primarily relies on the ClipboardPasswordService for global hotkey functionality
+    // The UI can be extended here to configure the settings
 }

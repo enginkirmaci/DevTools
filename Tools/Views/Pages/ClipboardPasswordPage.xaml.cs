@@ -1,12 +1,15 @@
-using System.Windows.Controls;
+using Microsoft.UI.Xaml.Controls;
+using Tools.ViewModels.Pages;
 
-namespace Tools.Views.Pages
+namespace Tools.Views.Pages;
+
+public sealed partial class ClipboardPasswordPage : Page
 {
-    public partial class ClipboardPasswordPage : Page
+    public ClipboardPasswordPageViewModel ViewModel { get; }
+
+    public ClipboardPasswordPage(ClipboardPasswordPageViewModel viewModel)
     {
-        public ClipboardPasswordPage()
-        {
-            InitializeComponent();
-        }
+        ViewModel = viewModel;
+        this.InitializeComponent();
     }
 }

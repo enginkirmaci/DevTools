@@ -1,89 +1,92 @@
-﻿<ui:FluentWindow
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Window
     x:Class="Tools.Views.Windows.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Tools.Views.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:Tools.Views.Windows"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    x:Name="MainWindowView"
-    Title="{Binding ViewModel.ApplicationTitle, Mode=OneWay}"
-    Width="1450"
-    Height="802"
-    MinWidth="900"
-    d:DataContext="{d:DesignInstance local:MainWindow,
-                                     IsDesignTimeCreatable=False}"
-    d:DesignHeight="650"
-    d:DesignWidth="1000"
-    ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
-    ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    ExtendsContentIntoTitleBar="True"
-    Loaded="MainWindowView_Loaded"
-    SizeChanged="MainWindow_OnSizeChanged"
-    WindowBackdropType="Mica"
-    WindowCornerPreference="Default"
-    WindowStartupLocation="CenterScreen"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Title="Dev Tools">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <!--<tray:NotifyIcon
-            Grid.Row="0"
-            FocusOnLeftClick="True"
-            Icon="pack://application:,,,/Assets/logo.png"
-            MenuOnRightClick="True"
-            TooltipText="{Binding ViewModel.ApplicationTitle, Mode=OneWay}">
-            <tray:NotifyIcon.Menu>
-        <ContextMenu ItemsSource="{Binding ViewModel.TrayMenuItems, Mode=OneWay}" />
-    </tray:NotifyIcon.Menu>
-        </tray:NotifyIcon>-->
+        <!-- Custom Title Bar -->
+        <Grid x:Name="AppTitleBar" Height="48" Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image Source="ms-appx:///Assets/logo.png" Width="24" Height="24" Margin="12,0,0,0"/>
+            <TextBlock Grid.Column="1" 
+                       Text="Dev Tools" 
+                       VerticalAlignment="Center" 
+                       Margin="12,0,0,0"
+                       Style="{StaticResource CaptionTextBlockStyle}"/>
+        </Grid>
 
-        <ui:NavigationView
+        <NavigationView
             x:Name="NavigationView"
-            Padding="42,0,42,0"
-            BreadcrumbBar="{Binding ElementName=BreadcrumbBar}"
-            EnableDebugMessages="True"
-            FrameMargin="0"
+            Grid.Row="1"
             IsBackButtonVisible="Visible"
-            IsPaneToggleVisible="True"
-            MenuItemsSource="{Binding ViewModel.MenuItems}"
-            OpenPaneLength="310"
-            PaneClosed="NavigationView_OnPaneClosed"
+            IsSettingsVisible="False"
+            IsPaneToggleButtonVisible="True"
+            OpenPaneLength="280"
             PaneDisplayMode="Left"
-            PaneOpened="NavigationView_OnPaneOpened"
-            SelectionChanged="OnNavigationSelectionChanged"
-            TitleBar="{Binding ElementName=TitleBar, Mode=OneWay}">
-            <ui:NavigationView.Header>
-                <StackPanel Margin="42,32,42,20">
-                    <ui:BreadcrumbBar x:Name="BreadcrumbBar" />
-                </StackPanel>
-            </ui:NavigationView.Header>
-            <ui:NavigationView.AutoSuggestBox>
-                <ui:AutoSuggestBox x:Name="AutoSuggestBox" PlaceholderText="Search">
-                    <ui:AutoSuggestBox.Icon>
-                        <ui:IconSourceElement>
-                            <ui:SymbolIconSource Symbol="Search24" />
-                        </ui:IconSourceElement>
-                    </ui:AutoSuggestBox.Icon>
-                </ui:AutoSuggestBox>
-            </ui:NavigationView.AutoSuggestBox>
-            <ui:NavigationView.ContentOverlay>
-                <Grid>
-                    <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
-                </Grid>
-            </ui:NavigationView.ContentOverlay>
-        </ui:NavigationView>
+            SelectionChanged="NavigationView_SelectionChanged"
+            BackRequested="NavigationView_BackRequested">
 
-        <ContentPresenter x:Name="RootContentDialog" Grid.Row="0" />
+            <NavigationView.MenuItems>
+                <NavigationViewItem Content="Dashboard" Tag="Dashboard">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE80F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Workspaces" Tag="Workspaces">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8B7;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Nuget Local Copy" Tag="NugetLocal">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8DE;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Formatters" Tag="Formatters">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8D2;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Clipboard Password" Tag="ClipboardPassword">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE77F;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="EF Tools" Tag="EFTools">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xEE94;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Code Execute" Tag="CodeExecute">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE943;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
 
-        <ui:TitleBar
-            x:Name="TitleBar"
-            Title="{Binding ViewModel.ApplicationTitle}"
-            Grid.Row="0"
-            CloseWindowByDoubleClickOnIcon="True">
-            <ui:TitleBar.Icon>
-                <ui:ImageIcon Source="pack://application:,,,/Assets/logo.png" />
-            </ui:TitleBar.Icon>
-        </ui:TitleBar>
+            <Frame x:Name="ContentFrame" Padding="24"/>
+        </NavigationView>
+
+        <!-- Snackbar/InfoBar area -->
+        <InfoBar x:Name="AppInfoBar"
+                 Grid.Row="1"
+                 HorizontalAlignment="Right"
+                 VerticalAlignment="Bottom"
+                 Margin="0,0,24,24"
+                 IsOpen="False"/>
     </Grid>
-</ui:FluentWindow>
+</Window>

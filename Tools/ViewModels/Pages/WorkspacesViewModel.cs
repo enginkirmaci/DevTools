@@ -1,63 +1,60 @@
-using Prism.Commands;
-using Prism.Mvvm;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Dispatching;
 using Tools.Library.Entities;
 using Tools.Library.Services;
 
 namespace Tools.ViewModels.Pages;
 
-public class WorkspacesViewModel : BindableBase
+public partial class WorkspacesViewModel : ObservableObject
 {
-    public DelegateCommand<string> OpenSolutionCommand { get; set; }
-    public DelegateCommand<string> OpenFolderCommand { get; set; }
-    public DelegateCommand<string> OpenWithVSCodeCommand { get; set; }
-    public DelegateCommand RefreshCommand { get; set; }
+    [ObservableProperty]
+    private string _filterText = string.Empty;
 
-    public static ObservableCollection<WorkspaceItem> Workspaces { get; set; } = new ObservableCollection<WorkspaceItem>();
-    public static ObservableCollection<WorkspaceItem> Platforms { get; set; } = new ObservableCollection<WorkspaceItem>();
-    public ObservableCollection<WorkspaceItem> FilteredWorkspaces { get; set; }
-    public ObservableCollection<WorkspaceItem> FilteredPlatforms { get; set; }
+    [ObservableProperty]
+    private ObservableCollection<WorkspaceItem> _filteredWorkspaces = new();
 
-    private static string _filterText = string.Empty;
+    [ObservableProperty]
+    private ObservableCollection<WorkspaceItem> _filteredPlatforms = new();
+
+    public IRelayCommand<string> OpenSolutionCommand { get; }
+    public IRelayCommand<string> OpenFolderCommand { get; }
+    public IRelayCommand<string> OpenWithVSCodeCommand { get; }
+    public IRelayCommand RefreshCommand { get; }
+
+    public static ObservableCollection<WorkspaceItem> Workspaces { get; set; } = new();
+    public static ObservableCollection<WorkspaceItem> Platforms { get; set; } = new();
+
     private readonly ISettingsService _settingsService;
-    private WorkspacesSettings _workspaceSettings;
-
-    public string FilterText
-    {
-        get => _filterText;
-        set
-        {
-            SetProperty(ref _filterText, value);
-            ApplyFilter();
-        }
-    }
+    private WorkspacesSettings _workspaceSettings = new();
+    private readonly DispatcherQueue _dispatcherQueue;
 
     public WorkspacesViewModel(ISettingsService settingsService)
     {
         _settingsService = settingsService;
+        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-        OpenSolutionCommand = new DelegateCommand<string>(OpenSolution);
-        OpenFolderCommand = new DelegateCommand<string>(OpenFolder);
-        OpenWithVSCodeCommand = new DelegateCommand<string>(OpenWithVSCode);
-        RefreshCommand = new DelegateCommand(async () =>
+        OpenSolutionCommand = new RelayCommand<string>(OpenSolution);
+        OpenFolderCommand = new RelayCommand<string>(OpenFolder);
+        OpenWithVSCodeCommand = new RelayCommand<string>(OpenWithVSCode);
+        RefreshCommand = new RelayCommand(async () =>
         {
             Workspaces = new ObservableCollection<WorkspaceItem>();
             Platforms = new ObservableCollection<WorkspaceItem>();
-
             await InitializeAsync();
         });
-
-        FilteredWorkspaces = new ObservableCollection<WorkspaceItem>();
-        FilteredPlatforms = new ObservableCollection<WorkspaceItem>();
 
         // Do not block the UI thread; fire-and-forget async initialization
         _ = InitializeAsync();
     }
 
-    // Helper to safely run async initialization without blocking UI thread
+    partial void OnFilterTextChanged(string value)
+    {
+        ApplyFilter();
+    }
 
     public async Task InitializeAsync()
     {
-        // Offload blocking I/O to background thread
         var settings = await _settingsService.GetSettingsAsync();
         _workspaceSettings = settings.Workspaces ?? new WorkspacesSettings();
 
@@ -77,9 +74,8 @@ public class WorkspacesViewModel : BindableBase
                 }
                 try
                 {
-                    // Offload directory scanning to background thread
                     var directories = await Task.Run(() =>
-                        GetAccessibleDirectoriesRecursively(folderPath, _workspaceSettings.GitFolderPattern).ToList()
+                        GetAccessibleDirectoriesRecursively(folderPath, _workspaceSettings.GitFolderPattern ?? ".git").ToList()
                     );
 
                     foreach (var dir in directories)
@@ -88,10 +84,9 @@ public class WorkspacesViewModel : BindableBase
                         if (parentDir == null) continue;
 
                         string[] solutionFiles = Array.Empty<string>();
-                        // Offload file search to background thread
                         await Task.Run(() =>
                         {
-                            solutionFiles = Directory.GetFiles(parentDir, _workspaceSettings.SolutionFilePattern);
+                            solutionFiles = Directory.GetFiles(parentDir, _workspaceSettings.SolutionFilePattern ?? "*.sln");
                         });
 
                         foreach (var solutionFile in solutionFiles)
@@ -104,7 +99,7 @@ public class WorkspacesViewModel : BindableBase
                             });
                         }
 
-                        if (dir.Contains(_workspaceSettings.PlatformFolderName, StringComparison.OrdinalIgnoreCase))
+                        if (dir.Contains(_workspaceSettings.PlatformFolderName ?? "platform", StringComparison.OrdinalIgnoreCase))
                         {
                             var platformDir = parentDir;
                             if (Directory.Exists(platformDir))
@@ -125,7 +120,7 @@ public class WorkspacesViewModel : BindableBase
             }
 
             // Update collections on UI thread
-            App.Current.Dispatcher.Invoke(() =>
+            _dispatcherQueue.TryEnqueue(() =>
             {
                 Workspaces = new ObservableCollection<WorkspaceItem>(workspaces.OrderBy(w => w.SolutionName));
                 Platforms = new ObservableCollection<WorkspaceItem>(platforms.OrderBy(p => p.PlatformName));
@@ -148,12 +143,10 @@ public class WorkspacesViewModel : BindableBase
         else
         {
             FilteredWorkspaces = new ObservableCollection<WorkspaceItem>(
-                Workspaces.Where(w => w.SolutionName.Contains(FilterText, StringComparison.OrdinalIgnoreCase)));
+                Workspaces.Where(w => w.SolutionName?.Contains(FilterText, StringComparison.OrdinalIgnoreCase) == true));
             FilteredPlatforms = new ObservableCollection<WorkspaceItem>(
-                Platforms.Where(p => p.PlatformName.Contains(FilterText, StringComparison.OrdinalIgnoreCase)));
+                Platforms.Where(p => p.PlatformName?.Contains(FilterText, StringComparison.OrdinalIgnoreCase) == true));
         }
-        RaisePropertyChanged(nameof(FilteredWorkspaces));
-        RaisePropertyChanged(nameof(FilteredPlatforms));
     }
 
     private IEnumerable<string> GetAccessibleDirectoriesRecursively(string rootPath, string searchPattern)
@@ -193,7 +186,7 @@ public class WorkspacesViewModel : BindableBase
         return foundDirectories;
     }
 
-    private void OpenSolution(string solutionPath)
+    private void OpenSolution(string? solutionPath)
     {
         if (string.IsNullOrWhiteSpace(solutionPath))
         {
@@ -207,7 +200,7 @@ public class WorkspacesViewModel : BindableBase
         });
     }
 
-    private void OpenFolder(string folderPath)
+    private void OpenFolder(string? folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath))
         {
@@ -221,7 +214,7 @@ public class WorkspacesViewModel : BindableBase
         });
     }
 
-    private void OpenWithVSCode(string folderPath)
+    private void OpenWithVSCode(string? folderPath)
     {
         if (string.IsNullOrWhiteSpace(folderPath))
         {
@@ -230,7 +223,7 @@ public class WorkspacesViewModel : BindableBase
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = _workspaceSettings.VSCodeExecutable,
+            FileName = _workspaceSettings?.VSCodeExecutable ?? "code",
             Arguments = folderPath,
             UseShellExecute = true,
             CreateNoWindow = true,

@@ -1,19 +1,15 @@
-
-using System.Windows.Controls;
+using Microsoft.UI.Xaml.Controls;
 using Tools.ViewModels.Pages;
 
-namespace Tools.Views.Pages
+namespace Tools.Views.Pages;
+
+public sealed partial class CodeExecutePage : Page
 {
-    public partial class CodeExecutePage : Page
+    public CodeExecutePageViewModel ViewModel { get; }
+
+    public CodeExecutePage(CodeExecutePageViewModel viewModel)
     {
-        public CodeExecutePageViewModel ViewModel { get; }
-
-        public CodeExecutePage(CodeExecutePageViewModel viewModel)
-        {
-            ViewModel = viewModel;
-            DataContext = this;
-
-            InitializeComponent();
-        }
+        ViewModel = viewModel;
+        this.InitializeComponent();
     }
 }

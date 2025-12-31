@@ -1,17 +1,16 @@
-﻿using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml.Controls;
 using Tools.Provider;
-using Wpf.Ui.Controls;
 
-namespace Tools.ViewModels.Windows
+namespace Tools.ViewModels.Windows;
+
+public partial class MainWindowViewModel : ObservableObject
 {
-    public class MainWindowViewModel : BindableBase
-    {
-        public string ApplicationTitle { get; } = "Dev Tools";
-        public ObservableCollection<NavigationViewItem> MenuItems { get; set; }
+    public string ApplicationTitle { get; } = "Dev Tools";
+    public ObservableCollection<NavigationViewItem> MenuItems { get; set; }
 
-        public MainWindowViewModel()
-        {
-            MenuItems = NavigationCollectionProvider.GetNavigationViewItems();
-        }
+    public MainWindowViewModel()
+    {
+        MenuItems = NavigationCollectionProvider.GetNavigationViewItems();
     }
 }

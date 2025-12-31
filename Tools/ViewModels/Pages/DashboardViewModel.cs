@@ -1,29 +1,29 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Tools.Library.Converters;
 using Tools.Library.Entities;
 using Tools.Provider;
-using Wpf.Ui;
+using Tools.Services;
 
 namespace Tools.ViewModels.Pages;
 
-public class DashboardViewModel : BindableBase
+public partial class DashboardViewModel : ObservableObject
 {
-    private readonly INavigationService navigationService;
+    private readonly INavigationService _navigationService;
 
-    public DelegateCommand<string> CardClickCommand { get; set; }
+    public IRelayCommand<string> CardClickCommand { get; }
     public ObservableCollection<NavigationItem> DashboardCards { get; set; }
 
     public DashboardViewModel(INavigationService navigationService)
     {
-        this.navigationService = navigationService;
+        _navigationService = navigationService;
 
-        CardClickCommand = new DelegateCommand<string>(CardClick);
+        CardClickCommand = new RelayCommand<string>(CardClick);
 
         DashboardCards = NavigationCollectionProvider.GetNavigationItems(CardClickCommand);
     }
 
-    private void CardClick(string parameter)
+    private void CardClick(string? parameter)
     {
         if (string.IsNullOrWhiteSpace(parameter))
         {
@@ -37,6 +37,6 @@ public class DashboardViewModel : BindableBase
             return;
         }
 
-        _ = navigationService.Navigate(pageType);
+        _navigationService.Navigate(pageType);
     }
 }

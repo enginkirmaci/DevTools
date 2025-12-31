@@ -1,45 +1,35 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
-using Prism.Commands;
-using Prism.Mvvm;
 
-namespace Tools.ViewModels.Pages
+namespace Tools.ViewModels.Pages;
+
+public partial class CodeExecutePageViewModel : ObservableObject
 {
-    public class CodeExecutePageViewModel : BindableBase
+    [ObservableProperty]
+    private string _immediateInput = string.Empty;
+
+    [ObservableProperty]
+    private string _immediateOutput = string.Empty;
+
+    public IAsyncRelayCommand ExecuteCommand { get; }
+
+    public CodeExecutePageViewModel()
     {
-        private string _immediateInput;
-        private string _immediateOutput;
+        ExecuteCommand = new AsyncRelayCommand(OnExecuteCommandAsync);
+    }
 
-        public string ImmediateInput
+    private async Task OnExecuteCommandAsync()
+    {
+        try
         {
-            get => _immediateInput;
-            set => SetProperty(ref _immediateInput, value);
+            var result = await CSharpScript.EvaluateAsync(ImmediateInput, ScriptOptions.Default);
+            ImmediateOutput = result?.ToString() ?? "Executed successfully with no result.";
         }
-
-        public string ImmediateOutput
+        catch (Exception ex)
         {
-            get => _immediateOutput;
-            set => SetProperty(ref _immediateOutput, value);
-        }
-
-        public ICommand ExecuteCommand { get; }
-
-        public CodeExecutePageViewModel()
-        {
-            ExecuteCommand = new DelegateCommand(OnExecuteCommand);
-        }
-
-        private async void OnExecuteCommand()
-        {
-            try
-            {
-                var result = await CSharpScript.EvaluateAsync(ImmediateInput, ScriptOptions.Default);
-                ImmediateOutput = result?.ToString() ?? "Executed successfully with no result.";
-            }
-            catch (Exception ex)
-            {
-                ImmediateOutput = $"Error: {ex.Message}";
-            }
+            ImmediateOutput = $"Error: {ex.Message}";
         }
     }
 }
