@@ -89,19 +89,3 @@ public partial class App : Application
 
     public static Window MainWindow => ((App)Current)._mainWindow!;
 }
-
-/// <summary>
-/// Simple BooleanToVisibilityConverter for WinUI 3
-/// </summary>
-public class BooleanToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, string language)
-    {
-        return value is bool b && b ? Visibility.Visible : Visibility.Collapsed;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
-    {
-        return value is Visibility v && v == Visibility.Visible;
-    }
-}

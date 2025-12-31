@@ -1,30 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Application
-    x:Class="Tools.App"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Tools"
-    xmlns:conv="using:Tools.Library.Converters">
+	x:Class="Tools.App"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:Tools"
+	xmlns:conv="using:Tools.Library.Converters">
 	<Application.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+				<XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
 			</ResourceDictionary.MergedDictionaries>
 
 			<!-- Boolean value resources used by pages/commands -->
 			<x:Boolean x:Key="TrueValue">True</x:Boolean>
 			<x:Boolean x:Key="FalseValue">False</x:Boolean>
 
-			<!-- Converters -->
-			<conv:EqualVisibilityConverter x:Key="EqualVisibilityConverter" />
-			<conv:EqualNotVisibilityConverter x:Key="EqualNotVisibilityConverter" />
-			<!-- CountToVisibilityConverter: returns Visible when a numeric or collection count > 0 -->
-			<conv:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+			<!-- Acrylic / modern window resources -->
+			<SolidColorBrush x:Key="WindowAcrylicBrush"
+					Color="#CC101216"/>
 
-			<!-- Existing converters -->
-			<local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+			<!-- Converters -->
+			<conv:EqualVisibilityConverter x:Key="EqualVisibilityConverter"/>
+			<conv:EqualNotVisibilityConverter x:Key="EqualNotVisibilityConverter"/>
+			<!-- CountToVisibilityConverter: returns Visible when a numeric or collection count > 0 -->
+			<conv:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+
+			<!-- Shared converters (centralized in Tools.Library.Converters) -->
+			<conv:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 			<!-- Inverse converter for boolean to visibility -->
-			<conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+			<conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
 		</ResourceDictionary>
 	</Application.Resources>
 </Application>

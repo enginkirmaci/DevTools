@@ -2,29 +2,33 @@
 <Window
     x:Class="Tools.Views.Windows.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Tools.Views.Windows"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Dev Tools">
 
-    <Grid>
+    <Grid Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Custom Title Bar -->
-        <Grid x:Name="AppTitleBar" Height="48" Background="Transparent">
+        <Grid x:Name="AppTitleBar"
+                Height="48"
+                Background="Transparent">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Image Source="ms-appx:///Assets/logo.png" Width="24" Height="24" Margin="12,0,0,0"/>
-            <TextBlock Grid.Column="1" 
-                       Text="Dev Tools" 
-                       VerticalAlignment="Center" 
+            <Image Source="ms-appx:///Assets/logo.png"
+                    Width="24"
+                    Height="24"
+                    Margin="12,0,0,0"/>
+            <TextBlock Grid.Column="1"
+                       Text="Dev Tools"
+                       VerticalAlignment="Center"
                        Margin="12,0,0,0"
                        Style="{StaticResource CaptionTextBlockStyle}"/>
         </Grid>
@@ -37,48 +41,58 @@
             IsPaneToggleButtonVisible="True"
             OpenPaneLength="280"
             PaneDisplayMode="Left"
+            Background="Transparent"
             SelectionChanged="NavigationView_SelectionChanged"
             BackRequested="NavigationView_BackRequested">
 
             <NavigationView.MenuItems>
-                <NavigationViewItem Content="Dashboard" Tag="Dashboard">
+                <NavigationViewItem Content="Dashboard"
+                        Tag="Dashboard">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE80F;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Workspaces" Tag="Workspaces">
+                <NavigationViewItem Content="Workspaces"
+                        Tag="Workspaces">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8B7;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Nuget Local Copy" Tag="NugetLocal">
+                <NavigationViewItem Content="Nuget Local Copy"
+                        Tag="NugetLocal">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8DE;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Formatters" Tag="Formatters">
+                <NavigationViewItem Content="Formatters"
+                        Tag="Formatters">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE8D2;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Clipboard Password" Tag="ClipboardPassword">
+                <NavigationViewItem Content="Clipboard Password"
+                        Tag="ClipboardPassword">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE77F;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="EF Tools" Tag="EFTools">
+                <NavigationViewItem Content="EF Tools"
+                        Tag="EFTools">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xEE94;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
-                <NavigationViewItem Content="Code Execute" Tag="CodeExecute">
+                <NavigationViewItem Content="Code Execute"
+                        Tag="CodeExecute">
                     <NavigationViewItem.Icon>
                         <FontIcon Glyph="&#xE943;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>
 
-            <Frame x:Name="ContentFrame" Padding="24"/>
+            <Frame x:Name="ContentFrame"
+                    Padding="24"
+                    Background="Transparent"/>
         </NavigationView>
 
         <!-- Snackbar/InfoBar area -->
