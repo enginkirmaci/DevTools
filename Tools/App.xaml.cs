@@ -1,7 +1,4 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Serilog;
+﻿using Serilog;
 using Tools.Library.Services;
 using Tools.Services;
 using Tools.ViewModels.Pages;
