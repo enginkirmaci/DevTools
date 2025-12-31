@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using Tools.Library.Services;
 using Tools.Services;
+using Tools.Services;
 using Tools.ViewModels.Pages;
 using Tools.ViewModels.Windows;
 using Tools.Views.Pages;
@@ -71,6 +72,7 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IClipboardPasswordService, ClipboardPasswordService>();
+        services.AddSingleton<IClipboardService, ClipboardService>();
     }
 
     /// <summary>
