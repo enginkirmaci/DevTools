@@ -13,6 +13,9 @@ public interface INavigationService
 
     // Event raised after navigation to notify subscribers of the new page type
     event Action<Type?>? Navigated;
+
+    // Event raised when back stack availability changes
+    event Action? BackStackChanged;
 }
 
 public class NavigationService : INavigationService
@@ -23,15 +26,19 @@ public class NavigationService : INavigationService
     private Page? _deferredPage;
     private Type? _deferredPageType;
 
+    // Custom back stack for DI-resolved pages (pages without parameterless ctors)
+    private readonly List<Page> _customBackStack = new();
+
     public Frame? Frame
     {
         get => _frame;
         set => _frame = value;
     }
 
-    public bool CanGoBack => _frame?.CanGoBack ?? false;
+    public bool CanGoBack => (_customBackStack.Count > 0) || (_frame?.CanGoBack ?? false);
 
     public event Action<Type?>? Navigated;
+    public event Action? BackStackChanged;
 
     public void SetFrame(Frame frame)
     {
@@ -61,23 +68,28 @@ public class NavigationService : INavigationService
             var resolved = App.Services.GetService(pageType) as Page;
             if (resolved is not null)
             {
-                // If the page type has a public parameterless constructor then allow
-                // the framework to navigate by type so it builds a JournalEntry.
-                // Otherwise set the frame content directly to the DI-resolved instance
-                // to avoid XAML activator instantiation (which will be null for pages
-                // without a parameterless ctor).
                 var hasParameterlessCtor = pageType.GetConstructor(Type.EmptyTypes) != null;
 
                 if (hasParameterlessCtor)
                 {
+                    // Let framework create the instance so a JournalEntry is created, but
+                    // replace it with our DI-resolved instance after navigation completes.
                     _deferredPage = resolved;
                     _deferredPageType = pageType;
-                    return _frame.Navigate(pageType, parameter);
+                    var result = _frame.Navigate(pageType, parameter);
+                    BackStackChanged?.Invoke();
+                    return result;
+                }
+
+                // No parameterless ctor - set content directly and manage our own back stack.
+                if (_frame.Content is Page current && current.GetType() != pageType)
+                {
+                    _customBackStack.Add(current);
+                    BackStackChanged?.Invoke();
                 }
 
                 _frame.Content = resolved;
 
-                // Notify subscribers that navigation completed (content set directly)
                 try
                 {
                     Navigated?.Invoke(pageType);
@@ -95,15 +107,49 @@ public class NavigationService : INavigationService
             // Resolution failed — fall back to framework activation below.
         }
 
-        return _frame.Navigate(pageType, parameter);
+        // Fallback to framework navigation which will maintain its own journal
+        // Clear custom back stack because framework will manage navigation entries now.
+        if (_customBackStack.Count > 0)
+        {
+            _customBackStack.Clear();
+            BackStackChanged?.Invoke();
+        }
+        var navResult = _frame.Navigate(pageType, parameter);
+        return navResult;
     }
 
     public bool GoBack()
     {
-        if (_frame == null || !_frame.CanGoBack)
+        if (_frame == null)
+            return false;
+
+        // If we have our own custom back entries, use them first
+        if (_customBackStack.Count > 0)
+        {
+            var lastIndex = _customBackStack.Count - 1;
+            var previous = _customBackStack[lastIndex];
+            _customBackStack.RemoveAt(lastIndex);
+
+            _frame.Content = previous;
+
+            try
+            {
+                Navigated?.Invoke(previous.GetType());
+            }
+            catch
+            {
+                // Ignore subscriber exceptions
+            }
+
+            BackStackChanged?.Invoke();
+            return true;
+        }
+
+        if (!_frame.CanGoBack)
             return false;
 
         _frame.GoBack();
+        // Frame.Navigated will fire and BackStackChanged will be invoked there
         return true;
     }
 
@@ -123,6 +169,19 @@ public class NavigationService : INavigationService
                 _deferredPageType = null;
             }
         }
+        else
+        {
+            // If navigation occurred via the framework (not our direct content set),
+            // clear any custom back stack because framework now owns navigation.
+            if (e.NavigationMode == NavigationMode.New || e.NavigationMode == NavigationMode.Back)
+            {
+                if (_customBackStack.Count > 0)
+                {
+                    _customBackStack.Clear();
+                    BackStackChanged?.Invoke();
+                }
+            }
+        }
 
         // Notify subscribers about the completed navigation
         try
@@ -133,5 +192,8 @@ public class NavigationService : INavigationService
         {
             // Ignore subscriber exceptions
         }
+
+        // Notify listeners about back stack availability
+        BackStackChanged?.Invoke();
     }
 }

@@ -40,8 +40,15 @@ public sealed partial class MainWindow : Window
         // Setup navigation service
         _navigationService.SetFrame(ContentFrame);
 
+        // Ensure initial back button state
+        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+
         // Subscribe to navigation events so we can update the NavigationView selection
         _navigationService.Navigated += OnNavigated;
+        _navigationService.BackStackChanged += OnBackStackChanged;
+
+        // Also update back button whenever the Frame navigates (framework journal changes)
+        ContentFrame.Navigated += ContentFrame_Navigated;
 
         // Setup window
         SetupWindow();
@@ -53,8 +60,23 @@ public sealed partial class MainWindow : Window
         NavigationView.SelectedItem = NavigationView.MenuItems[0];
     }
 
+    private void ContentFrame_Navigated(object sender, Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    {
+        // Update back button whenever the frame's navigation stack changes
+        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+    }
+
+    private void OnBackStackChanged()
+    {
+        // Called when custom back stack or frame back stack changes
+        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+    }
+
     private void OnNavigated(Type? pageType)
     {
+        // Always update back button enabled state when navigation occurs
+        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+
         if (pageType == null)
             return;
 
@@ -140,6 +162,8 @@ public sealed partial class MainWindow : Window
 
         // Unsubscribe from navigation events
         _navigationService.Navigated -= OnNavigated;
+        _navigationService.BackStackChanged -= OnBackStackChanged;
+        ContentFrame.Navigated -= ContentFrame_Navigated;
 
         // Restore original window proc
         if (_oldWndProc != IntPtr.Zero && _hwnd != nint.Zero)
@@ -193,6 +217,7 @@ public sealed partial class MainWindow : Window
         if (_navigationService.CanGoBack)
         {
             _navigationService.GoBack();
+            NavigationView.IsBackEnabled = _navigationService.CanGoBack;
         }
     }
 
