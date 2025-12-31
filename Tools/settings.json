@@ -11,13 +11,13 @@
   },
   "Workspaces": {
     "WorkspaceScanFolders": [
-      "C:\\Repos\\CLEARING"
+      "H:\\"
     ],
     "GitFolderPattern": ".git",
     "SolutionFilePattern": "*.sln",
     "PlatformFolderName": "platform",
     "VSCodeExecutable": "code",
-    "ExcludedFolders": []
+    "ExcludedFolders": ["H:\\ARCHIVE"]
   },
   "ClipboardPassword": {
     "EncryptedPassword": "STNlbmdraXIhdw=="
