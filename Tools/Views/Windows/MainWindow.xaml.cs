@@ -14,6 +14,7 @@ public sealed partial class MainWindow : Window
 {
     private bool _isUserClosedPane;
     private bool _isPaneOpenedOrClosedFromCode;
+    private bool _isNavigatingFromCode; // Guard to prevent re-entrancy when selecting items in code
     private readonly INavigationService _navigationService;
     private readonly IClipboardPasswordService _clipboardPasswordService;
     private AppWindow? _appWindow;
@@ -39,6 +40,9 @@ public sealed partial class MainWindow : Window
         // Setup navigation service
         _navigationService.SetFrame(ContentFrame);
 
+        // Subscribe to navigation events so we can update the NavigationView selection
+        _navigationService.Navigated += OnNavigated;
+
         // Setup window
         SetupWindow();
 
@@ -47,6 +51,40 @@ public sealed partial class MainWindow : Window
         
         // Select first item
         NavigationView.SelectedItem = NavigationView.MenuItems[0];
+    }
+
+    private void OnNavigated(Type? pageType)
+    {
+        if (pageType == null)
+            return;
+
+        // Map page type to tag
+        string? tag = pageType == typeof(DashboardPage) ? "Dashboard"
+            : pageType == typeof(WorkspacesPage) ? "Workspaces"
+            : pageType == typeof(NugetLocalPage) ? "NugetLocal"
+            : pageType == typeof(FormattersPage) ? "Formatters"
+            : pageType == typeof(ClipboardPasswordPage) ? "ClipboardPassword"
+            : pageType == typeof(EFToolsPage) ? "EFTools"
+            : pageType == typeof(CodeExecutePage) ? "CodeExecute"
+            : null;
+
+        if (tag == null)
+            return;
+
+        // Find matching NavigationViewItem and select it
+        foreach (var menuItem in NavigationView.MenuItems)
+        {
+            if (menuItem is NavigationViewItem nvi)
+            {
+                if (nvi.Tag?.ToString() == tag)
+                {
+                    _isNavigatingFromCode = true;
+                    NavigationView.SelectedItem = nvi;
+                    _isNavigatingFromCode = false;
+                    break;
+                }
+            }
+        }
     }
 
     private void SetupWindow()
@@ -100,6 +138,9 @@ public sealed partial class MainWindow : Window
     {
         _clipboardPasswordService.UnregisterHotKeys();
 
+        // Unsubscribe from navigation events
+        _navigationService.Navigated -= OnNavigated;
+
         // Restore original window proc
         if (_oldWndProc != IntPtr.Zero && _hwnd != nint.Zero)
         {
@@ -122,6 +163,9 @@ public sealed partial class MainWindow : Window
 
     private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
+        if (_isNavigatingFromCode)
+            return;
+
         if (args.SelectedItemContainer is NavigationViewItem item)
         {
             var tag = item.Tag?.ToString();

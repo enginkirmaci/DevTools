@@ -9,28 +9,28 @@
     mc:Ignorable="d"
     Background="Transparent">
 
-    <Grid Margin="0,0,0,24">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+	<Grid Margin="0,0,0,24">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
 
-        <!-- Header -->
-        <InfoBar
+		<!-- Header -->
+		<InfoBar
             Title="SQL to C# Converter"
             Grid.Row="0"
             Grid.ColumnSpan="2"
             IsClosable="False"
             IsOpen="True"
-            Margin="0,0,0,12"/>
+            Margin="0,0,0,12" />
 
-        <Button
+		<Button
             Grid.Row="0"
             Grid.ColumnSpan="2"
             Margin="0,0,0,12"
@@ -38,14 +38,14 @@
             VerticalAlignment="Center"
             Style="{StaticResource AccentButtonStyle}"
             Command="{x:Bind ViewModel.ConvertSqlCommand}">
-            <StackPanel Orientation="Horizontal">
-                <FontIcon Glyph="&#xE8AB;" Margin="0,0,8,0" FontSize="16"/>
-                <TextBlock Text="Convert to C#" />
-            </StackPanel>
-        </Button>
+			<StackPanel Orientation="Horizontal">
+				<FontIcon Glyph="&#xE8AB;" Margin="0,0,8,0" FontSize="16" />
+				<TextBlock Text="Convert to C#" />
+			</StackPanel>
+		</Button>
 
-        <!-- SQL Input -->
-        <TextBox
+		<!-- SQL Input -->
+		<TextBox
             x:Name="SqlInputTextBox"
             Grid.Row="1"
             Grid.Column="0"
@@ -53,32 +53,32 @@
             AcceptsReturn="True"
             TextWrapping="Wrap"
             PlaceholderText="Enter SQL Create Table statement..."
-            Text="{x:Bind ViewModel.SqlInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-            Height="200"/>
+            Text="{x:Bind ViewModel.SqlInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Height="200" />
 
-        <!-- C# Output -->
-        <Grid
+		<!-- C# Output -->
+		<Grid
             Grid.Row="1"
             Grid.Column="1"
             Margin="8,0,0,12">
-            <TextBox
+			<TextBox
                 AcceptsReturn="True"
                 IsReadOnly="True"
                 Text="{x:Bind ViewModel.CSharpOutput, Mode=OneWay}"
                 TextWrapping="Wrap"
-                Height="200"/>
-            <Button
+                Height="200" />
+			<Button
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
-                Margin="0,4,4,0"
+                Margin="0,26,6,0"
                 Command="{x:Bind ViewModel.CopyToClipboardCommand}"
                 ToolTipService.ToolTip="Copy">
-                <FontIcon Glyph="&#xE8C8;" FontSize="16"/>
-            </Button>
-        </Grid>
+				<FontIcon Glyph="&#xE8C8;" FontSize="16" />
+			</Button>
+		</Grid>
 
-        <!-- Repository Template Input -->
-        <TextBox
+		<!-- Repository Template Input -->
+		<TextBox
             x:Name="TableNameInputTextBox"
             Grid.Row="3"
             Grid.Column="0"
@@ -86,29 +86,29 @@
             AcceptsReturn="True"
             TextWrapping="Wrap"
             Header="Repository Template"
-            Text="{x:Bind ViewModel.RepositoryTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-            Height="200"/>
+            Text="{x:Bind ViewModel.RepositoryTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Height="200" />
 
-        <!-- Repository Output -->
-        <Grid
+		<!-- Repository Output -->
+		<Grid
             Grid.Row="3"
             Grid.Column="1"
             Margin="8,0,0,0">
-            <TextBox
+			<TextBox
                 AcceptsReturn="True"
                 IsReadOnly="True"
                 Header="Generated Repository"
                 Text="{x:Bind ViewModel.RepositoryOutput, Mode=OneWay}"
                 TextWrapping="Wrap"
-                Height="200"/>
-            <Button
+                Height="200" />
+			<Button
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
-                Margin="0,32,4,0"
+                Margin="0,60,6,0"
                 Command="{x:Bind ViewModel.CopyRepositoryToClipboardCommand}"
                 ToolTipService.ToolTip="Copy">
-                <FontIcon Glyph="&#xE8C8;" FontSize="16"/>
-            </Button>
-        </Grid>
-    </Grid>
+				<FontIcon Glyph="&#xE8C8;" FontSize="16" />
+			</Button>
+		</Grid>
+	</Grid>
 </Page>
