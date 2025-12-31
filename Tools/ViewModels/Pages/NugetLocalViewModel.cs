@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Runtime.InteropServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Tools.Library.Entities;
@@ -33,7 +34,7 @@ public partial class NugetLocalViewModel : ObservableObject
     private int _count;
 
     public IRelayCommand<object> WatchChangesCommand { get; }
-    public IRelayCommand<string> TextboxClickCommand { get; }
+    public IAsyncRelayCommand<string> TextboxClickCommand { get; }
 
     public NugetLocalViewModel(ISettingsService settingsService)
     {
@@ -41,7 +42,7 @@ public partial class NugetLocalViewModel : ObservableObject
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
         WatchChangesCommand = new RelayCommand<object>(WatchChangesCommandMethod);
-        TextboxClickCommand = new RelayCommand<string>(TextboxClickCommandMethod);
+        TextboxClickCommand = new AsyncRelayCommand<string>(TextboxClickCommandMethod);
 
         _ = InitializeAsync();
     }
@@ -55,27 +56,54 @@ public partial class NugetLocalViewModel : ObservableObject
         CopyFolder = _nugetSettings.CopyFolder ?? string.Empty;
     }
 
-    private async void TextboxClickCommandMethod(string? operation)
+    private async Task TextboxClickCommandMethod(string? operation)
     {
-        var picker = new FolderPicker();
-        picker.SuggestedStartLocation = PickerLocationId.ComputerFolder;
-        picker.FileTypeFilter.Add("*");
-
-        // Get the window handle for the picker
         var hwnd = WindowNative.GetWindowHandle(App.MainWindow);
-        InitializeWithWindow.Initialize(picker, hwnd);
 
-        var folder = await picker.PickSingleFolderAsync();
-        if (folder != null)
+        // Try WinRT FolderPicker first (standard for WinUI 3)
+        try
         {
-            if (operation == "Watch")
+            var picker = new FolderPicker();
+            picker.SuggestedStartLocation = PickerLocationId.Desktop;
+            picker.FileTypeFilter.Add("*");
+
+            InitializeWithWindow.Initialize(picker, hwnd);
+
+            var folder = await picker.PickSingleFolderAsync();
+            if (folder != null)
             {
-                WatchFolder = folder.Path;
+                if (operation == "Watch")
+                    WatchFolder = folder.Path;
+                else
+                    CopyFolder = folder.Path;
+
+                return;
             }
-            else
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"WinRT FolderPicker failed: {ex.Message}");
+            // Fall through to fallback
+        }
+
+        // Fallback to Win32 Common Item Dialog (more reliable in unpackaged apps)
+        try
+        {
+            var title = operation == "Watch" ? "Select Watch Folder" : "Select Copy Folder";
+            var path = Tools.Helpers.FolderPickerHelper.PickFolder(hwnd, title);
+            
+            if (!string.IsNullOrEmpty(path))
             {
-                CopyFolder = folder.Path;
+                if (operation == "Watch")
+                    WatchFolder = path;
+                else
+                    CopyFolder = path;
             }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Native FolderPicker fallback failed: {ex.Message}");
+            ShowError($"Failed to open folder picker: {ex.Message}");
         }
     }
 
