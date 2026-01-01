@@ -1,4 +1,6 @@
-﻿using Microsoft.UI;
+using System.Runtime.InteropServices;
+using Microsoft.UI;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -6,7 +8,6 @@ using Tools.Services;
 using Tools.ViewModels.Windows;
 using Tools.Views.Pages;
 using WinRT.Interop;
-using System.Runtime.InteropServices;
 
 namespace Tools.Views.Windows;
 
@@ -21,6 +22,7 @@ public sealed partial class MainWindow : Window
 
     // HWND and WndProc related
     private nint _hwnd;
+
     private IntPtr _oldWndProc = IntPtr.Zero;
     private WndProcDelegate? _wndProcDelegate;
 
@@ -55,7 +57,7 @@ public sealed partial class MainWindow : Window
 
         // Navigate to default page
         _navigationService.Navigate(App.DefaultPage);
-        
+
         // Select first item
         NavigationView.SelectedItem = NavigationView.MenuItems[0];
     }
@@ -111,6 +113,9 @@ public sealed partial class MainWindow : Window
 
     private void SetupWindow()
     {
+        SystemBackdrop = new MicaBackdrop()
+        { Kind = MicaKind.BaseAlt };
+
         // Get the window handle
         _hwnd = WindowNative.GetWindowHandle(this);
         var windowId = Win32Interop.GetWindowIdFromWindow(_hwnd);
@@ -120,7 +125,7 @@ public sealed partial class MainWindow : Window
         if (_appWindow != null)
         {
             _appWindow.Resize(new global::Windows.Graphics.SizeInt32(1450, 802));
-            
+
             // Center window on screen
             var displayArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
             if (displayArea != null)
@@ -135,6 +140,8 @@ public sealed partial class MainWindow : Window
             {
                 var titleBar = _appWindow.TitleBar;
                 titleBar.ExtendsContentIntoTitleBar = true;
+                // Enable system backdrop (Mica / Acrylic)
+                //titleBar.UseSystemBackdropBrush = true;
                 titleBar.ButtonBackgroundColor = Colors.Transparent;
                 titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
 
