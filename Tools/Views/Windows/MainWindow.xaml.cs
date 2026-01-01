@@ -146,7 +146,7 @@ public sealed partial class MainWindow : Window
                 titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
 
                 // Set the drag region
-                SetTitleBar(AppTitleBar);
+                SetTitleBar(AppTitleBarDragArea);
             }
         }
 
@@ -220,6 +220,15 @@ public sealed partial class MainWindow : Window
     }
 
     private void NavigationView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+    {
+        if (_navigationService.CanGoBack)
+        {
+            _navigationService.GoBack();
+            NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+        }
+    }
+
+    private void TitleBarBackButton_Click(object sender, RoutedEventArgs e)
     {
         if (_navigationService.CanGoBack)
         {
