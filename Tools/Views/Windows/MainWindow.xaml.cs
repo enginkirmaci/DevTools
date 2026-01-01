@@ -4,30 +4,49 @@ using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Tools.Services;
+using Tools.Library.Services.Abstractions;
 using Tools.ViewModels.Windows;
 using Tools.Views.Pages;
 using WinRT.Interop;
 
+using Tools.Helpers;
+
 namespace Tools.Views.Windows;
 
+/// <summary>
+/// Main application window with navigation, hotkey support, and window management.
+/// Implements Interface Segregation Principle - depends only on required service interfaces.
+/// </summary>
 public sealed partial class MainWindow : Window
 {
-    private bool _isUserClosedPane;
-    private bool _isPaneOpenedOrClosedFromCode;
-    private bool _isNavigatingFromCode; // Guard to prevent re-entrancy when selecting items in code
+    #region Constants
+    private const int NavigationPaneThreshold = 1200;
+    #endregion
+
+    #region Fields
     private readonly INavigationService _navigationService;
     private readonly IClipboardPasswordService _clipboardPasswordService;
-    private AppWindow? _appWindow;
+    private readonly WindowMessageHandler _messageHandler;
+    private readonly WindowConfigurator _windowConfigurator;
+    private readonly InfoBarManager _infoBarManager;
 
-    // HWND and WndProc related
-    private nint _hwnd;
+    private bool _isUserClosedPane;
+    private bool _isPaneOpenedOrClosedFromCode;
+    private bool _isNavigatingFromCode;
+    #endregion
 
-    private IntPtr _oldWndProc = IntPtr.Zero;
-    private WndProcDelegate? _wndProcDelegate;
-
+    #region Properties
+    /// <summary>
+    /// Gets the ViewModel for this window.
+    /// </summary>
     public MainWindowViewModel ViewModel { get; }
+    #endregion
 
+    #region Constructor
+
+    /// <summary>
+    /// Initializes a new instance of the MainWindow.
+    /// </summary>
     public MainWindow(
         MainWindowViewModel viewModel,
         INavigationService navigationService,
@@ -37,180 +56,179 @@ public sealed partial class MainWindow : Window
         _navigationService = navigationService;
         _clipboardPasswordService = clipboardPasswordService;
 
-        this.InitializeComponent();
+        // Initialize helper classes (Dependency Inversion Principle)
+        _messageHandler = new WindowMessageHandler(clipboardPasswordService);
+        _windowConfigurator = new WindowConfigurator(this);
 
-        // Setup navigation service
+        InitializeComponent();
+
+        // Initialize InfoBarManager after InitializeComponent
+        _infoBarManager = new InfoBarManager(AppInfoBar, DispatcherQueue);
+
+        InitializeNavigation();
+        InitializeWindow();
+        NavigateToDefaultPage();
+    }
+    #endregion
+
+    #region Initialization
+    /// <summary>
+    /// Initializes navigation service and event subscriptions.
+    /// </summary>
+    private void InitializeNavigation()
+    {
         _navigationService.SetFrame(ContentFrame);
-
-        // Ensure initial back button state
-        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
-
-        // Subscribe to navigation events so we can update the NavigationView selection
         _navigationService.Navigated += OnNavigated;
         _navigationService.BackStackChanged += OnBackStackChanged;
+        ContentFrame.Navigated += OnContentFrameNavigated;
 
-        // Also update back button whenever the Frame navigates (framework journal changes)
-        ContentFrame.Navigated += ContentFrame_Navigated;
+        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+    }
 
-        // Setup window
-        SetupWindow();
-
-        // Navigate to default page
+    /// <summary>
+    /// Navigates to the default application page.
+    /// </summary>
+    private void NavigateToDefaultPage()
+    {
         _navigationService.Navigate(App.DefaultPage);
-
-        // Select first item
         NavigationView.SelectedItem = NavigationView.MenuItems[0];
     }
 
-    private void ContentFrame_Navigated(object sender, Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
+    /// <summary>
+    /// Handles content frame navigation events.
+    /// </summary>
+    private void OnContentFrameNavigated(object sender, Microsoft.UI.Xaml.Navigation.NavigationEventArgs e)
     {
-        // Update back button whenever the frame's navigation stack changes
-        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+        UpdateBackButtonState();
     }
 
+    /// <summary>
+    /// Handles navigation back stack changes.
+    /// </summary>
     private void OnBackStackChanged()
     {
-        // Called when custom back stack or frame back stack changes
-        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+        UpdateBackButtonState();
     }
 
+    /// <summary>
+    /// Handles navigation completion and updates NavigationView selection.
+    /// </summary>
     private void OnNavigated(Type? pageType)
     {
-        // Always update back button enabled state when navigation occurs
+        UpdateBackButtonState();
+
+        if (pageType == null) return;
+
+        var tag = PageNavigationMapper.GetTagFromPageType(pageType);
+        if (tag == null) return;
+
+        SelectNavigationItem(tag);
+    }
+
+    /// <summary>
+    /// Updates the back button enabled state.
+    /// </summary>
+    private void UpdateBackButtonState()
+    {
         NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+    }
 
-        if (pageType == null)
-            return;
-
-        // Map page type to tag
-        string? tag = pageType == typeof(DashboardPage) ? "Dashboard"
-            : pageType == typeof(WorkspacesPage) ? "Workspaces"
-            : pageType == typeof(NugetLocalPage) ? "NugetLocal"
-            : pageType == typeof(FormattersPage) ? "Formatters"
-            : pageType == typeof(ClipboardPasswordPage) ? "ClipboardPassword"
-            : pageType == typeof(EFToolsPage) ? "EFTools"
-            : pageType == typeof(CodeExecutePage) ? "CodeExecute"
-            : null;
-
-        if (tag == null)
-            return;
-
-        // Find matching NavigationViewItem and select it
+    /// <summary>
+    /// Selects the navigation item matching the specified tag.
+    /// </summary>
+    private void SelectNavigationItem(string tag)
+    {
         foreach (var menuItem in NavigationView.MenuItems)
         {
-            if (menuItem is NavigationViewItem nvi)
+            if (menuItem is NavigationViewItem nvi && nvi.Tag?.ToString() == tag)
             {
-                if (nvi.Tag?.ToString() == tag)
-                {
-                    _isNavigatingFromCode = true;
-                    NavigationView.SelectedItem = nvi;
-                    _isNavigatingFromCode = false;
-                    break;
-                }
+                _isNavigatingFromCode = true;
+                NavigationView.SelectedItem = nvi;
+                _isNavigatingFromCode = false;
+                break;
             }
         }
     }
+    #endregion
 
-    private void SetupWindow()
+    #region UI Event Handlers
+
+    /// <summary>
+    /// Initializes window appearance, size, position, and event handlers.
+    /// </summary>
+    private void InitializeWindow()
     {
-        SystemBackdrop = new MicaBackdrop()
-        { Kind = MicaKind.BaseAlt };
-
-        // Get the window handle
-        _hwnd = WindowNative.GetWindowHandle(this);
-        var windowId = Win32Interop.GetWindowIdFromWindow(_hwnd);
-        _appWindow = AppWindow.GetFromWindowId(windowId);
-
-        // Set window size
-        if (_appWindow != null)
-        {
-            _appWindow.Resize(new global::Windows.Graphics.SizeInt32(1450, 802));
-
-            // Center window on screen
-            var displayArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
-            if (displayArea != null)
-            {
-                var centerX = (displayArea.WorkArea.Width - 1450) / 2;
-                var centerY = (displayArea.WorkArea.Height - 802) / 2;
-                _appWindow.Move(new global::Windows.Graphics.PointInt32(centerX, centerY));
-            }
-
-            // Setup title bar
-            if (AppWindowTitleBar.IsCustomizationSupported())
-            {
-                var titleBar = _appWindow.TitleBar;
-                titleBar.ExtendsContentIntoTitleBar = true;
-                // Enable system backdrop (Mica / Acrylic)
-                //titleBar.UseSystemBackdropBrush = true;
-                titleBar.ButtonBackgroundColor = Colors.Transparent;
-                titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-
-                // Set the drag region
-                SetTitleBar(AppTitleBarDragArea);
-            }
-        }
-
-        // Register global hotkeys
-        _clipboardPasswordService.RegisterHotKeys(_hwnd);
-
-        // Subclass the window to receive WM_HOTKEY
-        _wndProcDelegate = new WndProcDelegate(WndProc);
-        var newProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
-        _oldWndProc = SetWindowLongPtr(_hwnd, GWL_WNDPROC, newProcPtr);
-
-        // Handle window closing
-        this.Closed += MainWindow_Closed;
-        this.SizeChanged += MainWindow_SizeChanged;
+        _windowConfigurator.Configure(AppTitleBarDragArea);
+        ConfigureHotkeys();
+        SubscribeToWindowEvents();
     }
 
-    private void MainWindow_Closed(object sender, WindowEventArgs args)
+    /// <summary>
+    /// Configures global hotkey handling.
+    /// </summary>
+    private void ConfigureHotkeys()
     {
-        _clipboardPasswordService.UnregisterHotKeys();
-
-        // Unsubscribe from navigation events
-        _navigationService.Navigated -= OnNavigated;
-        _navigationService.BackStackChanged -= OnBackStackChanged;
-        ContentFrame.Navigated -= ContentFrame_Navigated;
-
-        // Restore original window proc
-        if (_oldWndProc != IntPtr.Zero && _hwnd != nint.Zero)
-        {
-            SetWindowLongPtr(_hwnd, GWL_WNDPROC, _oldWndProc);
-            _oldWndProc = IntPtr.Zero;
-        }
+        _clipboardPasswordService.RegisterHotKeys(_windowConfigurator.WindowHandle);
+        _messageHandler.Install(_windowConfigurator.WindowHandle);
     }
 
-    private void MainWindow_SizeChanged(object sender, WindowSizeChangedEventArgs args)
+    /// <summary>
+    /// Subscribes to window events.
+    /// </summary>
+    private void SubscribeToWindowEvents()
     {
-        if (_isUserClosedPane)
-        {
-            return;
-        }
+        Closed += OnWindowClosed;
+        SizeChanged += OnWindowSizeChanged;
+    }
+    #endregion
+
+    #region Navigation Event Handlers
+
+    /// <summary>
+    /// Handles window closing event and performs cleanup.
+    /// </summary>
+    private void OnWindowClosed(object sender, WindowEventArgs args)
+    {
+        Cleanup();
+    }
+
+    /// <summary>
+    /// Handles window size changes and adjusts navigation pane.
+    /// </summary>
+    private void OnWindowSizeChanged(object sender, WindowSizeChangedEventArgs args)
+    {
+        if (_isUserClosedPane) return;
 
         _isPaneOpenedOrClosedFromCode = true;
-        NavigationView.IsPaneOpen = args.Size.Width > 1200;
+        NavigationView.IsPaneOpen = args.Size.Width > NavigationPaneThreshold;
         _isPaneOpenedOrClosedFromCode = false;
     }
 
+    /// <summary>
+    /// Performs cleanup when window is closing.
+    /// </summary>
+    private void Cleanup()
+    {
+        _clipboardPasswordService.UnregisterHotKeys();
+
+        _navigationService.Navigated -= OnNavigated;
+        _navigationService.BackStackChanged -= OnBackStackChanged;
+        ContentFrame.Navigated -= OnContentFrameNavigated;
+
+        _messageHandler.Uninstall(_windowConfigurator.WindowHandle);
+    }
+
+    /// <summary>
+    /// Handles NavigationView selection changes.
+    /// </summary>
     private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
-        if (_isNavigatingFromCode)
-            return;
+        if (_isNavigatingFromCode) return;
 
         if (args.SelectedItemContainer is NavigationViewItem item)
         {
             var tag = item.Tag?.ToString();
-            Type? pageType = tag switch
-            {
-                "Dashboard" => typeof(DashboardPage),
-                "Workspaces" => typeof(WorkspacesPage),
-                "NugetLocal" => typeof(NugetLocalPage),
-                "Formatters" => typeof(FormattersPage),
-                "ClipboardPassword" => typeof(ClipboardPasswordPage),
-                "EFTools" => typeof(EFToolsPage),
-                "CodeExecute" => typeof(CodeExecutePage),
-                _ => null
-            };
+            var pageType = PageNavigationMapper.GetPageTypeFromTag(tag);
 
             if (pageType != null)
             {
@@ -219,84 +237,47 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// Handles NavigationView back button requests.
+    /// </summary>
     private void NavigationView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
     {
-        if (_navigationService.CanGoBack)
-        {
-            _navigationService.GoBack();
-            NavigationView.IsBackEnabled = _navigationService.CanGoBack;
-        }
+        NavigateBack();
     }
 
+    /// <summary>
+    /// Handles title bar back button clicks.
+    /// </summary>
     private void TitleBarBackButton_Click(object sender, RoutedEventArgs e)
     {
+        NavigateBack();
+    }
+
+    /// <summary>
+    /// Navigates back if possible.
+    /// </summary>
+    private void NavigateBack()
+    {
         if (_navigationService.CanGoBack)
         {
             _navigationService.GoBack();
-            NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+            UpdateBackButtonState();
         }
     }
 
+    #endregion
+
+    #region Public Methods
+    /// <summary>
+    /// Shows an informational message bar.
+    /// Delegates to InfoBarManager (Dependency Inversion Principle).
+    /// </summary>
+    /// <param name="title">The title of the message.</param>
+    /// <param name="message">The message content.</param>
+    /// <param name="severity">The severity level of the message.</param>
     public void ShowInfoBar(string title, string message, InfoBarSeverity severity = InfoBarSeverity.Informational)
     {
-        AppInfoBar.Title = title;
-        AppInfoBar.Message = message;
-        AppInfoBar.Severity = severity;
-        AppInfoBar.IsOpen = true;
-
-        // Auto-close after 5 seconds
-        var timer = DispatcherQueue.CreateTimer();
-        timer.Interval = TimeSpan.FromSeconds(5);
-        timer.Tick += (s, e) =>
-        {
-            AppInfoBar.IsOpen = false;
-            timer.Stop();
-        };
-        timer.Start();
+        _infoBarManager.Show(title, message, severity);
     }
-
-    // WndProc override for hotkey handling
-    private IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
-    {
-        const int WM_HOTKEY = 0x0312;
-        const int HOTKEY_ID = 9000;
-
-        if (msg == WM_HOTKEY)
-        {
-            if (wParam.ToInt32() == HOTKEY_ID)
-            {
-                // Fire-and-forget handling
-                _ = _clipboardPasswordService.HandleHotkeyAsync();
-                return IntPtr.Zero;
-            }
-        }
-
-        return CallWindowProc(_oldWndProc, hWnd, msg, wParam, lParam);
-    }
-
-    // PInvoke and helpers for subclassing
-    private const int GWL_WNDPROC = -4;
-
-    private delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-
-    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
-    private static extern IntPtr SetWindowLongPtrW(IntPtr hWnd, int nIndex, IntPtr newProc);
-
-    [DllImport("user32.dll", EntryPoint = "SetWindowLongW", SetLastError = true)]
-    private static extern int SetWindowLongW(IntPtr hWnd, int nIndex, int newProc);
-
-    private static IntPtr SetWindowLongPtr(nint hWnd, int nIndex, IntPtr newProc)
-    {
-        if (IntPtr.Size == 8)
-        {
-            return SetWindowLongPtrW(hWnd, nIndex, newProc);
-        }
-        else
-        {
-            return new IntPtr(SetWindowLongW(hWnd, nIndex, newProc.ToInt32()));
-        }
-    }
-
-    [DllImport("user32.dll", EntryPoint = "CallWindowProcW", SetLastError = true)]
-    private static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+    #endregion
 }

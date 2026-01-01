@@ -1,16 +1,26 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.UI.Xaml.Controls;
-using Tools.Provider;
+﻿using Microsoft.UI.Xaml.Controls;
+using Tools.Library.Mvvm;
+using Tools.Library.Providers;
 
 namespace Tools.ViewModels.Windows;
 
-public partial class MainWindowViewModel : ObservableObject
+/// <summary>
+/// ViewModel for the main window of the application.
+/// </summary>
+public partial class MainWindowViewModel : ViewModelBase
 {
+    /// <summary>
+    /// Gets the title of the application.
+    /// </summary>
     public string ApplicationTitle { get; } = "Dev Tools";
-    public ObservableCollection<NavigationViewItem> MenuItems { get; set; }
+
+    /// <summary>
+    /// Gets the collection of menu items for navigation.
+    /// </summary>
+    public IReadOnlyCollection<NavigationViewItem> MenuItems { get; }
 
     public MainWindowViewModel()
     {
-        MenuItems = NavigationCollectionProvider.GetNavigationViewItems();
+        MenuItems = NavigationProvider.GetNavigationMenuItems();
     }
 }

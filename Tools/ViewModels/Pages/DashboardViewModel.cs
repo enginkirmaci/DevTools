@@ -1,29 +1,37 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Tools.Library.Converters;
-using Tools.Library.Entities;
-using Tools.Provider;
-using Tools.Services;
+using Tools.Library.Models;
+using Tools.Library.Mvvm;
+using Tools.Library.Providers;
+using Tools.Library.Services.Abstractions;
 
 namespace Tools.ViewModels.Pages;
 
-public partial class DashboardViewModel : ObservableObject
+/// <summary>
+/// ViewModel for the Dashboard page.
+/// </summary>
+public partial class DashboardViewModel : PageViewModelBase
 {
     private readonly INavigationService _navigationService;
 
+    /// <summary>
+    /// Gets the command for card click actions.
+    /// </summary>
     public IRelayCommand<string> CardClickCommand { get; }
-    public ObservableCollection<NavigationItem> DashboardCards { get; set; }
+
+    /// <summary>
+    /// Gets the collection of dashboard navigation cards.
+    /// </summary>
+    public IReadOnlyCollection<NavigationItem> DashboardCards { get; }
 
     public DashboardViewModel(INavigationService navigationService)
     {
         _navigationService = navigationService;
-
-        CardClickCommand = new RelayCommand<string>(CardClick);
-
-        DashboardCards = NavigationCollectionProvider.GetNavigationItems(CardClickCommand);
+        CardClickCommand = new RelayCommand<string>(OnCardClick);
+        DashboardCards = NavigationProvider.GetDashboardItems(CardClickCommand);
     }
 
-    private void CardClick(string? parameter)
+    private void OnCardClick(string? parameter)
     {
         if (string.IsNullOrWhiteSpace(parameter))
         {
@@ -31,7 +39,6 @@ public partial class DashboardViewModel : ObservableObject
         }
 
         Type? pageType = NameToPageTypeConverter.Convert(parameter);
-
         if (pageType == null)
         {
             return;

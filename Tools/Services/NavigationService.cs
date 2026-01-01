@@ -1,23 +1,13 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Tools.Library.Services.Abstractions;
 
 namespace Tools.Services;
 
-public interface INavigationService
-{
-    Frame? Frame { get; set; }
-    bool CanGoBack { get; }
-    bool Navigate(Type pageType, object? parameter = null);
-    bool GoBack();
-    void SetFrame(Frame frame);
-
-    // Event raised after navigation to notify subscribers of the new page type
-    event Action<Type?>? Navigated;
-
-    // Event raised when back stack availability changes
-    event Action? BackStackChanged;
-}
-
+/// <summary>
+/// Implementation of navigation service for WinUI 3 applications.
+/// Handles navigation with dependency injection support.
+/// </summary>
 public class NavigationService : INavigationService
 {
     private Frame? _frame;
@@ -104,7 +94,7 @@ public class NavigationService : INavigationService
         }
         catch
         {
-            // Resolution failed — fall back to framework activation below.
+            // Resolution failed ï¿½ fall back to framework activation below.
         }
 
         // Fallback to framework navigation which will maintain its own journal

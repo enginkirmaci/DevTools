@@ -1,12 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tools.Library.Extensions;
-using Windows.ApplicationModel.DataTransfer;
+using Tools.Library.Mvvm;
+using Tools.Library.Services.Abstractions;
 
 namespace Tools.ViewModels.Pages;
 
-public partial class FormattersPageViewModel : ObservableObject
+/// <summary>
+/// ViewModel for the Formatters page.
+/// </summary>
+public partial class FormattersPageViewModel : PageViewModelBase
 {
+    private readonly IClipboardService _clipboardService;
+
     [ObservableProperty]
     private string _inputText = string.Empty;
 
@@ -28,11 +34,19 @@ public partial class FormattersPageViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<string> _history = new();
 
+    /// <summary>
+    /// Gets the command to convert text.
+    /// </summary>
     public IRelayCommand ConvertCommand { get; }
+
+    /// <summary>
+    /// Gets the command to copy text to clipboard.
+    /// </summary>
     public IRelayCommand<string> CopyToClipboardCommand { get; }
 
-    public FormattersPageViewModel()
+    public FormattersPageViewModel(IClipboardService clipboardService)
     {
+        _clipboardService = clipboardService;
         ConvertCommand = new RelayCommand(OnConvert);
         CopyToClipboardCommand = new RelayCommand<string>(OnCopyToClipboard);
     }
@@ -81,9 +95,7 @@ public partial class FormattersPageViewModel : ObservableObject
     {
         if (!string.IsNullOrEmpty(text))
         {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText(text);
-            Clipboard.SetContent(dataPackage);
+            _clipboardService.CopyText(text);
         }
     }
 }

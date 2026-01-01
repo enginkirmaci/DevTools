@@ -1,6 +1,6 @@
 ﻿using Serilog;
-using Tools.Library.Services;
-using Tools.Services;
+using Tools.Library.Extensions;
+using Tools.Library.Services.Abstractions;
 using Tools.Services;
 using Tools.ViewModels.Pages;
 using Tools.ViewModels.Windows;
@@ -46,33 +46,34 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        // Register Windows
+        // Register core library services
+        services.AddCoreServices();
+
+        // Register application services
+        services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<IClipboardPasswordService, ClipboardPasswordService>();
+
+        // Register windows and view models
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainWindowViewModel>();
 
-        // Register Pages
-        services.AddTransient<DashboardPage>();
-        services.AddTransient<DashboardViewModel>();
-        services.AddTransient<WorkspacesPage>();
-        services.AddTransient<WorkspacesViewModel>();
-        services.AddTransient<FormattersPage>();
-        services.AddTransient<FormattersPageViewModel>();
-        services.AddTransient<NugetLocalPage>();
-        services.AddTransient<NugetLocalViewModel>();
-        services.AddTransient<EFToolsPage>();
-        services.AddTransient<EFToolsPageViewModel>();
-        services.AddTransient<CodeExecutePage>();
-        services.AddTransient<CodeExecutePageViewModel>();
-        services.AddTransient<ClipboardPasswordPage>();
-        services.AddTransient<ClipboardPasswordPageViewModel>();
-        services.AddTransient<HostFileProxyPage>();
-        services.AddTransient<HostFileProxyViewModel>();
+        // Register pages and view models
+        RegisterPageWithViewModel<DashboardPage, DashboardViewModel>(services);
+        RegisterPageWithViewModel<WorkspacesPage, WorkspacesViewModel>(services);
+        RegisterPageWithViewModel<FormattersPage, FormattersPageViewModel>(services);
+        RegisterPageWithViewModel<NugetLocalPage, NugetLocalViewModel>(services);
+        RegisterPageWithViewModel<EFToolsPage, EFToolsPageViewModel>(services);
+        RegisterPageWithViewModel<CodeExecutePage, CodeExecutePageViewModel>(services);
+        RegisterPageWithViewModel<ClipboardPasswordPage, ClipboardPasswordPageViewModel>(services);
+        RegisterPageWithViewModel<HostFileProxyPage, HostFileProxyViewModel>(services);
+    }
 
-        // Register Services
-        services.AddSingleton<INavigationService, NavigationService>();
-        services.AddSingleton<ISettingsService, SettingsService>();
-        services.AddSingleton<IClipboardPasswordService, ClipboardPasswordService>();
-        services.AddSingleton<IClipboardService, ClipboardService>();
+    private static void RegisterPageWithViewModel<TPage, TViewModel>(IServiceCollection services)
+        where TPage : class
+        where TViewModel : class
+    {
+        services.AddTransient<TPage>();
+        services.AddTransient<TViewModel>();
     }
 
     /// <summary>

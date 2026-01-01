@@ -46,7 +46,7 @@
                     Grid.Column="2"
                     Margin="8,8,16,8"
                     VerticalAlignment="Stretch"
-                    Command="{x:Bind ViewModel.TextboxClickCommand}"
+					Command="{x:Bind ViewModel.SelectFolderCommand}"
                     CommandParameter="Watch">
 					<FontIcon Glyph="&#xE8B7;" FontSize="16" />
 				</Button>
@@ -64,7 +64,7 @@
                     Grid.Column="2"
                     Margin="8,8,16,8"
                     VerticalAlignment="Stretch"
-                    Command="{x:Bind ViewModel.TextboxClickCommand}"
+					Command="{x:Bind ViewModel.SelectFolderCommand}"
                     CommandParameter="Copy">
 					<FontIcon Glyph="&#xE8B7;" FontSize="16" />
 				</Button>

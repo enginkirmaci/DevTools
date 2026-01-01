@@ -2,21 +2,25 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
-using Tools.Library.Entities;
-using Tools.Library.Services;
+using Tools.Library.Configuration;
+using Tools.Library.Mvvm;
+using Tools.Library.Services.Abstractions;
 using Tools.Views.Windows;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 
 namespace Tools.ViewModels.Pages;
 
-public partial class NugetLocalViewModel : ObservableObject
+/// <summary>
+/// ViewModel for the Nuget Local page.
+/// </summary>
+public partial class NugetLocalViewModel : PageViewModelBase
 {
     private readonly ISettingsService _settingsService;
+    private readonly DispatcherQueue _dispatcherQueue;
     private FileSystemWatcher? _watcher;
     private NugetLocalSettings _nugetSettings = new();
     private DateTime _lastChanges = DateTime.Now;
-    private readonly DispatcherQueue _dispatcherQueue;
 
     [ObservableProperty]
     private ObservableCollection<string> _fileList = new();
@@ -33,21 +37,29 @@ public partial class NugetLocalViewModel : ObservableObject
     [ObservableProperty]
     private int _count;
 
+    /// <summary>
+    /// Gets the command to start/stop watching for changes.
+    /// </summary>
     public IRelayCommand<object> WatchChangesCommand { get; }
-    public IAsyncRelayCommand<string> TextboxClickCommand { get; }
+
+    /// <summary>
+    /// Gets the command to select folders.
+    /// </summary>
+    public IAsyncRelayCommand<string> SelectFolderCommand { get; }
 
     public NugetLocalViewModel(ISettingsService settingsService)
     {
         _settingsService = settingsService;
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-        WatchChangesCommand = new RelayCommand<object>(WatchChangesCommandMethod);
-        TextboxClickCommand = new AsyncRelayCommand<string>(TextboxClickCommandMethod);
+        WatchChangesCommand = new RelayCommand<object>(OnWatchChanges);
+        SelectFolderCommand = new AsyncRelayCommand<string>(OnSelectFolderAsync);
 
-        _ = InitializeAsync();
+        _ = OnInitializeAsync();
     }
 
-    public async Task InitializeAsync()
+    /// <inheritdoc/>
+    public override async Task OnInitializeAsync()
     {
         var settings = await _settingsService.GetSettingsAsync();
         _nugetSettings = settings.NugetLocal ?? new NugetLocalSettings();
@@ -56,15 +68,17 @@ public partial class NugetLocalViewModel : ObservableObject
         CopyFolder = _nugetSettings.CopyFolder ?? string.Empty;
     }
 
-    private async Task TextboxClickCommandMethod(string? operation)
+    private async Task OnSelectFolderAsync(string? operation)
     {
         var hwnd = WindowNative.GetWindowHandle(App.MainWindow);
 
         // Try WinRT FolderPicker first (standard for WinUI 3)
         try
         {
-            var picker = new FolderPicker();
-            picker.SuggestedStartLocation = PickerLocationId.Desktop;
+            var picker = new FolderPicker
+            {
+                SuggestedStartLocation = PickerLocationId.Desktop
+            };
             picker.FileTypeFilter.Add("*");
 
             InitializeWithWindow.Initialize(picker, hwnd);
@@ -72,18 +86,13 @@ public partial class NugetLocalViewModel : ObservableObject
             var folder = await picker.PickSingleFolderAsync();
             if (folder != null)
             {
-                if (operation == "Watch")
-                    WatchFolder = folder.Path;
-                else
-                    CopyFolder = folder.Path;
-
+                UpdateFolderPath(operation, folder.Path);
                 return;
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"WinRT FolderPicker failed: {ex.Message}");
-            // Fall through to fallback
         }
 
         // Fallback to Win32 Common Item Dialog (more reliable in unpackaged apps)
@@ -91,13 +100,10 @@ public partial class NugetLocalViewModel : ObservableObject
         {
             var title = operation == "Watch" ? "Select Watch Folder" : "Select Copy Folder";
             var path = Tools.Helpers.FolderPickerHelper.PickFolder(hwnd, title);
-            
+
             if (!string.IsNullOrEmpty(path))
             {
-                if (operation == "Watch")
-                    WatchFolder = path;
-                else
-                    CopyFolder = path;
+                UpdateFolderPath(operation, path);
             }
         }
         catch (Exception ex)
@@ -107,7 +113,19 @@ public partial class NugetLocalViewModel : ObservableObject
         }
     }
 
-    private void WatchChangesCommandMethod(object? started)
+    private void UpdateFolderPath(string? operation, string path)
+    {
+        if (operation == "Watch")
+        {
+            WatchFolder = path;
+        }
+        else
+        {
+            CopyFolder = path;
+        }
+    }
+
+    private void OnWatchChanges(object? started)
     {
         if (started is bool isStarted && isStarted)
         {

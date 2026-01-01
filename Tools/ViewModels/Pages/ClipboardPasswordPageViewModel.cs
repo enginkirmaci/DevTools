@@ -1,9 +1,12 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+using Tools.Library.Mvvm;
 
 namespace Tools.ViewModels.Pages;
 
-public partial class ClipboardPasswordPageViewModel : ObservableObject
+/// <summary>
+/// ViewModel for the Clipboard Password page.
+/// This page primarily relies on the ClipboardPasswordService for global hotkey functionality.
+/// </summary>
+public partial class ClipboardPasswordPageViewModel : PageViewModelBase
 {
-    // This page primarily relies on the ClipboardPasswordService for global hotkey functionality
-    // The UI can be extended here to configure the settings
+    // UI configuration could be added here in the future
 }

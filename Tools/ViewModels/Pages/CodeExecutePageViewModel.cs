@@ -2,10 +2,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
+using Tools.Library.Mvvm;
 
 namespace Tools.ViewModels.Pages;
 
-public partial class CodeExecutePageViewModel : ObservableObject
+/// <summary>
+/// ViewModel for the Code Execute page.
+/// </summary>
+public partial class CodeExecutePageViewModel : PageViewModelBase
 {
     [ObservableProperty]
     private string _immediateInput = string.Empty;
@@ -13,14 +17,17 @@ public partial class CodeExecutePageViewModel : ObservableObject
     [ObservableProperty]
     private string _immediateOutput = string.Empty;
 
+    /// <summary>
+    /// Gets the command to execute code.
+    /// </summary>
     public IAsyncRelayCommand ExecuteCommand { get; }
 
     public CodeExecutePageViewModel()
     {
-        ExecuteCommand = new AsyncRelayCommand(OnExecuteCommandAsync);
+        ExecuteCommand = new AsyncRelayCommand(OnExecuteAsync);
     }
 
-    private async Task OnExecuteCommandAsync()
+    private async Task OnExecuteAsync()
     {
         try
         {

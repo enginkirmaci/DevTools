@@ -1,8 +1,12 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Tools.Library.Mvvm;
 
 namespace Tools.ViewModels.Pages;
 
-public partial class HostFileProxyViewModel : ObservableObject
+/// <summary>
+/// ViewModel for the Host File Proxy page.
+/// Functionality to be implemented.
+/// </summary>
+public partial class HostFileProxyViewModel : PageViewModelBase
 {
-    // Placeholder ViewModel - functionality to be implemented
+    // Placeholder - functionality to be implemented
 }

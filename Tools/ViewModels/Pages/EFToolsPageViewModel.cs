@@ -1,13 +1,19 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Tools.Library.Formatters;
-using Tools.Library.Services;
-using Windows.ApplicationModel.DataTransfer;
+using Tools.Library.Mvvm;
+using Tools.Library.Services.Abstractions;
 
 namespace Tools.ViewModels.Pages;
 
-public partial class EFToolsPageViewModel : ObservableObject
+/// <summary>
+/// ViewModel for the EF Tools page.
+/// </summary>
+public partial class EFToolsPageViewModel : PageViewModelBase
 {
+    private readonly ISettingsService _settingsService;
+    private readonly IClipboardService _clipboardService;
+
     [ObservableProperty]
     private string _sqlInput = string.Empty;
 
@@ -20,30 +26,41 @@ public partial class EFToolsPageViewModel : ObservableObject
     [ObservableProperty]
     private string _repositoryTemplate = string.Empty;
 
+    /// <summary>
+    /// Gets the command to convert SQL to C#.
+    /// </summary>
     public IRelayCommand ConvertSqlCommand { get; }
+
+    /// <summary>
+    /// Gets the command to copy C# output to clipboard.
+    /// </summary>
     public IRelayCommand CopyToClipboardCommand { get; }
+
+    /// <summary>
+    /// Gets the command to copy repository output to clipboard.
+    /// </summary>
     public IRelayCommand CopyRepositoryToClipboardCommand { get; }
 
-    private readonly ISettingsService _settingsService;
-
-    public EFToolsPageViewModel(ISettingsService settingsService)
+    public EFToolsPageViewModel(ISettingsService settingsService, IClipboardService clipboardService)
     {
         _settingsService = settingsService;
+        _clipboardService = clipboardService;
 
-        ConvertSqlCommand = new RelayCommand(OnConvertSqlCommand);
-        CopyToClipboardCommand = new RelayCommand(OnCopyToClipboardCommand);
-        CopyRepositoryToClipboardCommand = new RelayCommand(OnCopyRepositoryToClipboardCommand);
+        ConvertSqlCommand = new RelayCommand(OnConvertSql);
+        CopyToClipboardCommand = new RelayCommand(OnCopyToClipboard);
+        CopyRepositoryToClipboardCommand = new RelayCommand(OnCopyRepositoryToClipboard);
 
-        _ = InitializeAsync();
+        _ = OnInitializeAsync();
     }
 
-    public async Task InitializeAsync()
+    /// <inheritdoc/>
+    public override async Task OnInitializeAsync()
     {
         var settings = await _settingsService.GetSettingsAsync();
         RepositoryTemplate = settings.EFToolsPage?.RepositoryTemplate ?? string.Empty;
     }
 
-    private void OnConvertSqlCommand()
+    private void OnConvertSql()
     {
         try
         {
@@ -57,23 +74,19 @@ public partial class EFToolsPageViewModel : ObservableObject
         }
     }
 
-    private void OnCopyToClipboardCommand()
+    private void OnCopyToClipboard()
     {
         if (!string.IsNullOrEmpty(CSharpOutput))
         {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText(CSharpOutput);
-            Clipboard.SetContent(dataPackage);
+            _clipboardService.CopyText(CSharpOutput);
         }
     }
 
-    private void OnCopyRepositoryToClipboardCommand()
+    private void OnCopyRepositoryToClipboard()
     {
         if (!string.IsNullOrEmpty(RepositoryOutput))
         {
-            var dataPackage = new DataPackage();
-            dataPackage.SetText(RepositoryOutput);
-            Clipboard.SetContent(dataPackage);
+            _clipboardService.CopyText(RepositoryOutput);
         }
     }
 

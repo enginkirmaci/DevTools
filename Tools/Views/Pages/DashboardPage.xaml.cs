@@ -12,9 +12,4 @@ public sealed partial class DashboardPage : Page
         ViewModel = viewModel;
         this.InitializeComponent();
     }
-
-    private void GridView_ItemClick(object sender, ItemClickEventArgs e)
-    {
-        // Navigation is handled through the command binding
-    }
 }
