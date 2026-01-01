@@ -14,6 +14,7 @@ public class NavigationService : INavigationService
 
     // Deferred DI-resolved page instance to replace the framework-created instance
     private Page? _deferredPage;
+
     private Type? _deferredPageType;
 
     // Custom back stack for DI-resolved pages (pages without parameterless ctors)
@@ -28,6 +29,7 @@ public class NavigationService : INavigationService
     public bool CanGoBack => (_customBackStack.Count > 0) || (_frame?.CanGoBack ?? false);
 
     public event Action<Type?>? Navigated;
+
     public event Action? BackStackChanged;
 
     public void SetFrame(Frame frame)

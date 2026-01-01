@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Tools.Library.Converters;
-using Tools.Library.Models;
+using Tools.Library.Entities;
 using Tools.Library.Mvvm;
 using Tools.Library.Providers;
 using Tools.Library.Services.Abstractions;

@@ -45,7 +45,7 @@ public static class PageNavigationMapper
         if (string.IsNullOrEmpty(tag))
             return null;
 
-        return Array.Find(_registeredPageTypes, t => t.Name == $"{tag}Page");
+        return Array.Find(_registeredPageTypes, t => t.Name == tag);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public static class PageNavigationMapper
         if (string.IsNullOrEmpty(tag))
             return false;
 
-        return Array.Exists(_registeredPageTypes, t => t.Name == $"{tag}Page");
+        return Array.Exists(_registeredPageTypes, t => t.Name == tag);
     }
 
     #endregion Public Methods

@@ -1,129 +1,64 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Window
-    x:Class="Tools.Views.Windows.MainWindow"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	x:Class="Tools.Views.Windows.MainWindow"
+	Title="Dev Tools"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	mc:Ignorable="d"
-    Title="Dev Tools">
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	mc:Ignorable="d">
 
-	<Grid Background="Transparent">
+	<Grid Background="{ThemeResource LayerFillColorDefaultBrush}">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<!-- Custom Title Bar -->
-		<Grid x:Name="AppTitleBar"
-                Height="40"
-                Background="Transparent" VerticalAlignment="Center"
-                Padding="12,0">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="Auto" />
-				<ColumnDefinition Width="*" />
-			</Grid.ColumnDefinitions>
-
-			<Button x:Name="TitleBarBackButton"
-                    Grid.Column="0"
-                    Width="28"
-                    Height="28"
-                    Margin="0,6,8,6"
-                    Padding="4"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    Visibility="{Binding IsBackEnabled, ElementName=NavigationView, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    IsEnabled="{Binding IsBackEnabled, ElementName=NavigationView}"
-                    Click="TitleBarBackButton_Click"
-                    AutomationProperties.Name="Back">
-				<SymbolIcon Symbol="Back" />
-			</Button>
-
-			<Grid Grid.Column="1"
-                    x:Name="AppTitleBarDragArea"
-                    VerticalAlignment="Stretch"
-                    HorizontalAlignment="Stretch">
-				<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-					<Image Source="ms-appx:///Assets/logo.png"
-        Width="22"
-        Height="22"
-        Margin="0,0,12,0" />
-					<TextBlock Text="Dev Tools"
-                           FontSize="16"
-                         Margin="0,0,0,4"
-                           Foreground="{ThemeResource SystemBaseHighColor}" />
-				</StackPanel>
-			</Grid>
-		</Grid>
+		<TitleBar
+			x:Name="AppTitleBar"
+			Title="DevTools"
+			BackRequested="TitleBar_BackRequested"
+			IsBackButtonVisible="True">
+			<TitleBar.IconSource>
+				<ImageIconSource ImageSource="/Assets/logo.ico" />
+			</TitleBar.IconSource>
+		</TitleBar>
 
 		<NavigationView
-            x:Name="NavigationView"
-            Grid.Row="1"
-            IsBackButtonVisible="Collapsed"
-            IsSettingsVisible="False"
-            IsPaneToggleButtonVisible="True"
-            OpenPaneLength="280"
-            PaneDisplayMode="Left"
-            Background="Transparent"
-            SelectionChanged="NavigationView_SelectionChanged"
-            BackRequested="NavigationView_BackRequested">
+			x:Name="NavigationView"
+			Grid.Row="1"
+			BackRequested="NavigationView_BackRequested"
+			Background="Transparent"
+			IsBackButtonVisible="Collapsed"
+			IsPaneOpen="True"
+			IsPaneToggleButtonVisible="True"
+			IsSettingsVisible="False"
+			OpenPaneLength="300"
+			PaneDisplayMode="Left"
+			SelectionChanged="NavigationView_SelectionChanged">
+			<NavigationView.HeaderTemplate>
+				<DataTemplate>
+					<TextBlock Margin="-18,-18,0,0" Text="{Binding}" />
+				</DataTemplate>
+			</NavigationView.HeaderTemplate>
+			<!--  Menu items are populated from code-behind to keep tags consistent with page types  -->
+			<NavigationView.MenuItems />
 
-			<NavigationView.MenuItems>
-				<NavigationViewItem Content="Dashboard"
-                        Tag="Dashboard">
-					<NavigationViewItem.Icon>
-						<FontIcon Glyph="&#xE80F;" />
-					</NavigationViewItem.Icon>
-				</NavigationViewItem>
-				<NavigationViewItem Content="Workspaces"
-                        Tag="Workspaces">
-					<NavigationViewItem.Icon>
-						<FontIcon Glyph="&#xE8B7;" />
-					</NavigationViewItem.Icon>
-				</NavigationViewItem>
-				<NavigationViewItem Content="Nuget Local Copy"
-                        Tag="NugetLocal">
-					<NavigationViewItem.Icon>
-						<FontIcon Glyph="&#xE8DE;" />
-					</NavigationViewItem.Icon>
-				</NavigationViewItem>
-				<NavigationViewItem Content="Formatters"
-                        Tag="Formatters">
-					<NavigationViewItem.Icon>
-						<FontIcon Glyph="&#xE8D2;" />
-					</NavigationViewItem.Icon>
-				</NavigationViewItem>
-				<NavigationViewItem Content="Clipboard Password"
-                        Tag="ClipboardPassword">
-					<NavigationViewItem.Icon>
-						<FontIcon Glyph="&#xE77F;" />
-					</NavigationViewItem.Icon>
-				</NavigationViewItem>
-				<NavigationViewItem Content="EF Tools"
-                        Tag="EFTools">
-					<NavigationViewItem.Icon>
-						<FontIcon Glyph="&#xEE94;" />
-					</NavigationViewItem.Icon>
-				</NavigationViewItem>
-				<NavigationViewItem Content="Code Execute"
-                        Tag="CodeExecute">
-					<NavigationViewItem.Icon>
-						<FontIcon Glyph="&#xE943;" />
-					</NavigationViewItem.Icon>
-				</NavigationViewItem>
-			</NavigationView.MenuItems>
-
-			<Frame x:Name="ContentFrame"
-                    Padding="24"
-                    Background="Transparent" />
+			<Frame
+				x:Name="ContentFrame"
+				Padding="32,12,32,24"
+				Background="Transparent" />
 		</NavigationView>
 
-		<!-- Snackbar/InfoBar area -->
-		<InfoBar x:Name="AppInfoBar"
-                 Grid.Row="1"
-                 HorizontalAlignment="Right"
-                 VerticalAlignment="Bottom"
-                 Margin="0,0,24,24"
-                 IsOpen="False" />
+		<!--  Modern InfoBar with animation  -->
+		<InfoBar
+			x:Name="AppInfoBar"
+			Grid.Row="1"
+			MaxWidth="400"
+			Margin="0,0,32,32"
+			HorizontalAlignment="Right"
+			VerticalAlignment="Bottom"
+			CornerRadius="8"
+			IsOpen="False" />
 	</Grid>
 </Window>

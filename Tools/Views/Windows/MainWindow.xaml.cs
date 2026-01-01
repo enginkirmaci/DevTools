@@ -10,6 +10,8 @@ using Tools.Views.Pages;
 using WinRT.Interop;
 
 using Tools.Helpers;
+using Tools.Library.Providers;
+using Tools.Library.Converters;
 
 namespace Tools.Views.Windows;
 
@@ -20,10 +22,13 @@ namespace Tools.Views.Windows;
 public sealed partial class MainWindow : Window
 {
     #region Constants
+
     private const int NavigationPaneThreshold = 1200;
-    #endregion
+
+    #endregion Constants
 
     #region Fields
+
     private readonly INavigationService _navigationService;
     private readonly IClipboardPasswordService _clipboardPasswordService;
     private readonly WindowMessageHandler _messageHandler;
@@ -33,14 +38,17 @@ public sealed partial class MainWindow : Window
     private bool _isUserClosedPane;
     private bool _isPaneOpenedOrClosedFromCode;
     private bool _isNavigatingFromCode;
-    #endregion
+
+    #endregion Fields
 
     #region Properties
+
     /// <summary>
     /// Gets the ViewModel for this window.
     /// </summary>
     public MainWindowViewModel ViewModel { get; }
-    #endregion
+
+    #endregion Properties
 
     #region Constructor
 
@@ -69,20 +77,29 @@ public sealed partial class MainWindow : Window
         InitializeWindow();
         NavigateToDefaultPage();
     }
-    #endregion
+
+    #endregion Constructor
 
     #region Initialization
+
     /// <summary>
     /// Initializes navigation service and event subscriptions.
     /// </summary>
     private void InitializeNavigation()
     {
+        // Populate NavigationView menu items using the shared provider so tags/keys remain consistent
+        var menuItems = NavigationProvider.GetNavigationMenuItems();
+        foreach (var mi in menuItems)
+        {
+            NavigationView.MenuItems.Add(mi);
+        }
+
         _navigationService.SetFrame(ContentFrame);
         _navigationService.Navigated += OnNavigated;
         _navigationService.BackStackChanged += OnBackStackChanged;
         ContentFrame.Navigated += OnContentFrameNavigated;
 
-        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+        AppTitleBar.IsBackButtonEnabled = _navigationService.CanGoBack;
     }
 
     /// <summary>
@@ -130,7 +147,7 @@ public sealed partial class MainWindow : Window
     /// </summary>
     private void UpdateBackButtonState()
     {
-        NavigationView.IsBackEnabled = _navigationService.CanGoBack;
+        AppTitleBar.IsBackButtonEnabled = _navigationService.CanGoBack;
     }
 
     /// <summary>
@@ -144,12 +161,25 @@ public sealed partial class MainWindow : Window
             {
                 _isNavigatingFromCode = true;
                 NavigationView.SelectedItem = nvi;
+
+                if ((string?)nvi.Tag == "DashboardPage")
+                {
+                    NavigationView.Header = string.Empty;
+                    NavigationView.AlwaysShowHeader = false;
+                }
+                else
+                {
+                    NavigationView.Header = nvi.Content;
+                    NavigationView.AlwaysShowHeader = true;
+                }
+
                 _isNavigatingFromCode = false;
                 break;
             }
         }
     }
-    #endregion
+
+    #endregion Initialization
 
     #region UI Event Handlers
 
@@ -158,7 +188,7 @@ public sealed partial class MainWindow : Window
     /// </summary>
     private void InitializeWindow()
     {
-        _windowConfigurator.Configure(AppTitleBarDragArea);
+        _windowConfigurator.Configure();
         ConfigureHotkeys();
         SubscribeToWindowEvents();
     }
@@ -180,7 +210,8 @@ public sealed partial class MainWindow : Window
         Closed += OnWindowClosed;
         SizeChanged += OnWindowSizeChanged;
     }
-    #endregion
+
+    #endregion UI Event Handlers
 
     #region Navigation Event Handlers
 
@@ -220,6 +251,7 @@ public sealed partial class MainWindow : Window
 
     /// <summary>
     /// Handles NavigationView selection changes.
+    /// Uses NameToPageTypeConverter to match page keys/tags the same way as DashboardViewModel.
     /// </summary>
     private void NavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
     {
@@ -228,7 +260,7 @@ public sealed partial class MainWindow : Window
         if (args.SelectedItemContainer is NavigationViewItem item)
         {
             var tag = item.Tag?.ToString();
-            var pageType = PageNavigationMapper.GetPageTypeFromTag(tag);
+            var pageType = NameToPageTypeConverter.Convert(tag ?? string.Empty);
 
             if (pageType != null)
             {
@@ -237,18 +269,15 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    /// <summary>
-    /// Handles NavigationView back button requests.
-    /// </summary>
-    private void NavigationView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
+    private void TitleBar_BackRequested(TitleBar sender, object args)
     {
         NavigateBack();
     }
 
     /// <summary>
-    /// Handles title bar back button clicks.
+    /// Handles NavigationView back button requests.
     /// </summary>
-    private void TitleBarBackButton_Click(object sender, RoutedEventArgs e)
+    private void NavigationView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
     {
         NavigateBack();
     }
@@ -265,9 +294,10 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    #endregion
+    #endregion Navigation Event Handlers
 
     #region Public Methods
+
     /// <summary>
     /// Shows an informational message bar.
     /// Delegates to InfoBarManager (Dependency Inversion Principle).
@@ -279,5 +309,6 @@ public sealed partial class MainWindow : Window
     {
         _infoBarManager.Show(title, message, severity);
     }
-    #endregion
+
+    #endregion Public Methods
 }

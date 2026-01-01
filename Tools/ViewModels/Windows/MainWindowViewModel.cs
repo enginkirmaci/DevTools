@@ -17,7 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// Gets the collection of menu items for navigation.
     /// </summary>
-    public IReadOnlyCollection<NavigationViewItem> MenuItems { get; }
+    public IReadOnlyCollection<NavigationViewItemBase> MenuItems { get; }
 
     public MainWindowViewModel()
     {

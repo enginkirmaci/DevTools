@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
 using Tools.Library.Configuration;
-using Tools.Library.Models;
+using Tools.Library.Entities;
 using Tools.Library.Mvvm;
 using Tools.Library.Services.Abstractions;
 
@@ -45,6 +45,11 @@ public partial class WorkspacesViewModel : PageViewModelBase
     public IRelayCommand<string> OpenWithVSCodeCommand { get; }
 
     /// <summary>
+    /// Gets the command to open a terminal in the folder.
+    /// </summary>
+    public IRelayCommand<string> OpenWithTerminalCommand { get; }
+
+    /// <summary>
     /// Gets the command to refresh workspaces.
     /// </summary>
     public IRelayCommand RefreshCommand { get; }
@@ -57,6 +62,7 @@ public partial class WorkspacesViewModel : PageViewModelBase
         OpenSolutionCommand = new RelayCommand<string>(OnOpenSolution);
         OpenFolderCommand = new RelayCommand<string>(OnOpenFolder);
         OpenWithVSCodeCommand = new RelayCommand<string>(OnOpenWithVSCode);
+        OpenWithTerminalCommand = new RelayCommand<string>(OnOpenWithTerminal);
         RefreshCommand = new RelayCommand(async () =>
         {
             _workspaces = new ObservableCollection<WorkspaceItem>();
@@ -256,4 +262,49 @@ public partial class WorkspacesViewModel : PageViewModelBase
             WindowStyle = ProcessWindowStyle.Hidden
         });
     }
+
+    private void OnOpenWithTerminal(string? folderPath)
+    {
+        if (string.IsNullOrWhiteSpace(folderPath))
+        {
+            return;
+        }
+
+        var exe = _workspaceSettings?.TerminalExecutable ?? "wt";
+        string args;
+
+        if (exe.EndsWith("wt", StringComparison.OrdinalIgnoreCase))
+        {
+            args = $"-d \"{folderPath}\"";
+        }
+        else if (exe.IndexOf("pwsh", StringComparison.OrdinalIgnoreCase) >= 0 || exe.IndexOf("powershell", StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            args = $"-NoExit -Command \"Set-Location -LiteralPath '{folderPath}'\"";
+        }
+        else if (exe.EndsWith("cmd", StringComparison.OrdinalIgnoreCase))
+        {
+            args = $"/k cd /d \"{folderPath}\"";
+        }
+        else
+        {
+            args = $"\"{folderPath}\"";
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = exe,
+                Arguments = args,
+                UseShellExecute = true,
+                CreateNoWindow = false,
+                WindowStyle = ProcessWindowStyle.Normal
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to start terminal '{exe}' with args '{args}': {ex.Message}");
+        }
+    }
+
 }

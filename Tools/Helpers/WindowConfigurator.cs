@@ -14,17 +14,22 @@ namespace Tools.Helpers;
 public sealed class WindowConfigurator
 {
     #region Constants
-    private const int DefaultWindowWidth = 1450;
-    private const int DefaultWindowHeight = 802;
-    #endregion
+
+    private const int DefaultWindowWidth = 1400;
+    private const int DefaultWindowHeight = 800;
+
+    #endregion Constants
 
     #region Fields
+
     private readonly Window _window;
     private AppWindow? _appWindow;
     private nint _hwnd;
-    #endregion
+
+    #endregion Fields
 
     #region Properties
+
     /// <summary>
     /// Gets the window handle.
     /// </summary>
@@ -34,9 +39,11 @@ public sealed class WindowConfigurator
     /// Gets the AppWindow instance.
     /// </summary>
     public AppWindow? AppWindow => _appWindow;
-    #endregion
+
+    #endregion Properties
 
     #region Constructor
+
     /// <summary>
     /// Initializes a new instance of the WindowConfigurator.
     /// </summary>
@@ -45,9 +52,11 @@ public sealed class WindowConfigurator
     {
         _window = window;
     }
-    #endregion
+
+    #endregion Constructor
 
     #region Public Methods
+
     /// <summary>
     /// Configures the window with backdrop, size, position, and title bar.
     /// </summary>
@@ -56,7 +65,7 @@ public sealed class WindowConfigurator
     {
         ConfigureBackdrop();
         ConfigureSizeAndPosition();
-        ConfigureTitleBar(titleBarElement);
+        ConfigureTitleBar();
     }
 
     /// <summary>
@@ -136,5 +145,6 @@ public sealed class WindowConfigurator
             _appWindow.Move(new global::Windows.Graphics.PointInt32(centerX, centerY));
         }
     }
-    #endregion
+
+    #endregion Public Methods
 }
