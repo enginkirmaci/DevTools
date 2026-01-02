@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Window
 	x:Class="Tools.Views.Windows.MainWindow"
-	Title="Dev Tools"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	Title="Dev Tools"
 	mc:Ignorable="d">
 
-	<Grid Background="{ThemeResource LayerFillColorDefaultBrush}">
+	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
 		<TitleBar
@@ -20,7 +20,7 @@
 			BackRequested="TitleBar_BackRequested"
 			IsBackButtonVisible="True">
 			<TitleBar.IconSource>
-				<ImageIconSource ImageSource="/Assets/logo.ico"/>
+				<ImageIconSource ImageSource="/Assets/logo.ico" />
 			</TitleBar.IconSource>
 		</TitleBar>
 
@@ -38,17 +38,42 @@
 			SelectionChanged="NavigationView_SelectionChanged">
 			<NavigationView.HeaderTemplate>
 				<DataTemplate>
-					<TextBlock Margin="-18,-18,0,0"
-							Text="{Binding}"/>
+					<Grid>
+						<Border
+							Height="134"
+							Margin="-54,-42,0,-58"
+							VerticalAlignment="Top"
+							BorderBrush="Transparent"
+							BorderThickness="0">
+							<Border.Background>
+								<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+									<GradientStop Offset="0" Color="{StaticResource LayerOnMicaBaseAltFillColorSecondary}" />
+									<GradientStop Offset="0.5" Color="{StaticResource LayerOnMicaBaseAltFillColorSecondary}" />
+									<GradientStop Offset="1" Color="Transparent" />
+								</LinearGradientBrush>
+							</Border.Background>
+						</Border>
+						<TextBlock
+							Margin="-18,-18,0,0"
+							Style="{StaticResource BodyLargeStrongTextBlockStyle}"
+							Text="{Binding}" />
+					</Grid>
 				</DataTemplate>
 			</NavigationView.HeaderTemplate>
 			<!--  Menu items are populated from code-behind to keep tags consistent with page types  -->
-			<NavigationView.MenuItems/>
+			<NavigationView.MenuItems />
 
 			<Frame
 				x:Name="ContentFrame"
+				Margin="0,-24,0,0"
 				Padding="32,12,32,24"
-				Background="Transparent"/>
+				Background="Transparent">
+				<Frame.ContentTransitions>
+					<TransitionCollection>
+						<NavigationThemeTransition />
+					</TransitionCollection>
+				</Frame.ContentTransitions>
+			</Frame>
 		</NavigationView>
 
 		<!--  Modern InfoBar with animation  -->
@@ -60,6 +85,6 @@
 			HorizontalAlignment="Right"
 			VerticalAlignment="Bottom"
 			CornerRadius="8"
-			IsOpen="False"/>
+			IsOpen="False" />
 	</Grid>
 </Window>
