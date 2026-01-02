@@ -1,114 +1,219 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Page
-    x:Class="Tools.Views.Pages.EFToolsPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Tools.Views.Pages"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="Transparent">
+	x:Class="Tools.Views.Pages.EFToolsPage"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:local="using:Tools.Views.Pages"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	Background="Transparent"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	mc:Ignorable="d">
 
-	<Grid Margin="0,0,0,24">
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*" />
-			<ColumnDefinition Width="*" />
-		</Grid.ColumnDefinitions>
+	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
-			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<!-- Header -->
-		<InfoBar
-            Title="SQL to C# Converter"
-            Grid.Row="0"
-            Grid.ColumnSpan="2"
-            IsClosable="False"
-            IsOpen="True"
-            Margin="0,0,0,12" />
+		<!--  Modern Header Card  -->
+		<Border
+			Margin="0,0,0,12"
+			Padding="12"
+			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+			BorderBrush="Transparent"
+			BorderThickness="0"
+			CornerRadius="8">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
 
-		<Button
-            Grid.Row="0"
-            Grid.ColumnSpan="2"
-            Margin="0,0,0,12"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Center"
-            Style="{StaticResource AccentButtonStyle}"
-            Command="{x:Bind ViewModel.ConvertSqlCommand}">
-			<StackPanel Orientation="Horizontal">
-				<FontIcon Glyph="&#xE8AB;" Margin="0,0,8,0" FontSize="16" />
-				<TextBlock Text="Convert to C#" />
-			</StackPanel>
-		</Button>
+				<TextBlock
+					Grid.Column="1"
+					VerticalAlignment="Center"
+					Text="Convert SQL CREATE TABLE statements to C# entity classes and repository implementations" />
 
-		<!-- SQL Input -->
-		<TextBox
-            x:Name="SqlInputTextBox"
-            Grid.Row="1"
-            Grid.Column="0"
-            Margin="0,0,8,12"
-            AcceptsReturn="True"
-            TextWrapping="Wrap"
-            PlaceholderText="Enter SQL Create Table statement..."
-            Text="{x:Bind ViewModel.SqlInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            Height="200" />
+				<Button
+					Grid.Column="2"
+					Height="36"
+					Command="{x:Bind ViewModel.ConvertSqlCommand}"
+					Style="{StaticResource AccentButtonStyle}">
+					<StackPanel Orientation="Horizontal" Spacing="8">
+						<FontIcon FontSize="16" Glyph="&#xE8AB;" />
+						<TextBlock Text="Convert to C#" />
+					</StackPanel>
+				</Button>
+			</Grid>
+		</Border>
 
-		<!-- C# Output -->
-		<Grid
-            Grid.Row="1"
-            Grid.Column="1"
-            Margin="8,0,0,12">
-			<TextBox
-                AcceptsReturn="True"
-                IsReadOnly="True"
-                Text="{x:Bind ViewModel.CSharpOutput, Mode=OneWay}"
-                TextWrapping="Wrap"
-                Height="200" />
-			<Button
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,26,6,0"
-                Command="{x:Bind ViewModel.CopyToClipboardCommand}"
-                ToolTipService.ToolTip="Copy">
-				<FontIcon Glyph="&#xE8C8;" FontSize="16" />
-			</Button>
+		<!--  Entity Conversion Section  -->
+		<Grid Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="16" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+
+			<!--  SQL Input Card  -->
+			<Border
+				Margin="0,0,0,12"
+				Padding="12"
+				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+				BorderBrush="Transparent"
+				BorderThickness="0"
+				CornerRadius="8">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
+					<Grid Height="40" Margin="0,0,0,6">
+						<TextBlock
+							VerticalAlignment="Center"
+							Style="{StaticResource BodyStrongTextBlockStyle}"
+							Text="SQL Input" />
+					</Grid>
+
+					<TextBox
+						x:Name="SqlInputTextBox"
+						Grid.Row="1"
+						MinHeight="200"
+						AcceptsReturn="True"
+						Background="Transparent"
+						BorderThickness="0"
+						FontFamily="Consolas"
+						PlaceholderText="Enter SQL CREATE TABLE statement..."
+						Text="{x:Bind ViewModel.SqlInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+						TextWrapping="Wrap" />
+				</Grid>
+			</Border>
+
+			<!--  C# Output Card  -->
+			<Border
+				Grid.Column="2"
+				Margin="0,0,0,12"
+				Padding="12"
+				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+				BorderBrush="Transparent"
+				BorderThickness="0"
+				CornerRadius="8">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
+					<Grid Height="40" Margin="0,0,0,6">
+						<TextBlock
+							VerticalAlignment="Center"
+							Style="{StaticResource BodyStrongTextBlockStyle}"
+							Text="C# Entity Class" />
+						<Button
+							Width="40"
+							Height="40"
+							HorizontalAlignment="Right"
+							Command="{x:Bind ViewModel.CopyToClipboardCommand}"
+							ToolTipService.ToolTip="Copy to clipboard">
+							<FontIcon FontSize="16" Glyph="&#xE8C8;" />
+						</Button>
+					</Grid>
+
+					<ScrollViewer Grid.Row="1">
+						<TextBlock
+							FontFamily="Consolas"
+							FontSize="12"
+							Text="{x:Bind ViewModel.CSharpOutput, Mode=OneWay}"
+							TextWrapping="Wrap" />
+					</ScrollViewer>
+				</Grid>
+			</Border>
 		</Grid>
 
-		<!-- Repository Template Input -->
-		<TextBox
-            x:Name="TableNameInputTextBox"
-            Grid.Row="3"
-            Grid.Column="0"
-            Margin="0,0,8,0"
-            AcceptsReturn="True"
-            TextWrapping="Wrap"
-            Header="Repository Template"
-            Text="{x:Bind ViewModel.RepositoryTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            Height="200" />
+		<!--  Repository Template Section  -->
+		<Grid Grid.Row="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="16" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
 
-		<!-- Repository Output -->
-		<Grid
-            Grid.Row="3"
-            Grid.Column="1"
-            Margin="8,0,0,0">
-			<TextBox
-                AcceptsReturn="True"
-                IsReadOnly="True"
-                Header="Generated Repository"
-                Text="{x:Bind ViewModel.RepositoryOutput, Mode=OneWay}"
-                TextWrapping="Wrap"
-                Height="200" />
-			<Button
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Margin="0,60,6,0"
-                Command="{x:Bind ViewModel.CopyRepositoryToClipboardCommand}"
-                ToolTipService.ToolTip="Copy">
-				<FontIcon Glyph="&#xE8C8;" FontSize="16" />
-			</Button>
+			<!--  Template Input Card  -->
+			<Border
+				Margin="0,0,0,12"
+				Padding="12"
+				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+				BorderBrush="Transparent"
+				BorderThickness="0"
+				CornerRadius="8">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
+					<Grid Height="40" Margin="0,0,0,6">
+						<TextBlock
+							VerticalAlignment="Center"
+							Style="{StaticResource BodyStrongTextBlockStyle}"
+							Text="Repository Template" />
+					</Grid>
+
+					<TextBox
+						x:Name="TableNameInputTextBox"
+						Grid.Row="1"
+						MinHeight="200"
+						AcceptsReturn="True"
+						Background="Transparent"
+						BorderThickness="0"
+						FontFamily="Consolas"
+						Text="{x:Bind ViewModel.RepositoryTemplate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+						TextWrapping="Wrap" />
+				</Grid>
+			</Border>
+
+			<!--  Repository Output Card  -->
+			<Border
+				Grid.Column="2"
+				Margin="0,0,0,12"
+				Padding="12"
+				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+				BorderBrush="Transparent"
+				BorderThickness="0"
+				CornerRadius="8">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
+					<Grid Height="40" Margin="0,0,0,6">
+						<TextBlock
+							VerticalAlignment="Center"
+							Style="{StaticResource BodyStrongTextBlockStyle}"
+							Text="Generated Repository" />
+						<Button
+							Width="40"
+							Height="40"
+							HorizontalAlignment="Right"
+							Command="{x:Bind ViewModel.CopyRepositoryToClipboardCommand}"
+							ToolTipService.ToolTip="Copy to clipboard">
+							<FontIcon FontSize="16" Glyph="&#xE8C8;" />
+						</Button>
+					</Grid>
+
+					<ScrollViewer Grid.Row="1">
+						<TextBlock
+							FontFamily="Consolas"
+							FontSize="12"
+							Text="{x:Bind ViewModel.RepositoryOutput, Mode=OneWay}"
+							TextWrapping="Wrap" />
+					</ScrollViewer>
+				</Grid>
+			</Border>
 		</Grid>
 	</Grid>
 </Page>

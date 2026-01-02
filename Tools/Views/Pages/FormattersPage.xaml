@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Page
-    x:Class="Tools.Views.Pages.FormattersPage"
-    x:Name="RootPage"
+	x:Class="Tools.Views.Pages.FormattersPage"
+	x:Name="RootPage"
+	Background="Transparent"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	mc:Ignorable="d"
-    Background="Transparent">
+	mc:Ignorable="d">
 
 	<Grid Margin="0,0,0,24">
 		<Grid.ColumnDefinitions>
@@ -15,55 +15,61 @@
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
 
-		<!-- Operation Selection -->
+		<!--  Operation Selection  -->
 		<Border
-            Grid.Column="0"
-            Margin="0,0,12,0"
-            Padding="16"
-            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8">
+			Grid.Column="0"
+			Margin="0,0,12,0"
+			Padding="16"
+			VerticalAlignment="Top"
+			Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+			BorderBrush="Transparent"
+			BorderThickness="0"
+			CornerRadius="8">
 			<StackPanel Orientation="Vertical">
+				<TextBlock
+					Margin="0,0,0,8"
+					VerticalAlignment="Center"
+					Style="{StaticResource BodyStrongTextBlockStyle}"
+					Text="Convert to" />
 				<RadioButton
-                    Margin="0,4"
-                    Content="Base64 Encode"
-                    GroupName="Operation"
-                    IsChecked="{x:Bind ViewModel.IsBase64EncodeSelected, Mode=TwoWay}" />
+					Margin="0,4"
+					Content="Base64 Encode"
+					GroupName="Operation"
+					IsChecked="{x:Bind ViewModel.IsBase64EncodeSelected, Mode=TwoWay}" />
 				<RadioButton
-                    Margin="0,4"
-                    Content="Base64 Decode"
-                    GroupName="Operation"
-                    IsChecked="{x:Bind ViewModel.IsBase64DecodeSelected, Mode=TwoWay}" />
+					Margin="0,4"
+					Content="Base64 Decode"
+					GroupName="Operation"
+					IsChecked="{x:Bind ViewModel.IsBase64DecodeSelected, Mode=TwoWay}" />
 				<RadioButton
-                    Margin="0,4"
-                    Content="Snake Case"
-                    GroupName="Operation"
-                    IsChecked="{x:Bind ViewModel.IsSnakeCaseSelected, Mode=TwoWay}" />
+					Margin="0,4"
+					Content="Snake Case"
+					GroupName="Operation"
+					IsChecked="{x:Bind ViewModel.IsSnakeCaseSelected, Mode=TwoWay}" />
 				<RadioButton
-                    Margin="0,4"
-                    Content="Pascal Case"
-                    GroupName="Operation"
-                    IsChecked="{x:Bind ViewModel.IsPascalCaseSelected, Mode=TwoWay}" />
+					Margin="0,4"
+					Content="Pascal Case"
+					GroupName="Operation"
+					IsChecked="{x:Bind ViewModel.IsPascalCaseSelected, Mode=TwoWay}" />
 			</StackPanel>
 		</Border>
 
-		<!-- Input and Output -->
+		<!--  Input and Output  -->
 		<Grid Grid.Column="1">
 			<Grid.RowDefinitions>
-				<RowDefinition Height="160" />
+				<RowDefinition Height="Auto" />
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 
-			<!-- Input Area -->
+			<!--  Input Area  -->
 			<Border
-                Grid.Row="0"
-                Margin="0,0,0,12"
-                Padding="16"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
+				Grid.Row="0"
+				Margin="0,0,0,12"
+				Padding="16"
+				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+				BorderBrush="Transparent"
+				BorderThickness="0"
+				CornerRadius="8">
 				<Grid>
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*" />
@@ -71,63 +77,81 @@
 					</Grid.ColumnDefinitions>
 
 					<TextBox
-                        Grid.Column="0"
-                        Margin="0,0,8,0"
-                        AcceptsReturn="True"
-                        TextWrapping="Wrap"
-                        PlaceholderText="Enter text to convert..."
-                        Text="{x:Bind ViewModel.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+						Grid.Column="0"
+						Margin="0,0,8,0"
+						VerticalAlignment="Center"
+						AcceptsReturn="True"
+						PlaceholderText="Enter text to convert..."
+						Text="{x:Bind ViewModel.InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+						TextWrapping="Wrap" />
 
 					<Button
-                        Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource AccentButtonStyle}"
-                        Command="{x:Bind ViewModel.ConvertCommand}">
+						Grid.Column="1"
+						Height="36"
+						VerticalAlignment="Center"
+						Command="{x:Bind ViewModel.ConvertCommand}"
+						Style="{StaticResource AccentButtonStyle}">
 						<StackPanel Orientation="Horizontal">
-							<FontIcon Glyph="&#xE8AB;" Margin="0,0,8,0" FontSize="16" />
+							<FontIcon
+								Margin="0,0,8,0"
+								FontSize="16"
+								Glyph="&#xE8AB;" />
 							<TextBlock Text="Convert" />
 						</StackPanel>
 					</Button>
 				</Grid>
 			</Border>
 
-			<!-- History Area -->
+			<!--  History Area  -->
 			<Border
-                Grid.Row="1"
-                Padding="16"
-                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                BorderThickness="1"
-                CornerRadius="8">
-				<ScrollViewer>
-					<ItemsRepeater ItemsSource="{x:Bind ViewModel.History, Mode=OneWay}">
-						<ItemsRepeater.ItemTemplate>
-							<DataTemplate x:DataType="x:String">
-								<Grid Margin="0,6">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="*" />
-										<ColumnDefinition Width="Auto" />
-									</Grid.ColumnDefinitions>
-									<TextBlock
-                                        Grid.Column="0"
-                                        VerticalAlignment="Center"
-                                        Text="{x:Bind}"
-                                        TextWrapping="Wrap" />
-									<Button
-                                        Grid.Column="1"
-                                        Margin="8,0,0,0"
-                                        Command="{Binding ViewModel.CopyToClipboardCommand, ElementName=RootPage}"
-                                        CommandParameter="{x:Bind}">
-										<StackPanel Orientation="Horizontal">
-											<FontIcon Glyph="&#xE8C8;" FontSize="14" />
-											<TextBlock Text="Copy" Margin="4,0,0,0" />
-										</StackPanel>
-									</Button>
-								</Grid>
-							</DataTemplate>
-						</ItemsRepeater.ItemTemplate>
-					</ItemsRepeater>
-				</ScrollViewer>
+				Grid.Row="1"
+				Padding="16"
+				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+				BorderBrush="Transparent"
+				BorderThickness="0"
+				CornerRadius="8">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="*" />
+					</Grid.RowDefinitions>
+
+					<TextBlock
+						Margin="0,0,0,6"
+						VerticalAlignment="Center"
+						Style="{StaticResource BodyStrongTextBlockStyle}"
+						Text="Output" />
+
+					<ScrollViewer Grid.Row="1">
+						<ItemsRepeater ItemsSource="{x:Bind ViewModel.History, Mode=OneWay}">
+							<ItemsRepeater.ItemTemplate>
+								<DataTemplate x:DataType="x:String">
+									<Grid Margin="0,6">
+										<Grid.ColumnDefinitions>
+											<ColumnDefinition Width="*" />
+											<ColumnDefinition Width="Auto" />
+										</Grid.ColumnDefinitions>
+										<TextBlock
+											Grid.Column="0"
+											VerticalAlignment="Center"
+											Text="{Binding}"
+											TextWrapping="Wrap" />
+										<Button
+											Grid.Column="1"
+											Margin="8,0,0,0"
+											Command="{Binding ViewModel.CopyToClipboardCommand, ElementName=RootPage}"
+											CommandParameter="{Binding}">
+											<StackPanel Orientation="Horizontal">
+												<FontIcon FontSize="14" Glyph="&#xE8C8;" />
+												<TextBlock Margin="4,0,0,0" Text="Copy" />
+											</StackPanel>
+										</Button>
+									</Grid>
+								</DataTemplate>
+							</ItemsRepeater.ItemTemplate>
+						</ItemsRepeater>
+					</ScrollViewer>
+				</Grid>
 			</Border>
 		</Grid>
 	</Grid>

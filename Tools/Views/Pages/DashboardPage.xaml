@@ -21,9 +21,9 @@
 			Margin="0,0,0,20">
 			<Border.Background>
 				<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-					<GradientStop Offset="1" Color="Transparent" />
-					<!--<GradientStop Offset="0.5" Color="#FF6B69D6" />-->
 					<GradientStop Offset="0" Color="{StaticResource LayerOnMicaBaseAltFillColorSecondary}" />
+					<GradientStop Offset="0.5" Color="{StaticResource LayerOnMicaBaseAltFillColorSecondary}" />
+					<GradientStop Offset="1" Color="Transparent" />
 				</LinearGradientBrush>
 			</Border.Background>
 			<Grid Margin="32,0">
@@ -95,7 +95,7 @@
 									Text="{Binding Title}"
 									TextWrapping="Wrap" />
 
-								<TextBlock 
+								<TextBlock
 									Opacity="0.7"
 									Style="{StaticResource CaptionTextBlockStyle}"
 									Text="{Binding Subtitle}"
