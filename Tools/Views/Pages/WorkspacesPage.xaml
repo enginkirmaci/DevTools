@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Page
 	x:Class="Tools.Views.Pages.WorkspacesPage"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:conv="using:Tools.Library.Converters"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	Background="Transparent"
-	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	mc:Ignorable="d">
 
-	<Grid x:Name="RootGrid"
-			DataContext="{x:Bind ViewModel}">
+	<Grid x:Name="RootGrid" DataContext="{x:Bind ViewModel}">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
 		<!--  Filter and Refresh  -->
@@ -27,15 +26,15 @@
 			CornerRadius="8">
 			<Grid>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*"/>
-					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 
 				<TextBox
 					Grid.Column="0"
 					Margin="0,0,12,0"
 					PlaceholderText="Filter..."
-					Text="{x:Bind ViewModel.FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+					Text="{x:Bind ViewModel.FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
 				<Button
 					Grid.Column="1"
@@ -44,21 +43,19 @@
 					VerticalAlignment="Center"
 					Command="{x:Bind ViewModel.RefreshCommand}"
 					ToolTipService.ToolTip="Refresh workspaces">
-					<FontIcon FontSize="16"
-							Glyph="&#xE72C;"/>
+					<FontIcon FontSize="16" Glyph="&#xE72C;" />
 				</Button>
 			</Grid>
 		</Border>
 
-		<ScrollViewer Grid.Row="1"
-				VerticalScrollBarVisibility="Auto">
+		<ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
 			<Grid>
 				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
 
 				<!--  Platforms Header  -->
@@ -67,9 +64,9 @@
 					Margin="0,0,0,8"
 					Style="{StaticResource SubtitleTextBlockStyle}"
 					Visibility="{x:Bind ViewModel.FilteredPlatforms.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}">
-					<Run Text="Platforms ("/>
-					<Run Text="{x:Bind ViewModel.FilteredPlatforms.Count, Mode=OneWay}"/>
-					<Run Text=")"/>
+					<Run Text="Platforms (" />
+					<Run Text="{x:Bind ViewModel.FilteredPlatforms.Count, Mode=OneWay}" />
+					<Run Text=")" />
 				</TextBlock>
 
 				<!--  Platforms List  -->
@@ -82,8 +79,8 @@
 						<UniformGridLayout
 							MinColumnSpacing="8"
 							MinItemHeight="100"
-							MinItemWidth="414"
-							MinRowSpacing="8"/>
+							MinItemWidth="410"
+							MinRowSpacing="8" />
 					</ItemsRepeater.Layout>
 					<ItemsRepeater.ItemTemplate>
 						<DataTemplate>
@@ -95,8 +92,8 @@
 								CornerRadius="6">
 								<Grid>
 									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="*"/>
-										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*" />
+										<ColumnDefinition Width="Auto" />
 									</Grid.ColumnDefinitions>
 
 									<StackPanel
@@ -106,12 +103,12 @@
 										<TextBlock
 											FontWeight="SemiBold"
 											Text="{Binding PlatformName}"
-											TextWrapping="Wrap"/>
+											TextWrapping="Wrap" />
 										<TextBlock
 											Opacity="0.7"
 											Style="{StaticResource CaptionTextBlockStyle}"
 											Text="{Binding FolderPath}"
-											TextWrapping="Wrap"/>
+											TextWrapping="Wrap" />
 									</StackPanel>
 
 									<VariableSizedWrapGrid
@@ -127,8 +124,7 @@
 											Command="{Binding DataContext.OpenWithVSCodeCommand, ElementName=RootGrid}"
 											CommandParameter="{Binding FolderPath}"
 											ToolTipService.ToolTip="VS Code">
-											<FontIcon FontSize="16"
-													Glyph="&#xE943;"/>
+											<FontIcon FontSize="16" Glyph="&#xE943;" />
 										</Button>
 										<Button
 											Width="42"
@@ -139,8 +135,7 @@
 											Command="{Binding DataContext.OpenWithTerminalCommand, ElementName=RootGrid}"
 											CommandParameter="{Binding FolderPath}"
 											ToolTipService.ToolTip="Terminal">
-											<FontIcon FontSize="16"
-													Glyph="&#xE756;"/>
+											<FontIcon FontSize="16" Glyph="&#xE756;" />
 										</Button>
 										<Button
 											Width="42"
@@ -151,8 +146,7 @@
 											Command="{Binding DataContext.OpenFolderCommand, ElementName=RootGrid}"
 											CommandParameter="{Binding FolderPath}"
 											ToolTipService.ToolTip="Explorer">
-											<FontIcon FontSize="16"
-													Glyph="&#xE838;"/>
+											<FontIcon FontSize="16" Glyph="&#xE838;" />
 										</Button>
 									</VariableSizedWrapGrid>
 								</Grid>
@@ -167,20 +161,19 @@
 					Grid.Row="3"
 					Margin="0,0,0,8"
 					Style="{StaticResource SubtitleTextBlockStyle}">
-					<Run Text="Projects ("/>
-					<Run Text="{x:Bind ViewModel.FilteredWorkspaces.Count, Mode=OneWay}"/>
-					<Run Text=")"/>
+					<Run Text="Projects (" />
+					<Run Text="{x:Bind ViewModel.FilteredWorkspaces.Count, Mode=OneWay}" />
+					<Run Text=")" />
 				</TextBlock>
 
 				<!--  Projects List  -->
-				<ItemsRepeater Grid.Row="4"
-						ItemsSource="{x:Bind ViewModel.FilteredWorkspaces, Mode=OneWay}">
+				<ItemsRepeater Grid.Row="4" ItemsSource="{x:Bind ViewModel.FilteredWorkspaces, Mode=OneWay}">
 					<ItemsRepeater.Layout>
 						<UniformGridLayout
 							MinColumnSpacing="8"
 							MinItemHeight="100"
-							MinItemWidth="414"
-							MinRowSpacing="8"/>
+							MinItemWidth="410"
+							MinRowSpacing="8" />
 					</ItemsRepeater.Layout>
 					<ItemsRepeater.ItemTemplate>
 						<DataTemplate>
@@ -192,8 +185,8 @@
 								CornerRadius="6">
 								<Grid>
 									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="*"/>
-										<ColumnDefinition Width="Auto"/>
+										<ColumnDefinition Width="*" />
+										<ColumnDefinition Width="Auto" />
 									</Grid.ColumnDefinitions>
 
 									<StackPanel
@@ -203,12 +196,12 @@
 										<TextBlock
 											FontWeight="SemiBold"
 											Text="{Binding SolutionName}"
-											TextWrapping="Wrap"/>
+											TextWrapping="Wrap" />
 										<TextBlock
 											Opacity="0.7"
 											Style="{StaticResource CaptionTextBlockStyle}"
 											Text="{Binding FolderPath}"
-											TextWrapping="Wrap"/>
+											TextWrapping="Wrap" />
 									</StackPanel>
 
 									<VariableSizedWrapGrid
@@ -224,8 +217,7 @@
 											Command="{Binding DataContext.OpenSolutionCommand, ElementName=RootGrid}"
 											CommandParameter="{Binding SolutionPath}"
 											ToolTipService.ToolTip="Visual Studio">
-											<FontIcon FontSize="16"
-													Glyph="&#xE8A7;"/>
+											<FontIcon FontSize="16" Glyph="&#xE8A7;" />
 										</Button>
 										<Button
 											Width="42"
@@ -236,8 +228,7 @@
 											Command="{Binding DataContext.OpenWithTerminalCommand, ElementName=RootGrid}"
 											CommandParameter="{Binding FolderPath}"
 											ToolTipService.ToolTip="Terminal">
-											<FontIcon FontSize="16"
-													Glyph="&#xE756;"/>
+											<FontIcon FontSize="16" Glyph="&#xE756;" />
 										</Button>
 										<Button
 											Width="42"
@@ -248,8 +239,7 @@
 											Command="{Binding DataContext.OpenWithVSCodeCommand, ElementName=RootGrid}"
 											CommandParameter="{Binding FolderPath}"
 											ToolTipService.ToolTip="VS Code">
-											<FontIcon FontSize="16"
-													Glyph="&#xE943;"/>
+											<FontIcon FontSize="16" Glyph="&#xE943;" />
 										</Button>
 										<Button
 											Width="42"
@@ -260,8 +250,7 @@
 											Command="{Binding DataContext.OpenFolderCommand, ElementName=RootGrid}"
 											CommandParameter="{Binding FolderPath}"
 											ToolTipService.ToolTip="Explorer">
-											<FontIcon FontSize="16"
-													Glyph="&#xE838;"/>
+											<FontIcon FontSize="16" Glyph="&#xE838;" />
 										</Button>
 									</VariableSizedWrapGrid>
 								</Grid>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<ApplicationIcon>Assets\logo.ico</ApplicationIcon>
@@ -16,19 +16,14 @@
 		<EnableMsixTooling>true</EnableMsixTooling>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="Assets\logo.png" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="Assets\logo.ico" />
-	</ItemGroup>
-
+ 
+	 
 	<ItemGroup>
 		<ProjectReference Include="..\Tools.Library\Tools.Library.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.0.0-experimental3" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.7175" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
@@ -41,7 +36,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Assets\logo.png" />
+		<Content Include="Assets\logo.ico">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	  <Content Update="Assets\bg.svg">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\logo.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\logo.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>
