@@ -37,6 +37,9 @@ public partial class NugetLocalViewModel : PageViewModelBase
     [ObservableProperty]
     private int _count;
 
+    [ObservableProperty]
+    private bool _clearCacheOnCopy;
+
     /// <summary>
     /// Gets the command to start/stop watching for changes.
     /// </summary>
@@ -66,6 +69,36 @@ public partial class NugetLocalViewModel : PageViewModelBase
 
         WatchFolder = _nugetSettings.WatchFolder ?? string.Empty;
         CopyFolder = _nugetSettings.CopyFolder ?? string.Empty;
+        ClearCacheOnCopy = _nugetSettings.ClearCacheOnCopy;
+    }
+
+    partial void OnWatchFolderChanged(string value)
+    {
+        _ = SaveSettingAsync(() => _nugetSettings.WatchFolder = value);
+    }
+
+    partial void OnCopyFolderChanged(string value)
+    {
+        _ = SaveSettingAsync(() => _nugetSettings.CopyFolder = value);
+    }
+
+    partial void OnClearCacheOnCopyChanged(bool value)
+    {
+        _ = SaveSettingAsync(() => _nugetSettings.ClearCacheOnCopy = value);
+    }
+
+    private async Task SaveSettingAsync(Action updateAction)
+    {
+        try
+        {
+            var settings = await _settingsService.GetSettingsAsync();
+            updateAction();
+            await _settingsService.SaveSettingsAsync(settings);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error saving settings: {ex.Message}");
+        }
     }
 
     private async Task OnSelectFolderAsync(string? operation)
@@ -181,6 +214,12 @@ public partial class NugetLocalViewModel : PageViewModelBase
 
                 FileList.Insert(0, $"{e.FullPath} moved.");
 
+                // Clear NuGet cache for this package if enabled
+                if (ClearCacheOnCopy)
+                {
+                    await ClearPackageCacheAsync(e.FullPath);
+                }
+
                 Debug.WriteLine("File copied: " + e.FullPath);
 
                 if (DateTime.Now < _lastChanges.AddSeconds(_nugetSettings.CountResetIntervalSeconds))
@@ -194,6 +233,110 @@ public partial class NugetLocalViewModel : PageViewModelBase
                 }
             }
         });
+    }
+
+    private async Task ClearPackageCacheAsync(string packagePath)
+    {
+        try
+        {
+            var (packageId, version) = ExtractPackageInfo(Path.GetFileName(packagePath));
+            if (string.IsNullOrEmpty(packageId) || string.IsNullOrEmpty(version))
+            {
+                FileList.Insert(0, $"  ⚠ Could not parse package info from {Path.GetFileName(packagePath)}");
+                return;
+            }
+
+            // Get global packages folder
+            var globalPackagesPath = await GetGlobalPackagesFolderAsync();
+            if (string.IsNullOrEmpty(globalPackagesPath))
+            {
+                FileList.Insert(0, "  ⚠ Could not locate NuGet global packages folder");
+                return;
+            }
+
+            // Delete specific package version folder
+            var packageFolderPath = Path.Combine(globalPackagesPath, packageId.ToLowerInvariant(), version.ToLowerInvariant());
+            if (Directory.Exists(packageFolderPath))
+            {
+                Directory.Delete(packageFolderPath, true);
+                FileList.Insert(0, $"  ✓ Cleared cache for {packageId} {version}");
+                Debug.WriteLine($"Cleared cache: {packageFolderPath}");
+            }
+            else
+            {
+                FileList.Insert(0, $"  ℹ No cache found for {packageId} {version}");
+            }
+        }
+        catch (Exception ex)
+        {
+            FileList.Insert(0, $"  ✗ Cache clear error: {ex.Message}");
+            Debug.WriteLine($"Error clearing cache: {ex.Message}");
+        }
+    }
+
+    private (string packageId, string version) ExtractPackageInfo(string fileName)
+    {
+        // Pattern: PackageId.Version.nupkg
+        // Example: MyPackage.1.0.0.nupkg or MyPackage.1.0.0-beta.nupkg
+        if (!fileName.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase))
+        {
+            return (string.Empty, string.Empty);
+        }
+
+        var nameWithoutExt = fileName.Substring(0, fileName.Length - 6); // Remove .nupkg
+        var parts = nameWithoutExt.Split('.');
+
+        // Find the first part that looks like a version number
+        for (int i = parts.Length - 1; i >= 0; i--)
+        {
+            if (int.TryParse(parts[i], out _))
+            {
+                // Found a numeric part, this might be the start of version
+                var packageId = string.Join(".", parts.Take(i));
+                var version = string.Join(".", parts.Skip(i));
+                return (packageId, version);
+            }
+        }
+
+        return (string.Empty, string.Empty);
+    }
+
+    private async Task<string> GetGlobalPackagesFolderAsync()
+    {
+        try
+        {
+            var startInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = "nuget locals global-packages --list",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = System.Diagnostics.Process.Start(startInfo);
+            if (process == null)
+            {
+                return string.Empty;
+            }
+
+            var output = await process.StandardOutput.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            // Output format: "global-packages: C:\Users\...\packages"
+            var match = System.Text.RegularExpressions.Regex.Match(output, @"global-packages:\s*(.+)");
+            if (match.Success)
+            {
+                return match.Groups[1].Value.Trim();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error getting global packages folder: {ex.Message}");
+        }
+
+        return string.Empty;
     }
 
     private void ShowError(string message)

@@ -7,7 +7,8 @@
     "CopyFolder": "C:\\Repos\\CLEARING\\Clearing.Common\\nuget",
     "NugetPackageFilter": "*.nupkg",
     "FileCopyDelayMs": 2000,
-    "CountResetIntervalSeconds": 60
+    "CountResetIntervalSeconds": 60,
+    "ClearCacheOnCopy": true
   },
   "Workspaces": {
     "WorkspaceScanFolders": [
@@ -17,7 +18,9 @@
     "SolutionFilePattern": "*.sln",
     "PlatformFolderName": "platform",
     "VSCodeExecutable": "code",
-    "ExcludedFolders": ["H:\\ARCHIVE"]
+    "ExcludedFolders": [
+      "H:\\ARCHIVE"
+    ]
   },
   "ClipboardPassword": {
     "EncryptedPassword": ""
