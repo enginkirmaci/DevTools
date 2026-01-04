@@ -54,6 +54,11 @@ public partial class WorkspacesViewModel : PageViewModelBase
     /// </summary>
     public IRelayCommand RefreshCommand { get; }
 
+    /// <summary>
+    /// Gets the command to open workspace settings.
+    /// </summary>
+    public IAsyncRelayCommand OpenSettingsCommand { get; }
+
     public WorkspacesViewModel(ISettingsService settingsService)
     {
         _settingsService = settingsService;
@@ -69,6 +74,7 @@ public partial class WorkspacesViewModel : PageViewModelBase
             _platforms = new ObservableCollection<WorkspaceItem>();
             await OnInitializeAsync();
         });
+        OpenSettingsCommand = new AsyncRelayCommand(OnOpenSettingsAsync);
 
         _ = OnInitializeAsync();
     }
@@ -304,6 +310,44 @@ public partial class WorkspacesViewModel : PageViewModelBase
         catch (Exception ex)
         {
             Debug.WriteLine($"Failed to start terminal '{exe}' with args '{args}': {ex.Message}");
+        }
+    }
+
+    private async Task OnOpenSettingsAsync()
+    {
+        try
+        {
+            // Get current settings
+            var settings = await _settingsService.GetSettingsAsync();
+            var currentWorkspaceSettings = settings.Workspaces ?? new WorkspacesSettings();
+
+            // Create and show dialog
+            var dialog = new Tools.Views.Windows.WorkspaceSettingsDialog(currentWorkspaceSettings)
+            {
+                XamlRoot = App.MainWindow.Content.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            // If user clicked Save, update and persist settings
+            if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+            {
+                dialog.SaveSettings();
+                settings.Workspaces = dialog.Settings;
+                await _settingsService.SaveSettingsAsync(settings);
+
+                // Update local settings reference
+                _workspaceSettings = dialog.Settings;
+
+                // Refresh workspaces
+                _workspaces = new ObservableCollection<WorkspaceItem>();
+                _platforms = new ObservableCollection<WorkspaceItem>();
+                await OnInitializeAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error opening workspace settings: {ex.Message}");
         }
     }
 

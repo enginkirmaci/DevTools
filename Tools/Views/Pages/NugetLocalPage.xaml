@@ -10,9 +10,9 @@
 
 	<Grid Margin="0">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
 		<!--  Modern Configuration Area  -->
@@ -25,28 +25,28 @@
 			CornerRadius="8">
 			<Grid>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition/>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition />
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
 
 				<TextBlock
 					Margin="0,0,0,12"
 					VerticalAlignment="Center"
 					FontWeight="SemiBold"
-					Text="Watch Directory"/>
+					Text="Watch Directory" />
 
 				<TextBox
 					Grid.Column="1"
 					Margin="12,0,0,12"
 					VerticalAlignment="Center"
-					Text="{x:Bind ViewModel.WatchFolder, Mode=TwoWay}"/>
+					Text="{x:Bind ViewModel.WatchFolder, Mode=TwoWay}" />
 
 				<Button
 					Grid.Column="2"
@@ -56,8 +56,7 @@
 					Command="{x:Bind ViewModel.SelectFolderCommand}"
 					CommandParameter="Watch"
 					ToolTipService.ToolTip="Browse for watch folder">
-					<FontIcon FontSize="16"
-							Glyph="&#xE8B7;"/>
+					<FontIcon FontSize="16" Glyph="&#xE8B7;" />
 				</Button>
 
 				<!--  Start/Stop Button  -->
@@ -71,12 +70,9 @@
 					CommandParameter="{StaticResource TrueValue}"
 					Style="{StaticResource AccentButtonStyle}"
 					Visibility="{x:Bind ViewModel.WatchStarted, Mode=OneWay, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
-					<StackPanel Orientation="Horizontal"
-							Spacing="10">
-						<FontIcon FontSize="20"
-								Glyph="&#xE768;"/>
-						<TextBlock FontSize="16"
-								Text="Watch"/>
+					<StackPanel Orientation="Horizontal" Spacing="10">
+						<FontIcon FontSize="20" Glyph="&#xE768;" />
+						<TextBlock FontSize="16" Text="Watch" />
 					</StackPanel>
 				</Button>
 
@@ -89,12 +85,9 @@
 					Command="{x:Bind ViewModel.WatchChangesCommand}"
 					CommandParameter="{StaticResource FalseValue}"
 					Visibility="{x:Bind ViewModel.WatchStarted, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-					<StackPanel Orientation="Horizontal"
-							Spacing="10">
-						<FontIcon FontSize="20"
-								Glyph="&#xE71A;"/>
-						<TextBlock FontSize="16"
-								Text="Stop"/>
+					<StackPanel Orientation="Horizontal" Spacing="10">
+						<FontIcon FontSize="20" Glyph="&#xE71A;" />
+						<TextBlock FontSize="16" Text="Stop" />
 					</StackPanel>
 				</Button>
 
@@ -102,14 +95,14 @@
 					Grid.Row="1"
 					VerticalAlignment="Center"
 					FontWeight="SemiBold"
-					Text="Copy Directory"/>
+					Text="Copy Directory" />
 
 				<TextBox
 					Grid.Row="1"
 					Grid.Column="1"
 					Margin="12,0,0,0"
 					VerticalAlignment="Center"
-					Text="{x:Bind ViewModel.CopyFolder, Mode=TwoWay}"/>
+					Text="{x:Bind ViewModel.CopyFolder, Mode=TwoWay}" />
 
 				<Button
 					Grid.Row="1"
@@ -120,8 +113,7 @@
 					Command="{x:Bind ViewModel.SelectFolderCommand}"
 					CommandParameter="Copy"
 					ToolTipService.ToolTip="Browse for copy folder">
-					<FontIcon FontSize="18"
-							Glyph="&#xE8B7;"/>
+					<FontIcon FontSize="16" Glyph="&#xE8B7;" />
 				</Button>
 
 				<CheckBox
@@ -129,7 +121,7 @@
 					Grid.ColumnSpan="3"
 					Margin="0,12,0,0"
 					Content="Clear NuGet cache for copied packages"
-					IsChecked="{x:Bind ViewModel.ClearCacheOnCopy, Mode=TwoWay}"/>
+					IsChecked="{x:Bind ViewModel.ClearCacheOnCopy, Mode=TwoWay}" />
 			</Grid>
 		</Border>
 
@@ -144,8 +136,8 @@
 			CornerRadius="8">
 			<Grid>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
 				</Grid.ColumnDefinitions>
 
 				<Border
@@ -153,11 +145,11 @@
 					Height="40"
 					Margin="0,0,16,0"
 					Background="#33999999"
-					CornerRadius="10">
+					CornerRadius="8">
 					<FontIcon
 						FontSize="20"
 						Foreground="White"
-						Glyph="&#xE8F1;"/>
+						Glyph="&#xE8F1;" />
 				</Border>
 
 				<StackPanel
@@ -167,11 +159,11 @@
 					<TextBlock
 						Foreground="White"
 						Opacity="0.9"
-						Text="Packages Moved (Last 60s)"/>
+						Text="Packages Moved (Last 60s)" />
 					<TextBlock
 						FontWeight="Bold"
 						Foreground="White"
-						Text="{x:Bind ViewModel.Count, Mode=OneWay}"/>
+						Text="{x:Bind ViewModel.Count, Mode=OneWay}" />
 				</StackPanel>
 			</Grid>
 		</Border>
@@ -186,17 +178,16 @@
 			CornerRadius="8">
 			<Grid>
 				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="*"/>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="*" />
 				</Grid.RowDefinitions>
 
 				<TextBlock
 					Margin="0,0,0,12"
 					Style="{StaticResource BodyStrongTextBlockStyle}"
-					Text="Activity Log"/>
+					Text="Activity Log" />
 
-				<ScrollViewer Grid.Row="1"
-						MaxHeight="300">
+				<ScrollViewer Grid.Row="1" MaxHeight="300">
 					<Border
 						Padding="12"
 						Background="{ThemeResource SubtleFillColorSecondaryBrush}"
@@ -209,7 +200,7 @@
 										FontFamily="Consolas"
 										FontSize="12"
 										Text="{x:Bind}"
-										TextWrapping="Wrap"/>
+										TextWrapping="Wrap" />
 								</DataTemplate>
 							</ItemsRepeater.ItemTemplate>
 						</ItemsRepeater>

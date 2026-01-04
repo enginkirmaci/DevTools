@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentDialog
+	x:Class="Tools.Views.Windows.WorkspaceSettingsDialog"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Title="Workspace Settings"
+	CloseButtonText="Cancel"
+	DefaultButton="Primary"
+	PrimaryButtonText="Save"
+	mc:Ignorable="d">
+
+	<ScrollViewer MaxHeight="600" VerticalScrollBarVisibility="Auto">
+		<StackPanel Spacing="16">
+			<!--  Workspace Scan Folders  -->
+			<StackPanel Spacing="8">
+				<TextBlock
+					FontWeight="SemiBold"
+					Text="Workspace Scan Folders"
+					ToolTipService.ToolTip="Folders to scan for workspaces (one per line)" />
+				<TextBox
+					x:Name="WorkspaceScanFoldersTextBox"
+					Height="120"
+					AcceptsReturn="True"
+					PlaceholderText="Enter folder paths, one per line&#x0a;Example:&#x0a;C:\Projects&#x0a;D:\Development"
+					TextWrapping="Wrap" />
+			</StackPanel>
+
+			<!--  Excluded Folders  -->
+			<StackPanel Spacing="8">
+				<TextBlock
+					FontWeight="SemiBold"
+					Text="Excluded Folders"
+					ToolTipService.ToolTip="Folders to exclude from scanning (one per line)" />
+				<TextBox
+					x:Name="ExcludedFoldersTextBox"
+					Height="100"
+					AcceptsReturn="True"
+					PlaceholderText="Enter folder paths to exclude, one per line&#x0a;Example:&#x0a;C:\Projects\Archive&#x0a;node_modules"
+					TextWrapping="Wrap" />
+			</StackPanel>
+
+			<!--  Git Folder Pattern  -->
+			<StackPanel Spacing="8">
+				<TextBlock
+					FontWeight="SemiBold"
+					Text="Git Folder Pattern"
+					ToolTipService.ToolTip="Pattern to search for git folders" />
+				<TextBox
+					x:Name="GitFolderPatternTextBox"
+					PlaceholderText="*.git" />
+			</StackPanel>
+
+			<!--  Solution File Pattern  -->
+			<StackPanel Spacing="8">
+				<TextBlock
+					FontWeight="SemiBold"
+					Text="Solution File Pattern"
+					ToolTipService.ToolTip="Pattern to search for solution files" />
+				<TextBox
+					x:Name="SolutionFilePatternTextBox"
+					PlaceholderText="*.sln" />
+			</StackPanel>
+
+			<!--  Platform Folder Name  -->
+			<StackPanel Spacing="8">
+				<TextBlock
+					FontWeight="SemiBold"
+					Text="Platform Folder Name"
+					ToolTipService.ToolTip="Identifier for platform folders" />
+				<TextBox
+					x:Name="PlatformFolderNameTextBox"
+					PlaceholderText="platform" />
+			</StackPanel>
+
+			<!--  VS Code Executable  -->
+			<StackPanel Spacing="8">
+				<TextBlock
+					FontWeight="SemiBold"
+					Text="VS Code Executable"
+					ToolTipService.ToolTip="Path or command for VS Code" />
+				<TextBox
+					x:Name="VSCodeExecutableTextBox"
+					PlaceholderText="code" />
+			</StackPanel>
+
+			<!--  Terminal Executable  -->
+			<StackPanel Spacing="8">
+				<TextBlock
+					FontWeight="SemiBold"
+					Text="Terminal Executable"
+					ToolTipService.ToolTip="Path or command for terminal" />
+				<TextBox
+					x:Name="TerminalExecutableTextBox"
+					PlaceholderText="wt" />
+			</StackPanel>
+		</StackPanel>
+	</ScrollViewer>
+</ContentDialog>

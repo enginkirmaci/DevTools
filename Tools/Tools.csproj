@@ -16,6 +16,13 @@
 		<EnableMsixTooling>true</EnableMsixTooling>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <None Remove="Assets\folder.png" />
+	  <None Remove="Assets\terminal.png" />
+	  <None Remove="Assets\vs.png" />
+	  <None Remove="Assets\vscode.png" />
+	</ItemGroup>
+
  
 	 
 	<ItemGroup>
@@ -39,12 +46,24 @@
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	  <Content Update="Assets\bg.svg">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\folder.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Assets\logo.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  <Content Update="Assets\logo.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\terminal.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\vs.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="Assets\vscode.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
