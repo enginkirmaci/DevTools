@@ -221,6 +221,8 @@ public sealed partial class MainWindow : Window
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         Cleanup();
+
+        App.Current.Exit();
     }
 
     /// <summary>

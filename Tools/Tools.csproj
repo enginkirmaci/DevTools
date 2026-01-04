@@ -21,6 +21,7 @@
 	  <None Remove="Assets\terminal.png" />
 	  <None Remove="Assets\vs.png" />
 	  <None Remove="Assets\vscode.png" />
+	  <None Remove="settings.json" />
 	</ItemGroup>
 
  
@@ -45,6 +46,9 @@
 		<Content Include="Assets\logo.ico">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="settings.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	  <Content Update="Assets\bg.svg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
@@ -66,12 +70,6 @@
 	  <Content Update="Assets\vscode.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="settings.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
 	</ItemGroup>
 
 </Project>

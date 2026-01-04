@@ -22,6 +22,9 @@ public partial class NugetLocalViewModel : PageViewModelBase
     private NugetLocalSettings _nugetSettings = new();
     private DateTime _lastChanges = DateTime.Now;
 
+    // Guard to avoid saving settings while initial values are being applied
+    private bool _isInitializing;
+
     [ObservableProperty]
     private ObservableCollection<string> _fileList = new();
 
@@ -64,26 +67,37 @@ public partial class NugetLocalViewModel : PageViewModelBase
     /// <inheritdoc/>
     public override async Task OnInitializeAsync()
     {
-        var settings = await _settingsService.GetSettingsAsync();
-        _nugetSettings = settings.NugetLocal ?? new NugetLocalSettings();
+        _isInitializing = true;
+        try
+        {
+            var settings = await _settingsService.GetSettingsAsync();
+            _nugetSettings = settings.NugetLocal ?? new NugetLocalSettings();
 
-        WatchFolder = _nugetSettings.WatchFolder ?? string.Empty;
-        CopyFolder = _nugetSettings.CopyFolder ?? string.Empty;
-        ClearCacheOnCopy = _nugetSettings.ClearCacheOnCopy;
+            WatchFolder = _nugetSettings.WatchFolder ?? string.Empty;
+            CopyFolder = _nugetSettings.CopyFolder ?? string.Empty;
+            ClearCacheOnCopy = _nugetSettings.ClearCacheOnCopy;
+        }
+        finally
+        {
+            _isInitializing = false;
+        }
     }
 
     partial void OnWatchFolderChanged(string value)
     {
+        if (_isInitializing) return;
         _ = SaveSettingAsync(() => _nugetSettings.WatchFolder = value);
     }
 
     partial void OnCopyFolderChanged(string value)
     {
+        if (_isInitializing) return;
         _ = SaveSettingAsync(() => _nugetSettings.CopyFolder = value);
     }
 
     partial void OnClearCacheOnCopyChanged(bool value)
     {
+        if (_isInitializing) return;
         _ = SaveSettingAsync(() => _nugetSettings.ClearCacheOnCopy = value);
     }
 

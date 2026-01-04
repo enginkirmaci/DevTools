@@ -4,6 +4,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using WinRT.Interop;
+using Tools.Library.Entities;
 
 namespace Tools.Helpers;
 
@@ -145,6 +146,140 @@ public sealed class WindowConfigurator
             _appWindow.Move(new global::Windows.Graphics.PointInt32(centerX, centerY));
         }
     }
+
+    /// <summary>
+    /// Sets the window to be always on top (topmost).
+    /// </summary>
+    /// <param name="isAlwaysOnTop">True to make the window always on top, false otherwise.</param>
+    public void SetAlwaysOnTop(bool isAlwaysOnTop)
+    {
+        if (_appWindow?.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.IsAlwaysOnTop = isAlwaysOnTop;
+        }
+    }
+
+    /// <summary>
+    /// Positions the window in a specific corner of the screen.
+    /// </summary>
+    /// <param name="position">The corner position.</param>
+    /// <param name="margin">Margin from the screen edge in pixels.</param>
+    public void PositionInCorner(WindowCornerPosition position, int margin = 20)
+    {
+        if (_appWindow == null) return;
+
+        var windowId = Win32Interop.GetWindowIdFromWindow(_hwnd);
+        var displayArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
+
+        if (displayArea == null) return;
+
+        var size = _appWindow.Size;
+        var workArea = displayArea.WorkArea;
+        int x, y;
+
+        switch (position)
+        {
+            case WindowCornerPosition.TopLeft:
+                x = workArea.X + margin;
+                y = workArea.Y + margin;
+                break;
+            case WindowCornerPosition.TopRight:
+                x = workArea.X + workArea.Width - size.Width - margin;
+                y = workArea.Y + margin;
+                break;
+            case WindowCornerPosition.BottomLeft:
+                x = workArea.X + margin;
+                y = workArea.Y + workArea.Height - size.Height - margin;
+                break;
+            case WindowCornerPosition.BottomRight:
+            default:
+                x = workArea.X + workArea.Width - size.Width - margin;
+                y = workArea.Y + workArea.Height - size.Height - margin;
+                break;
+        }
+
+        _appWindow.Move(new global::Windows.Graphics.PointInt32(x, y));
+    }
+
+    /// <summary>
+    /// Brings the window to the front and activates it.
+    /// </summary>
+    public void BringToFront()
+    {
+        if (_hwnd == 0) return;
+
+        // Use Win32 API to bring window to front
+        SetForegroundWindow(_hwnd);
+        _window.Activate();
+    }
+
+    /// <summary>
+    /// Configures the window as a compact overlay (small, minimal chrome).
+    /// </summary>
+    /// <param name="width">Window width.</param>
+    /// <param name="height">Window height.</param>
+    public void SetCompactOverlayStyle(int width, int height)
+    {
+        if (_appWindow == null) return;
+
+        // Resize to compact dimensions
+        _appWindow.Resize(new global::Windows.Graphics.SizeInt32(width, height));
+
+        // Configure presenter for overlay style
+        if (_appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.IsResizable = false;
+            presenter.IsMinimizable = true;
+            presenter.IsMaximizable = false;
+            presenter.IsAlwaysOnTop = true;
+
+            // Hide default titlebar for custom titlebar
+            presenter.SetBorderAndTitleBar(true, false);
+        }
+    }
+
+    /// <summary>
+    /// Configures a custom title bar with drag region.
+    /// </summary>
+    /// <param name="titleBarElement">The UIElement to use as the drag region.</param>
+    public void ConfigureCustomTitleBar(UIElement titleBarElement)
+    {
+        if (_appWindow == null) return;
+
+        // Set the drag region for the custom title bar
+        // The entire titleBarElement will be draggable
+        _window.ExtendsContentIntoTitleBar = true;
+        _window.SetTitleBar(titleBarElement);
+    }
+
+    /// <summary>
+    /// Hides the window using Win32 ShowWindow(SW_HIDE).
+    /// </summary>
+    public void Hide()
+    {
+        if (_hwnd == 0) return;
+        ShowWindow(_hwnd, SW_HIDE);
+    }
+
+    /// <summary>
+    /// Shows the window using Win32 ShowWindow(SW_SHOW) and activates it.
+    /// </summary>
+    public void Show()
+    {
+        if (_hwnd == 0) return;
+        ShowWindow(_hwnd, SW_SHOW);
+        SetForegroundWindow(_hwnd);
+        _window.Activate();
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(nint hWnd);
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool ShowWindow(nint hWnd, int nCmdShow);
+
+    private const int SW_HIDE = 0;
+    private const int SW_SHOW = 5;
 
     #endregion Public Methods
 }

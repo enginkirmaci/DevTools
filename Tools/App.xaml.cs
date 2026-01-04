@@ -1,5 +1,7 @@
-﻿using Serilog;
+﻿using Microsoft.UI.Dispatching;
+using Serilog;
 using Tools.Library.Extensions;
+using Tools.Library.Services;
 using Tools.Library.Services.Abstractions;
 using Tools.Services;
 using Tools.ViewModels.Pages;
@@ -53,9 +55,21 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IClipboardPasswordService, ClipboardPasswordService>();
 
+        // Register Focus Timer service (needs DispatcherQueue from UI thread)
+        services.AddSingleton<IFocusTimerService>(sp =>
+        {
+            var settingsService = sp.GetRequiredService<ISettingsService>();
+            var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            return new FocusTimerService(settingsService, dispatcherQueue);
+        });
+
         // Register windows and view models
         services.AddSingleton<MainWindow>();
         services.AddSingleton<MainWindowViewModel>();
+
+        // Register Timer Notification Window (singleton to reuse)
+        services.AddSingleton<TimerNotificationWindow>();
+        services.AddSingleton<TimerNotificationWindowViewModel>();
 
         // Register pages and view models
         RegisterPageWithViewModel<DashboardPage, DashboardViewModel>(services);
@@ -66,6 +80,7 @@ public partial class App : Application
         RegisterPageWithViewModel<CodeExecutePage, CodeExecutePageViewModel>(services);
         RegisterPageWithViewModel<ClipboardPasswordPage, ClipboardPasswordPageViewModel>(services);
         RegisterPageWithViewModel<HostFileProxyPage, HostFileProxyViewModel>(services);
+        RegisterPageWithViewModel<FocusTimerSettingsPage, FocusTimerSettingsViewModel>(services);
     }
 
     private static void RegisterPageWithViewModel<TPage, TViewModel>(IServiceCollection services)
@@ -83,6 +98,10 @@ public partial class App : Application
     {
         _mainWindow = Services.GetRequiredService<MainWindow>();
         _mainWindow.Activate();
+
+        // Initialize the timer notification window (but don't show it yet)
+        // This ensures event handlers are set up before the timer service fires events
+        //_ = Services.GetRequiredService<TimerNotificationWindow>();
     }
 
     public static TService GetService<TService>() where TService : class

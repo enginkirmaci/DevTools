@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Tools.Library.Mvvm;
 using Tools.Library.Providers;
+using Tools.Views.Windows;
 
 namespace Tools.ViewModels.Windows;
 

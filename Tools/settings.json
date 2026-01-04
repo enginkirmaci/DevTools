@@ -24,5 +24,22 @@
   },
   "ClipboardPassword": {
     "EncryptedPassword": ""
+  },
+  "FocusTimer": {
+    "WorkStartTime": "00:30",
+    "WorkEndTime": "2:00",
+    "LunchStartTime": "13:00",
+    "LunchDurationMinutes": 60,
+    "TotalDailyBreakMinutes": 30,
+    "DesiredBreakCount": 3,
+    "TimerVisibilityMode": 0,
+    "WindowCornerPosition": 0,
+    "PlaySoundOnNotification": true,
+    "PersistedState": {
+      "LastResetDate": "2026-01-05",
+      "CurrentBreakPoolMinutes": 34.02640526666667,
+      "RemainingBreakCount": 3,
+      "BreakTimeTakenMinutes": 1.7367973666666667
+    }
   }
 }
