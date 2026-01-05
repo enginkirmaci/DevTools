@@ -366,12 +366,12 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
     {
         var color = status switch
         {
-            FocusTimerStatus.Working => Colors.DodgerBlue, // Blue - working
-            FocusTimerStatus.BreakActive => Colors.Green, // Green - on break
-            FocusTimerStatus.NotificationTriggered => Colors.Orange, // Orange - break notification
-            FocusTimerStatus.LunchMode => Colors.Purple, // Purple - lunch
-            FocusTimerStatus.DayEnded => Colors.Gray, // Gray - day ended
-            _ => Colors.DodgerBlue // Default blue
+            FocusTimerStatus.Working => Colors.DodgerBlue, // Session active
+            FocusTimerStatus.BreakActive => Colors.MediumSeaGreen, // On break
+            FocusTimerStatus.NotificationTriggered => Colors.Coral, // Waiting for action
+            FocusTimerStatus.LunchMode => Colors.MediumPurple,
+            FocusTimerStatus.DayEnded => Colors.SlateGray,
+            _ => Colors.DodgerBlue
         };
         ProgressRingBrush = new SolidColorBrush(color);
     }
@@ -380,17 +380,13 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
     {
         return state.Status switch
         {
-            FocusTimerStatus.Stopped => "Timer stopped",
-            FocusTimerStatus.Working => state.TimeUntilNextBreak.HasValue
-                ? $"Next break in {FormatTimeSpan(state.TimeUntilNextBreak.Value)}"
-                : "Working...",
-            FocusTimerStatus.NotificationTriggered => "Break time!",
-            FocusTimerStatus.BreakActive => state.BreakTimeRemaining.HasValue
-                ? $"Break ends in {FormatTimeSpan(state.BreakTimeRemaining.Value)}"
-                : "On break",
-            FocusTimerStatus.LunchMode => "Lunch break",
-            FocusTimerStatus.DayEnded => "Work day ended",
-            _ => "Unknown"
+            FocusTimerStatus.Stopped => "Ready to Start",
+            FocusTimerStatus.Working => "Focusing",
+            FocusTimerStatus.NotificationTriggered => "Time for a break!",
+            FocusTimerStatus.BreakActive => "On Break",
+            FocusTimerStatus.LunchMode => "Lunch Break",
+            FocusTimerStatus.DayEnded => "Day Finished",
+            _ => "Focus Timer"
         };
     }
 

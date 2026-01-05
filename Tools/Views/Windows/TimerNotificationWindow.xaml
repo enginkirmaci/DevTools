@@ -1,250 +1,296 @@
 <Window
-    x:Class="Tools.Views.Windows.TimerNotificationWindow"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Focus Timer"
-    mc:Ignorable="d">
+	x:Class="Tools.Views.Windows.TimerNotificationWindow"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Title="Focus Timer"
+	mc:Ignorable="d">
 
-    <Border
-        Background="{ThemeResource LayerFillColorDefaultBrush}"
-        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-        BorderThickness="1"
-        CornerRadius="12">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="40" />
-                <!--  Custom Title Bar  -->
-                <RowDefinition Height="*" />
-                <!--  Main Content  -->
-            </Grid.RowDefinitions>
+	<Border
+		Background="{ThemeResource LayerFillColorDefaultBrush}"
+		BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+		BorderThickness="1"
+		CornerRadius="16">
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="32" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
 
-            <!--  Custom Title Bar  -->
-            <Grid
-                x:Name="CustomTitleBar"
-                Grid.Row="0"
-                Padding="12,0"
-                Background="Transparent">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+			<!--  Custom Title Bar  -->
+			<Grid
+				x:Name="CustomTitleBar"
+				Grid.Row="0"
+				Padding="16,0,8,0"
+				Background="Transparent">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
 
-                <!--  Drag Region (Title)  -->
-                <TextBlock
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    FontWeight="SemiBold"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    Text="Focus Timer" />
+				<Button
+					x:Name="PinButton"
+					Grid.Column="1"
+					Width="36"
+					Height="36"
+					Margin="0,0,4,0"
+					Background="Transparent"
+					BorderThickness="0"
+					Click="OnPinToggle"
+					ToolTipService.ToolTip="Pin window">
+					<FontIcon x:Name="PinIcon" FontSize="12" />
+				</Button>
 
-                <!--  Pin Button  -->
-                <Button
-                    x:Name="PinButton"
-                    Grid.Column="1"
-                    Width="36"
-                    Height="36"
-                    Margin="0,0,4,0"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="OnPinToggle"
-                    ToolTipService.ToolTip="Pin window always on top">
-                    <FontIcon x:Name="PinIcon" FontSize="12" />
-                </Button>
+				<Button
+					x:Name="CloseButton"
+					Grid.Column="2"
+					Width="36"
+					Height="36"
+					Background="Transparent"
+					BorderThickness="0"
+					Click="OnCloseClick"
+					ToolTipService.ToolTip="Hide">
+					<FontIcon FontSize="12" Glyph="&#xE711;" />
+				</Button>
+			</Grid>
 
-                <!--  Close Button  -->
-                <Button
-                    x:Name="CloseButton"
-                    Grid.Column="2"
-                    Width="36"
-                    Height="36"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Click="OnCloseClick"
-                    ToolTipService.ToolTip="Hide window">
-                    <FontIcon FontSize="12" Glyph="&#xE711;" />
-                </Button>
-            </Grid>
+			<!--  Main Content  -->
+			<Grid Grid.Row="1" Padding="28,8,28,28">
+				<Grid.ChildrenTransitions>
+					<TransitionCollection>
+						<EntranceThemeTransition FromVerticalOffset="20" />
+					</TransitionCollection>
+				</Grid.ChildrenTransitions>
 
-            <!--  Main Content  -->
-            <Grid Grid.Row="1" Padding="20,12,20,20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <!--  Progress Ring Area  -->
-                    <RowDefinition Height="Auto" />
-                    <!--  Work Day Info  -->
-                    <RowDefinition Height="Auto" />
-                    <!--  Break Interval Info  -->
-                    <RowDefinition Height="Auto" />
-                    <!--  Break Bank  -->
-                    <RowDefinition Height="Auto" />
-                    <!--  Action Buttons  -->
-                    <RowDefinition Height="*" />
-                    <!--  Settings Link  -->
-                </Grid.RowDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
 
-                <!--  Progress Ring with Overlay Text  -->
-                <Grid
-                    Grid.Row="0"
-                    Margin="0,8,0,16"
-                    HorizontalAlignment="Center">
-                    <ProgressRing
-                        Width="140"
-                        Height="140"
-                        Foreground="{x:Bind ViewModel.ProgressRingBrush, Mode=OneWay}"
-                        IsIndeterminate="False"
-                        Maximum="{x:Bind ViewModel.SessionProgressMax, Mode=OneWay}"
-                        Value="{x:Bind ViewModel.SessionProgress, Mode=OneWay}" />
+				<Expander
+					Grid.RowSpan="3"
+					Margin="0,16,0,0"
+					HorizontalAlignment="Right"
+					VerticalAlignment="Bottom"
+					ExpandDirection="Up"
+					IsExpanded="False">
+					<Expander.Header>
+						<FontIcon
+							VerticalAlignment="Center"
+							FontSize="16"
+							Glyph="&#xE9D2;" />
+					</Expander.Header>
+					<StackPanel Orientation="Vertical">
+						<StackPanel
+							HorizontalAlignment="Center"
+							Orientation="Horizontal"
+							Spacing="8">
+							<FontIcon
+								VerticalAlignment="Center"
+								FontSize="14"
+								Glyph="&#xE823;"
+								Opacity="0.5" />
+							<TextBlock
+								FontSize="14"
+								FontWeight="Medium"
+								Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+								Text="{x:Bind ViewModel.WorkDayCountdown, Mode=OneWay}" />
+						</StackPanel>
 
-                    <!--  Countdown Display Inside Ring  -->
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            FontSize="32"
-                            FontWeight="Bold"
-                            Text="{x:Bind ViewModel.CountdownDisplay, Mode=OneWay}" />
-                        <TextBlock
-                            Margin="0,2,0,0"
-                            HorizontalAlignment="Center"
-                            FontSize="11"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" />
-                    </StackPanel>
-                </Grid>
+						<StackPanel
+							HorizontalAlignment="Center"
+							Orientation="Horizontal"
+							Spacing="8">
+							<FontIcon
+								VerticalAlignment="Center"
+								FontSize="14"
+								Glyph="&#xE821;"
+								Opacity="0.5" />
+							<TextBlock
+								FontSize="14"
+								FontWeight="Medium"
+								Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+								Text="{x:Bind ViewModel.BreakIntervalDisplay, Mode=OneWay}" />
+						</StackPanel>
 
-                <!--  Work Day Countdown  -->
-                <TextBlock
-                    Grid.Row="1"
-                    Margin="0,0,0,8"
-                    HorizontalAlignment="Center"
-                    FontSize="13"
-                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                    Text="{x:Bind ViewModel.WorkDayCountdown, Mode=OneWay}" />
+						<StackPanel Orientation="Horizontal" Spacing="6">
+							<FontIcon
+								VerticalAlignment="Center"
+								FontSize="12"
+								Glyph="&#xEC32;" />
+							<TextBlock
+								Margin="0,0,0,10"
+								VerticalAlignment="Center"
+								FontSize="12"
+								FontWeight="Medium"
+								Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+								Text="{x:Bind ViewModel.BreakBankStatus, Mode=OneWay}" />
+						</StackPanel>
+					</StackPanel>
+				</Expander>
 
-                <!--  Break Interval Info  -->
-                <TextBlock
-                    Grid.Row="2"
-                    Margin="0,0,0,12"
-                    HorizontalAlignment="Center"
-                    FontSize="12"
-                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                    Text="{x:Bind ViewModel.BreakIntervalDisplay, Mode=OneWay}" />
+				<!--  Timer Section  -->
+				<Grid
+					Grid.Row="0"
+					Margin="0,16,0,32"
+					HorizontalAlignment="Center">
+					<!--  Background Ring  -->
+					<ProgressRing
+						Width="160"
+						Height="160"
+						Foreground="{x:Bind ViewModel.ProgressRingBrush, Mode=OneWay}"
+						IsIndeterminate="False"
+						Maximum="100"
+						Value="{x:Bind ViewModel.SessionProgress, Mode=OneWay}" />
 
-                <!--  Break Bank Indicator  -->
-                <Grid Grid.Row="3" Margin="0,0,0,16">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBlock
-                        Grid.Row="0"
-                        Margin="0,0,0,4"
-                        HorizontalAlignment="Center"
-                        FontSize="11"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                        Text="{x:Bind ViewModel.BreakBankStatus, Mode=OneWay}" />
-                    <ProgressBar
-                        Grid.Row="1"
-                        Height="6"
-                        CornerRadius="3"
-                        Maximum="100"
-                        Value="{x:Bind ViewModel.BreakBankPercentage, Mode=OneWay}" />
-                </Grid>
+					<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+						<TextBlock
+							Margin="0,0,0,-6"
+							HorizontalAlignment="Center"
+							FontSize="48"
+							FontWeight="Bold"
+							Text="{x:Bind ViewModel.CountdownDisplay, Mode=OneWay}" />
+						<TextBlock
+							HorizontalAlignment="Center"
+							CharacterSpacing="50"
+							FontSize="12"
+							FontWeight="SemiBold"
+							Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+							Opacity="0.8"
+							Text="{x:Bind ViewModel.StatusMessage, Mode=OneWay}" />
+					</StackPanel>
+				</Grid>
 
-                <!--  Action Buttons - Stopped State  -->
-                <StackPanel
-                    x:Name="StoppedButtons"
-                    Grid.Row="4"
-                    HorizontalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="8"
-                    Visibility="Visible">
-                    <Button
-                        Padding="20,10"
-                        Command="{x:Bind ViewModel.StartTimerCommand}"
-                        Style="{StaticResource AccentButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontSize="14" Glyph="&#xE768;" />
-                            <TextBlock Text="Start" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+				<!--  Action Buttons Container  -->
+				<Grid Grid.Row="1" Margin="0,16,0,0">
+					<!--  Stopped State  -->
+					<Button
+						x:Name="StoppedButtons"
+						Height="48"
+						HorizontalAlignment="Stretch"
+						Command="{x:Bind ViewModel.StartTimerCommand}"
+						CornerRadius="12"
+						Style="{StaticResource AccentButtonStyle}"
+						Visibility="Visible">
+						<StackPanel Orientation="Horizontal" Spacing="12">
+							<FontIcon FontSize="18" Glyph="&#xE768;" />
+							<TextBlock
+								FontSize="15"
+								FontWeight="SemiBold"
+								Text="Start Focus" />
+						</StackPanel>
+					</Button>
 
-                <!--  Action Buttons - Working State  -->
-                <StackPanel
-                    x:Name="WorkingButtons"
-                    Grid.Row="4"
-                    HorizontalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="8"
-                    Visibility="Collapsed">
-                    <Button
-                        Padding="16,8"
-                        Command="{x:Bind ViewModel.TakeBreakNowCommand}"
-                        Style="{StaticResource AccentButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontSize="14" Glyph="&#xE7F8;" />
-                            <TextBlock Text="Take Break" />
-                        </StackPanel>
-                    </Button>
-                    <Button Padding="16,8" Command="{x:Bind ViewModel.StopTimerCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontSize="14" Glyph="&#xE71A;" />
-                            <TextBlock Text="Stop" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+					<!--  Working State  -->
+					<Grid
+						x:Name="WorkingButtons"
+						ColumnDefinitions="*, Auto"
+						Visibility="Collapsed">
+						<Button
+							Grid.Column="0"
+							Height="48"
+							Margin="0,0,10,0"
+							HorizontalAlignment="Stretch"
+							Command="{x:Bind ViewModel.TakeBreakNowCommand}"
+							CornerRadius="12"
+							Style="{StaticResource AccentButtonStyle}">
+							<StackPanel Orientation="Horizontal" Spacing="10">
+								<FontIcon FontSize="18" Glyph="&#xE7F8;" />
+								<TextBlock
+									FontSize="15"
+									FontWeight="SemiBold"
+									Text="Take Break" />
+							</StackPanel>
+						</Button>
+						<Button
+							Grid.Column="1"
+							Height="48"
+							Command="{x:Bind ViewModel.StopTimerCommand}"
+							CornerRadius="12"
+							ToolTipService.ToolTip="Stop Session">
+							<StackPanel Orientation="Horizontal" Spacing="10">
+								<FontIcon FontSize="18" Glyph="&#xE71A;" />
+								<TextBlock
+									FontSize="15"
+									FontWeight="SemiBold"
+									Text="Stop" />
+							</StackPanel>
+						</Button>
+					</Grid>
 
-                <!--  Action Buttons - Notification State  -->
-                <StackPanel
-                    x:Name="NotificationButtons"
-                    Grid.Row="4"
-                    HorizontalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="8"
-                    Visibility="Collapsed">
-                    <Button
-                        Padding="16,8"
-                        Command="{x:Bind ViewModel.TakeBreakCommand}"
-                        Style="{StaticResource AccentButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontSize="14" Glyph="&#xE7F8;" />
-                            <TextBlock Text="Take Break" />
-                        </StackPanel>
-                    </Button>
-                    <Button
-                        Padding="12,8"
-                        Command="{x:Bind ViewModel.SnoozeBreakCommand}"
-                        ToolTipService.ToolTip="Snooze for 5 minutes">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon FontSize="14" Glyph="&#xED4C;" />
-                            <TextBlock Text="5m" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
+					<!--  Notification State  -->
+					<Grid
+						x:Name="NotificationButtons"
+						ColumnDefinitions="*, Auto"
+						Visibility="Collapsed">
+						<Button
+							Grid.Column="0"
+							Height="48"
+							Margin="0,0,10,0"
+							HorizontalAlignment="Stretch"
+							Command="{x:Bind ViewModel.TakeBreakCommand}"
+							CornerRadius="12"
+							Style="{StaticResource AccentButtonStyle}">
+							<StackPanel Orientation="Horizontal" Spacing="10">
+								<FontIcon FontSize="18" Glyph="&#xE7F8;" />
+								<TextBlock
+									FontSize="15"
+									FontWeight="SemiBold"
+									Text="Break Now" />
+							</StackPanel>
+						</Button>
+						<Button
+							Grid.Column="1"
+							Width="80"
+							Height="48"
+							Command="{x:Bind ViewModel.SnoozeBreakCommand}"
+							CornerRadius="12">
+							<StackPanel Orientation="Horizontal" Spacing="8">
+								<FontIcon FontSize="16" Glyph="&#xED4C;" />
+								<TextBlock
+									FontSize="15"
+									FontWeight="SemiBold"
+									Text="5m" />
+							</StackPanel>
+						</Button>
+					</Grid>
 
-                <!--  Action Buttons - Break Active State  -->
-                <StackPanel
-                    x:Name="BreakActiveButtons"
-                    Grid.Row="4"
-                    HorizontalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="8"
-                    Visibility="Collapsed">
-                    <Button
-                        Padding="20,10"
-                        Command="{x:Bind ViewModel.EndBreakEarlyCommand}"
-                        Style="{StaticResource AccentButtonStyle}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontSize="14" Glyph="&#xE72A;" />
-                            <TextBlock Text="Resume Work" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Grid>
-    </Border>
+					<!--  Break Active State  -->
+					<Button
+						x:Name="BreakActiveButtons"
+						Height="48"
+						HorizontalAlignment="Stretch"
+						Command="{x:Bind ViewModel.EndBreakEarlyCommand}"
+						CornerRadius="12"
+						Style="{StaticResource AccentButtonStyle}"
+						Visibility="Collapsed">
+						<StackPanel Orientation="Horizontal" Spacing="12">
+							<FontIcon FontSize="18" Glyph="&#xE72A;" />
+							<TextBlock
+								FontSize="15"
+								FontWeight="SemiBold"
+								Text="Resume Work" />
+						</StackPanel>
+					</Button>
+				</Grid>
+
+				<Grid Grid.Row="2" Margin="0,16,0,0">
+					<FontIcon
+						VerticalAlignment="Center"
+						FontSize="12"
+						Glyph="&#xEC32;" />
+					<ProgressBar
+						Grid.Row="1"
+						Height="6"
+						VerticalAlignment="Center"
+						CornerRadius="3"
+						Maximum="100"
+						Value="{x:Bind ViewModel.BreakBankPercentage, Mode=OneWay}" />
+				</Grid>
+			</Grid>
+		</Grid>
+	</Border>
 </Window>
