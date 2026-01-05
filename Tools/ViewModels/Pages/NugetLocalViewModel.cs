@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Dispatching;
@@ -298,18 +298,15 @@ public partial class NugetLocalViewModel : PageViewModelBase
         }
 
         var nameWithoutExt = fileName.Substring(0, fileName.Length - 6); // Remove .nupkg
-        var parts = nameWithoutExt.Split('.');
 
-        // Find the first part that looks like a version number
-        for (int i = parts.Length - 1; i >= 0; i--)
+        const string pattern = @"^(?<id>.+?)\.(?<version>\d+(\.\d+)*(\-[^\+]+)?(\+[^\s]+)?)$";
+
+        var match = Regex.Match(nameWithoutExt, pattern);
+        if (match.Success)
         {
-            if (int.TryParse(parts[i], out _))
-            {
-                // Found a numeric part, this might be the start of version
-                var packageId = string.Join(".", parts.Take(i));
-                var version = string.Join(".", parts.Skip(i));
-                return (packageId, version);
-            }
+            var pkgId = match.Groups["id"].Value;
+            var version = match.Groups["version"].Value;
+            return (pkgId, version);
         }
 
         return (string.Empty, string.Empty);

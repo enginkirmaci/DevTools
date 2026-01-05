@@ -1,6 +1,6 @@
 {
   "EFToolsPage": {
-    "RepositoryTemplate": "\npublic class {TABLENAME}Repository : QueryableRepository<{TABLENAME}, DbContext>, I{TABLENAME}Repository\n{\n    public {TABLENAME}Repository(DbContext context) : base(context)\n    {\n    }\n}\n\npublic interface I{TABLENAME}Repository : IQueryableRepository<{TABLENAME}>\n{\n}"
+    "RepositoryTemplate": "\npublic class {TABLENAME}Repository : QueryableRepository\u003C{TABLENAME}, DbContext\u003E, I{TABLENAME}Repository\n{\n    public {TABLENAME}Repository(DbContext context) : base(context)\n    {\n    }\n}\n\npublic interface I{TABLENAME}Repository : IQueryableRepository\u003C{TABLENAME}\u003E\n{\n}"
   },
   "NugetLocal": {
     "WatchFolder": "C:\\Repos\\CLEARING\\Clearing.Common",
@@ -12,34 +12,33 @@
   },
   "Workspaces": {
     "WorkspaceScanFolders": [
-      "H:\\"
+      "C:\\Repos\\CLEARING"
     ],
     "GitFolderPattern": ".git",
     "SolutionFilePattern": "*.sln",
     "PlatformFolderName": "platform",
     "VSCodeExecutable": "code",
-    "ExcludedFolders": [
-      "H:\\ARCHIVE"
-    ]
+    "TerminalExecutable": "wt",
+    "ExcludedFolders": []
   },
   "ClipboardPassword": {
     "EncryptedPassword": ""
   },
   "FocusTimer": {
-    "WorkStartTime": "00:30",
-    "WorkEndTime": "2:00",
+    "WorkStartTime": "09:00",
+    "WorkEndTime": "18:00",
     "LunchStartTime": "13:00",
     "LunchDurationMinutes": 60,
-    "TotalDailyBreakMinutes": 30,
-    "DesiredBreakCount": 3,
-    "TimerVisibilityMode": 0,
+    "TotalDailyBreakMinutes": 60,
+    "DesiredBreakCount": 7,
+    "TimerVisibilityMode": 1,
     "WindowCornerPosition": 0,
     "PlaySoundOnNotification": true,
     "PersistedState": {
       "LastResetDate": "2026-01-05",
-      "CurrentBreakPoolMinutes": 34.02640526666667,
-      "RemainingBreakCount": 3,
-      "BreakTimeTakenMinutes": 1.7367973666666667
+      "CurrentBreakPoolMinutes": 60,
+      "RemainingBreakCount": 7,
+      "BreakTimeTakenMinutes": 0
     }
   }
 }
