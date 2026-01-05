@@ -215,12 +215,6 @@
                             <TextBlock Text="Take Break" />
                         </StackPanel>
                     </Button>
-                    <Button Padding="16,8" Command="{x:Bind ViewModel.SkipBreakCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <FontIcon FontSize="14" Glyph="&#xE893;" />
-                            <TextBlock Text="Skip" />
-                        </StackPanel>
-                    </Button>
                     <Button
                         Padding="12,8"
                         Command="{x:Bind ViewModel.SnoozeBreakCommand}"

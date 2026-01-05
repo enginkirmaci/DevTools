@@ -83,7 +83,6 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
 
     public IRelayCommand TakeBreakCommand { get; }
     public IRelayCommand TakeBreakNowCommand { get; }
-    public IRelayCommand SkipBreakCommand { get; }
     public IRelayCommand SnoozeBreakCommand { get; }
     public IRelayCommand EndBreakEarlyCommand { get; }
     public IRelayCommand StartTimerCommand { get; }
@@ -101,7 +100,6 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
 
         TakeBreakCommand = new RelayCommand(OnTakeBreak, CanTakeBreak);
         TakeBreakNowCommand = new RelayCommand(OnTakeBreakNow, CanTakeBreakNow);
-        SkipBreakCommand = new RelayCommand(OnSkipBreak, CanSkipBreak);
         SnoozeBreakCommand = new RelayCommand(OnSnoozeBreak, CanSnoozeBreak);
         EndBreakEarlyCommand = new RelayCommand(OnEndBreakEarly, CanEndBreakEarly);
         StartTimerCommand = new AsyncRelayCommand(OnStartTimerAsync, CanStartTimer);
@@ -133,9 +131,11 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
 
     private void UpdateFromState(FocusTimerState state)
     {
-        CountdownDisplay = state.CountdownDisplay;
-        StatusMessage = state.StatusMessage;
-        BreakBankPercentage = state.BreakBankPercentage;
+        CountdownDisplay = GetCountdownDisplay(state);
+        StatusMessage = GetStatusMessage(state);
+        BreakBankPercentage = state.TotalDailyBreakMinutes > 0
+            ? Math.Min(100, (state.CurrentBreakPoolMinutes / state.TotalDailyBreakMinutes) * 100)
+            : 0;
         BreakPoolMinutes = state.CurrentBreakPoolMinutes;
         RemainingBreakCount = state.RemainingBreakCount;
         CurrentStatus = state.Status;
@@ -166,7 +166,6 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
         // Update command states
         ((RelayCommand)TakeBreakNowCommand).NotifyCanExecuteChanged();
         ((RelayCommand)TakeBreakCommand).NotifyCanExecuteChanged();
-        ((RelayCommand)SkipBreakCommand).NotifyCanExecuteChanged();
         ((RelayCommand)SnoozeBreakCommand).NotifyCanExecuteChanged();
         ((RelayCommand)EndBreakEarlyCommand).NotifyCanExecuteChanged();
         ((AsyncRelayCommand)StartTimerCommand).NotifyCanExecuteChanged();
@@ -191,17 +190,6 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
     private bool CanTakeBreakNow()
     {
         return CurrentStatus == FocusTimerStatus.Working || CurrentStatus == FocusTimerStatus.LunchMode;
-    }
-
-    private void OnSkipBreak()
-    {
-        System.Diagnostics.Debug.WriteLine("[TimerWindowViewModel] OnSkipBreak called");
-        _focusTimerService.SkipBreak();
-    }
-
-    private bool CanSkipBreak()
-    {
-        return CurrentStatus == FocusTimerStatus.NotificationTriggered;
     }
 
     private void OnSnoozeBreak()
@@ -388,6 +376,51 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
         ProgressRingBrush = new SolidColorBrush(color);
     }
 
-    #endregion Private Methods
+    private string GetStatusMessage(FocusTimerState state)
+    {
+        return state.Status switch
+        {
+            FocusTimerStatus.Stopped => "Timer stopped",
+            FocusTimerStatus.Working => state.TimeUntilNextBreak.HasValue
+                ? $"Next break in {FormatTimeSpan(state.TimeUntilNextBreak.Value)}"
+                : "Working...",
+            FocusTimerStatus.NotificationTriggered => "Break time!",
+            FocusTimerStatus.BreakActive => state.BreakTimeRemaining.HasValue
+                ? $"Break ends in {FormatTimeSpan(state.BreakTimeRemaining.Value)}"
+                : "On break",
+            FocusTimerStatus.LunchMode => "Lunch break",
+            FocusTimerStatus.DayEnded => "Work day ended",
+            _ => "Unknown"
+        };
+    }
 
+    private string GetCountdownDisplay(FocusTimerState state)
+    {
+        return state.Status switch
+        {
+            FocusTimerStatus.Working => state.TimeUntilNextBreak.HasValue
+                ? FormatTimeSpan(state.TimeUntilNextBreak.Value)
+                : "--:--",
+            FocusTimerStatus.BreakActive => state.BreakTimeRemaining.HasValue
+                ? FormatTimeSpan(state.BreakTimeRemaining.Value)
+                : "--:--",
+            FocusTimerStatus.NotificationTriggered => FormatMinutes(state.CurrentBreakDurationMinutes),
+            _ => "--:--"
+        };
+    }
+
+    private static string FormatTimeSpan(TimeSpan ts)
+    {
+        if (ts.TotalHours >= 1)
+            return $"{(int)ts.TotalHours}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+        return $"{ts.Minutes:D2}:{ts.Seconds:D2}";
+    }
+
+    private static string FormatMinutes(double minutes)
+    {
+        var ts = TimeSpan.FromMinutes(minutes);
+        return FormatTimeSpan(ts);
+    }
+
+    #endregion Private Methods
 }

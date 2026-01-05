@@ -303,9 +303,9 @@ public partial class FocusTimerSettingsViewModel : PageViewModelBase
         TimerStatusText = state.Status switch
         {
             FocusTimerStatus.Stopped => "Timer is stopped",
-            FocusTimerStatus.Working => $"Working - Next break: {state.CountdownDisplay}",
+            FocusTimerStatus.Working => state.TimeUntilNextBreak.HasValue ? $"Working - Next break: {FormatTimeSpan(state.TimeUntilNextBreak.Value)}" : "Working...",
             FocusTimerStatus.NotificationTriggered => "Break time!",
-            FocusTimerStatus.BreakActive => $"On break - {state.CountdownDisplay} remaining",
+            FocusTimerStatus.BreakActive => state.BreakTimeRemaining.HasValue ? $"On break - {FormatTimeSpan(state.BreakTimeRemaining.Value)} remaining" : "On break",
             FocusTimerStatus.LunchMode => "Lunch break",
             FocusTimerStatus.DayEnded => "Work day ended",
             _ => "Unknown"
