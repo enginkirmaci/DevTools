@@ -13,7 +13,7 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-
+		 
 		<!--  Modern Header Banner with Gradient  -->
 		<Border
 			Grid.Row="0"

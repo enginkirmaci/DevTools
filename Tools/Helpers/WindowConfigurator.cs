@@ -78,6 +78,30 @@ public sealed class WindowConfigurator
     }
 
     /// <summary>
+    /// Configures the window backdrop with Acrylic effect.
+    /// </summary>
+    public void SetAcrylicBackdrop()
+    {
+        _window.SystemBackdrop = new DesktopAcrylicBackdrop();
+    }
+
+    /// <summary>
+    /// Sets the window to have fully rounded corners using Windows 11 DWM API.
+    /// </summary>
+    public void SetRoundedCorners()
+    {
+        if (_hwnd == 0)
+        {
+            _hwnd = WindowNative.GetWindowHandle(_window);
+        }
+
+        if (_hwnd == 0) return;
+
+        int preference = (int)DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
+        DwmSetWindowAttribute(_hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref preference, sizeof(int));
+    }
+
+    /// <summary>
     /// Configures window size and centers it on screen.
     /// </summary>
     public void ConfigureSizeAndPosition()
@@ -292,8 +316,20 @@ public sealed class WindowConfigurator
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern bool ShowWindow(nint hWnd, int nCmdShow);
 
+    [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(nint hwnd, int attr, ref int attrValue, int attrSize);
+
     private const int SW_HIDE = 0;
     private const int SW_SHOW = 5;
+    private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+
+    private enum DWM_WINDOW_CORNER_PREFERENCE
+    {
+        DWMWCP_DEFAULT = 0,
+        DWMWCP_DONOTROUND = 1,
+        DWMWCP_ROUND = 2,
+        DWMWCP_ROUNDSMALL = 3
+    }
 
     #endregion Public Methods
 }

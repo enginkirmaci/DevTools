@@ -222,7 +222,7 @@ public sealed partial class MainWindow : Window
     {
         Cleanup();
 
-        App.Current.Exit();
+        Application.Current.Exit();
     }
 
     /// <summary>

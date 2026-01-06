@@ -76,7 +76,7 @@ public static class FolderPickerHelper
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Win32 FolderPicker failed: {ex.Message}");
+            Debug.WriteLine($"Win32 FolderPicker failed: {ex.Message}");
         }
         finally
         {

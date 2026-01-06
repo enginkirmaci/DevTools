@@ -6,12 +6,8 @@
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	Title="Focus Timer"
 	mc:Ignorable="d">
-
-	<Border
-		Background="{ThemeResource LayerFillColorDefaultBrush}"
-		BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-		BorderThickness="1"
-		CornerRadius="16">
+ 
+	<Border BorderThickness="1" CornerRadius="16">
 		<Grid>
 
 			<!--  Custom Title Bar  -->
@@ -56,7 +52,7 @@
 			</Grid>
 
 			<!--  Main Content  -->
-			<Grid Grid.Row="1" Padding="28,8,28,28">
+			<Grid Grid.Row="1" Padding="18">
 				<Grid.ChildrenTransitions>
 					<TransitionCollection>
 						<EntranceThemeTransition FromVerticalOffset="20" />
@@ -104,7 +100,7 @@
 				</Grid>
 
 				<!--  Action Buttons Container  -->
-				<Grid Grid.Row="1" Margin="0,16,0,0">
+				<Grid Grid.Row="1">
 					<!--  Stopped State  -->
 					<Button
 						x:Name="StoppedButtons"
@@ -151,7 +147,7 @@
 							CornerRadius="12"
 							ToolTipService.ToolTip="Stop Session">
 							<StackPanel Orientation="Horizontal" Spacing="10">
-								<FontIcon FontSize="18" Glyph="&#xE71A;" />
+								<!--<FontIcon FontSize="18" Glyph="&#xE71A;" />-->
 								<TextBlock
 									FontSize="15"
 									FontWeight="SemiBold"
@@ -235,52 +231,73 @@
 						Value="{x:Bind ViewModel.BreakBankPercentage, Mode=OneWay}" />
 				</Grid>-->
 
-				<StackPanel
+				<Grid
 					Grid.Row="3"
 					Margin="0,16,0,0"
-					Orientation="Vertical">
-					<StackPanel Orientation="Horizontal" Spacing="8">
-						<FontIcon
-							HorizontalAlignment="Left"
-							VerticalAlignment="Center"
-							FontSize="14"
-							Glyph="&#xE823;"
-							Opacity="0.5" />
-						<TextBlock
-							FontSize="14"
-							FontWeight="Medium"
-							Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-							Text="{x:Bind ViewModel.WorkDayCountdown, Mode=OneWay}" />
-					</StackPanel>
+					ColumnSpacing="8"
+					RowSpacing="4">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+						<RowDefinition Height="Auto" />
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
 
-					<StackPanel Orientation="Horizontal" Spacing="8">
-						<FontIcon
-							HorizontalAlignment="Left"
-							VerticalAlignment="Center"
-							FontSize="14"
-							Glyph="&#xE821;"
-							Opacity="0.5" />
-						<TextBlock
-							FontSize="14"
-							FontWeight="Medium"
-							Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-							Text="{x:Bind ViewModel.BreakIntervalDisplay, Mode=OneWay}" />
-					</StackPanel>
+					<!--  Work Day  -->
+					<FontIcon
+						Grid.Row="0"
+						Grid.Column="0"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontSize="14"
+						Glyph="&#xE823;"
+						Opacity="0.5" />
+					<TextBlock
+						Grid.Row="0"
+						Grid.Column="1"
+						FontSize="14"
+						FontWeight="Medium"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+						Text="{x:Bind ViewModel.WorkDayCountdown, Mode=OneWay}" />
 
-					<StackPanel Orientation="Horizontal" Spacing="8">
-						<FontIcon
-							HorizontalAlignment="Left"
-							VerticalAlignment="Center"
-							FontSize="14"
-							Glyph="&#xEC32;"
-							Opacity="0.5" />
-						<TextBlock
-							FontSize="14"
-							FontWeight="Medium"
-							Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-							Text="{x:Bind ViewModel.BreakBankStatus, Mode=OneWay}" />
-					</StackPanel>
-				</StackPanel>
+					<!--  Break Interval  -->
+					<FontIcon
+						Grid.Row="1"
+						Grid.Column="0"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontSize="14"
+						Glyph="&#xE821;"
+						Opacity="0.5" />
+					<TextBlock
+						Grid.Row="1"
+						Grid.Column="1"
+						FontSize="14"
+						FontWeight="Medium"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+						Text="{x:Bind ViewModel.BreakIntervalDisplay, Mode=OneWay}" />
+
+					<!--  Break Bank  -->
+					<FontIcon
+						Grid.Row="2"
+						Grid.Column="0"
+						Margin="3,0,0,0"
+						HorizontalAlignment="Center"
+						VerticalAlignment="Center"
+						FontSize="14"
+						Glyph="&#xEC32;"
+						Opacity="0.5" />
+					<TextBlock
+						Grid.Row="2"
+						Grid.Column="1"
+						FontSize="14"
+						FontWeight="Medium"
+						Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+						Text="{x:Bind ViewModel.BreakBankStatus, Mode=OneWay}" />
+				</Grid>
 			</Grid>
 		</Grid>
 	</Border>

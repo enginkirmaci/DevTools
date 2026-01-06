@@ -60,11 +60,12 @@ public sealed partial class TimerNotificationWindow : Window
 
     private void InitializeWindow()
     {
-        _windowConfigurator.ConfigureBackdrop();
+        _windowConfigurator.SetAcrylicBackdrop();
         _windowConfigurator.ConfigureSizeAndPosition();
         _windowConfigurator.SetCompactOverlayStyle(WindowWidth, WindowHeight);
         _windowConfigurator.ConfigureCustomTitleBar(CustomTitleBar);
         _windowConfigurator.HideFromTaskbar();
+        _windowConfigurator.SetRoundedCorners();
 
         // Position in configured corner
         _currentPosition = (WindowCornerPosition)_focusTimerService.Settings.WindowCornerPosition;
@@ -102,12 +103,12 @@ public sealed partial class TimerNotificationWindow : Window
 
     private void OnWindowVisibilityRequested(object? sender, bool shouldShow)
     {
-        System.Diagnostics.Debug.WriteLine($"[TimerWindow] OnWindowVisibilityRequested: shouldShow={shouldShow}");
+        Debug.WriteLine($"[TimerWindow] OnWindowVisibilityRequested: shouldShow={shouldShow}");
         DispatcherQueue.TryEnqueue(() =>
         {
             if (shouldShow)
             {
-                System.Diagnostics.Debug.WriteLine("[TimerWindow] Calling ShowWindow()");
+                Debug.WriteLine("[TimerWindow] Calling ShowWindow()");
                 ShowWindow();
             }
             else
@@ -128,7 +129,7 @@ public sealed partial class TimerNotificationWindow : Window
 
     private void OnStateChanged(object? sender, FocusTimerStateChangedEventArgs e)
     {
-        System.Diagnostics.Debug.WriteLine($"[TimerWindow] OnStateChanged: Status={e.State.Status}, TimeUntilNextBreak={e.State.TimeUntilNextBreak?.TotalMinutes:F1}min, BreakTimeRemaining={e.State.BreakTimeRemaining?.TotalMinutes:F1}min");
+        Debug.WriteLine($"[TimerWindow] OnStateChanged: Status={e.State.Status}, TimeUntilNextBreak={e.State.TimeUntilNextBreak?.TotalMinutes:F1}min, BreakTimeRemaining={e.State.BreakTimeRemaining?.TotalMinutes:F1}min");
         DispatcherQueue.TryEnqueue(() =>
         {
             UpdateButtonVisibility(e.State.Status);

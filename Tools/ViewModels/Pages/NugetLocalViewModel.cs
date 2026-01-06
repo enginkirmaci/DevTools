@@ -146,7 +146,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
         try
         {
             var title = operation == "Watch" ? "Select Watch Folder" : "Select Copy Folder";
-            var path = Tools.Helpers.FolderPickerHelper.PickFolder(hwnd, title);
+            var path = Helpers.FolderPickerHelper.PickFolder(hwnd, title);
 
             if (!string.IsNullOrEmpty(path))
             {
@@ -326,7 +326,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
                 CreateNoWindow = true
             };
 
-            using var process = System.Diagnostics.Process.Start(startInfo);
+            using var process = Process.Start(startInfo);
             if (process == null)
             {
                 return string.Empty;
@@ -336,7 +336,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
             await process.WaitForExitAsync();
 
             // Output format: "global-packages: C:\Users\...\packages"
-            var match = System.Text.RegularExpressions.Regex.Match(output, @"global-packages:\s*(.+)");
+            var match = Regex.Match(output, @"global-packages:\s*(.+)");
             if (match.Success)
             {
                 return match.Groups[1].Value.Trim();
@@ -355,7 +355,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
         // Show error via MainWindow InfoBar
         if (App.MainWindow is MainWindow mainWindow)
         {
-            mainWindow.ShowInfoBar("Error", message, Microsoft.UI.Xaml.Controls.InfoBarSeverity.Error);
+            mainWindow.ShowInfoBar("Error", message, InfoBarSeverity.Error);
         }
     }
 }

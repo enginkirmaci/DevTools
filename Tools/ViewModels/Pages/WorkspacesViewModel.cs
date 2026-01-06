@@ -330,7 +330,7 @@ public partial class WorkspacesViewModel : PageViewModelBase
             var result = await dialog.ShowAsync();
 
             // If user clicked Save, update and persist settings
-            if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
+            if (result == ContentDialogResult.Primary)
             {
                 dialog.SaveSettings();
                 settings.Workspaces = dialog.Settings;
