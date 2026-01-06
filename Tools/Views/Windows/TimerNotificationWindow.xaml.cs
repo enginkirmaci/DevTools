@@ -14,8 +14,8 @@ public sealed partial class TimerNotificationWindow : Window
 {
     #region Constants
 
-    private const int WindowWidth = 380;
-    private const int WindowHeight = 520;
+    private const int WindowWidth = 280;
+    private const int WindowHeight = 440;
 
     #endregion Constants
 
@@ -64,6 +64,7 @@ public sealed partial class TimerNotificationWindow : Window
         _windowConfigurator.ConfigureSizeAndPosition();
         _windowConfigurator.SetCompactOverlayStyle(WindowWidth, WindowHeight);
         _windowConfigurator.ConfigureCustomTitleBar(CustomTitleBar);
+        _windowConfigurator.HideFromTaskbar();
 
         // Position in configured corner
         _currentPosition = (WindowCornerPosition)_focusTimerService.Settings.WindowCornerPosition;

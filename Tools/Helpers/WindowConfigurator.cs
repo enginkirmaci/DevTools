@@ -183,14 +183,17 @@ public sealed class WindowConfigurator
                 x = workArea.X + margin;
                 y = workArea.Y + margin;
                 break;
+
             case WindowCornerPosition.TopRight:
                 x = workArea.X + workArea.Width - size.Width - margin;
                 y = workArea.Y + margin;
                 break;
+
             case WindowCornerPosition.BottomLeft:
                 x = workArea.X + margin;
                 y = workArea.Y + workArea.Height - size.Height - margin;
                 break;
+
             case WindowCornerPosition.BottomRight:
             default:
                 x = workArea.X + workArea.Width - size.Width - margin;
@@ -250,6 +253,17 @@ public sealed class WindowConfigurator
         // The entire titleBarElement will be draggable
         _window.ExtendsContentIntoTitleBar = true;
         _window.SetTitleBar(titleBarElement);
+    }
+
+    /// <summary>
+    /// Hides the window from the taskbar and Alt+Tab switcher.
+    /// </summary>
+    public void HideFromTaskbar()
+    {
+        if (_appWindow != null)
+        {
+            _appWindow.IsShownInSwitchers = false;
+        }
     }
 
     /// <summary>

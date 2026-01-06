@@ -57,7 +57,7 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
     private string _nextBreakDuration = "0";
 
     [ObservableProperty]
-    private string _breakBankStatus = "Break bank: 0 min";
+    private string _breakBankStatus = "0 min";
 
     [ObservableProperty]
     private string _workDayCountdown = "--:--";
@@ -149,7 +149,7 @@ public partial class TimerNotificationWindowViewModel : ViewModelBase
 
         // Update display strings
         NextBreakDuration = $"{state.CurrentBreakDurationMinutes:F0}";
-        BreakBankStatus = $"Break bank: {state.CurrentBreakPoolMinutes:F0} min ({state.RemainingBreakCount} breaks left)";
+        BreakBankStatus = $"{state.CurrentBreakPoolMinutes:F0} min ({state.RemainingBreakCount} breaks left)";
 
         // Calculate work day countdown
         CalculateWorkDayCountdown();
