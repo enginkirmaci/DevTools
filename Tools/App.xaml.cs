@@ -51,19 +51,15 @@ public partial class App : Application
         // Register core library services
         services.AddCoreServices();
 
+        // Register DispatcherQueue for services that need it (like DispatcherTimerProvider)
+        services.AddSingleton(DispatcherQueue.GetForCurrentThread());
+
         // Register application services
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IClipboardPasswordService, ClipboardPasswordService>();
 
-        // Register Focus Timer service (needs DispatcherQueue from UI thread)
-        services.AddSingleton<IFocusTimerService>(sp =>
-        {
-            var settingsService = sp.GetRequiredService<ISettingsService>();
-            var scheduler = sp.GetRequiredService<IFocusTimerScheduler>();
-            var stateManager = sp.GetRequiredService<IFocusTimerStateManager>();
-            var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-            return new FocusTimerService(settingsService, scheduler, stateManager, dispatcherQueue);
-        });
+        // Register Focus Timer service
+        services.AddSingleton<IFocusTimerService, FocusTimerService>();
 
         // Register windows and view models
         services.AddSingleton<MainWindow>();

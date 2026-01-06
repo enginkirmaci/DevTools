@@ -184,7 +184,7 @@
 							Command="{x:Bind ViewModel.SnoozeBreakCommand}"
 							CornerRadius="12">
 							<StackPanel Orientation="Horizontal" Spacing="8">
-								<FontIcon FontSize="16" Glyph="&#xED4C;" />
+								<!--<FontIcon FontSize="16" Glyph="&#xED4C;" />-->
 								<TextBlock
 									FontSize="15"
 									FontWeight="SemiBold"

@@ -167,7 +167,6 @@ public partial class FocusTimerSettingsViewModel : PageViewModelBase
         _isInitializing = true;
         try
         {
-            App.Services.GetService<TimerNotificationWindow>();
             await LoadSettingsAsync();
         }
         finally
@@ -211,6 +210,14 @@ public partial class FocusTimerSettingsViewModel : PageViewModelBase
     private async Task SaveSettingsAsync()
     {
         if (_isInitializing) return;
+
+        UpdateSettingsFromProperties();
+        await _focusTimerService.UpdateSettingsAsync(_settings);
+        UpdateCalculatedValues();
+    }
+
+    private void UpdateSettingsFromProperties()
+    {
         _settings.WorkStartTime = FormatTimeSpan(WorkStartTime);
         _settings.WorkEndTime = FormatTimeSpan(WorkEndTime);
         _settings.LunchStartTime = FormatTimeSpan(LunchStartTime);
@@ -220,9 +227,6 @@ public partial class FocusTimerSettingsViewModel : PageViewModelBase
         _settings.TimerVisibilityMode = SelectedVisibilityMode;
         _settings.WindowCornerPosition = SelectedCornerPosition;
         _settings.PlaySoundOnNotification = PlaySoundOnNotification;
-
-        await _focusTimerService.UpdateSettingsAsync(_settings);
-        UpdateCalculatedValues();
     }
 
     private static TimeSpan ParseTimeSpan(string timeString)
@@ -315,36 +319,48 @@ public partial class FocusTimerSettingsViewModel : PageViewModelBase
         RemainingBreaks = state.RemainingBreakCount;
         BreaksTakenToday = state.BreakTimeTakenMinutes;
 
-        ((AsyncRelayCommand)StartTimerCommand).NotifyCanExecuteChanged();
-        ((AsyncRelayCommand)StopTimerCommand).NotifyCanExecuteChanged();
+        StartTimerCommand.NotifyCanExecuteChanged();
+        StopTimerCommand.NotifyCanExecuteChanged();
     }
 
     private void UpdateCalculatedValues()
     {
-        // Calculate expected break duration
-        var breakDuration = DesiredBreakCount > 0
-            ? TotalDailyBreakMinutes / DesiredBreakCount
-            : TotalDailyBreakMinutes;
+        UpdateSettingsFromProperties();
+
+        var breakDuration = GetCalculatedBreakDuration();
         CalculatedBreakDuration = $"{breakDuration} min per break";
 
-        // Calculate break interval
-        var workStart = WorkStartTime;
-        var workEnd = WorkEndTime;
-        var lunchDuration = TimeSpan.FromMinutes(LunchDurationMinutes);
-        var totalWorkTime = workEnd - workStart - lunchDuration;
-        var intervalMinutes = DesiredBreakCount > 0
-            ? totalWorkTime.TotalMinutes / (DesiredBreakCount + 1)
-            : totalWorkTime.TotalMinutes;
+        var (hours, minutes) = GetCalculatedBreakInterval();
 
-        if (intervalMinutes >= 60)
+        if (hours >= 1)
         {
-            var hours = intervalMinutes / 60;
             CalculatedBreakInterval = $"Approximately every {hours:F1} hours";
         }
         else
         {
-            CalculatedBreakInterval = $"Approximately every {intervalMinutes:F0} minutes";
+            CalculatedBreakInterval = $"Approximately every {minutes:F0} minutes";
         }
+    }
+
+    private int GetCalculatedBreakDuration()
+    {
+        return DesiredBreakCount > 0
+            ? TotalDailyBreakMinutes / DesiredBreakCount
+            : TotalDailyBreakMinutes;
+    }
+
+    private (double hours, double minutes) GetCalculatedBreakInterval()
+    {
+        var workStart = WorkStartTime;
+        var workEnd = WorkEndTime;
+        var lunchDuration = TimeSpan.FromMinutes(LunchDurationMinutes);
+        var totalWorkTime = workEnd - workStart - lunchDuration;
+
+        var intervalMinutes = DesiredBreakCount > 0
+            ? totalWorkTime.TotalMinutes / (DesiredBreakCount + 1)
+            : totalWorkTime.TotalMinutes;
+
+        return (intervalMinutes / 60, intervalMinutes % 60);
     }
 
     #endregion Private Methods - Timer Control
@@ -363,23 +379,17 @@ public partial class FocusTimerSettingsViewModel : PageViewModelBase
 
     #region Property Change Handlers
 
-    partial void OnWorkStartTimeChanged(TimeSpan value) => _ = SaveSettingsAsync();
+    private void OnSettingChanged() => _ = SaveSettingsAsync();
 
-    partial void OnWorkEndTimeChanged(TimeSpan value) => _ = SaveSettingsAsync();
-
-    partial void OnLunchStartTimeChanged(TimeSpan value) => _ = SaveSettingsAsync();
-
-    partial void OnLunchDurationMinutesChanged(int value) => _ = SaveSettingsAsync();
-
-    partial void OnTotalDailyBreakMinutesChanged(int value) => _ = SaveSettingsAsync();
-
-    partial void OnDesiredBreakCountChanged(int value) => _ = SaveSettingsAsync();
-
-    partial void OnSelectedVisibilityModeChanged(int value) => _ = SaveSettingsAsync();
-
-    partial void OnSelectedCornerPositionChanged(int value) => _ = SaveSettingsAsync();
-
-    partial void OnPlaySoundOnNotificationChanged(bool value) => _ = SaveSettingsAsync();
+    partial void OnWorkStartTimeChanged(TimeSpan value) => OnSettingChanged();
+    partial void OnWorkEndTimeChanged(TimeSpan value) => OnSettingChanged();
+    partial void OnLunchStartTimeChanged(TimeSpan value) => OnSettingChanged();
+    partial void OnLunchDurationMinutesChanged(int value) => OnSettingChanged();
+    partial void OnTotalDailyBreakMinutesChanged(int value) => OnSettingChanged();
+    partial void OnDesiredBreakCountChanged(int value) => OnSettingChanged();
+    partial void OnSelectedVisibilityModeChanged(int value) => OnSettingChanged();
+    partial void OnSelectedCornerPositionChanged(int value) => OnSettingChanged();
+    partial void OnPlaySoundOnNotificationChanged(bool value) => OnSettingChanged();
 
     // Update formatted text when numeric values change
     partial void OnCurrentBreakPoolChanged(double value)

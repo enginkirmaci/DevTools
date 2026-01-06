@@ -14,7 +14,7 @@ public sealed partial class TimerNotificationWindow : Window
 {
     #region Constants
 
-    private const int WindowWidth = 280;
+    private const int WindowWidth = 300;
     private const int WindowHeight = 440;
 
     #endregion Constants
