@@ -59,8 +59,10 @@ public partial class App : Application
         services.AddSingleton<IFocusTimerService>(sp =>
         {
             var settingsService = sp.GetRequiredService<ISettingsService>();
+            var scheduler = sp.GetRequiredService<IFocusTimerScheduler>();
+            var stateManager = sp.GetRequiredService<IFocusTimerStateManager>();
             var dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-            return new FocusTimerService(settingsService, dispatcherQueue);
+            return new FocusTimerService(settingsService, scheduler, stateManager, dispatcherQueue);
         });
 
         // Register windows and view models
