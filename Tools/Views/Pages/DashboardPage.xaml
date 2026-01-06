@@ -13,12 +13,12 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
-		 
+
 		<!--  Modern Header Banner with Gradient  -->
 		<Border
 			Grid.Row="0"
 			Height="140"
-			Margin="0,36,0,20">
+			Margin="0,36,0,0">
 			<Border.Background>
 				<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
 					<GradientStop Offset="0" Color="{StaticResource LayerOnMicaBaseAltFillColorSecondary}" />
@@ -58,6 +58,7 @@
 		<!--  Dashboard Cards with improved styling  -->
 		<GridView
 			Grid.Row="1"
+			Margin="0,-10,0,0"
 			Padding="18"
 			ItemsSource="{x:Bind ViewModel.DashboardCards}"
 			SelectionMode="None">
