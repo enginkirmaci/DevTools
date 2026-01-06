@@ -32,16 +32,13 @@ public partial class NugetLocalViewModel : PageViewModelBase
     private string _watchFolder = string.Empty;
 
     [ObservableProperty]
-    private string _copyFolder = string.Empty;
+    private string _globalPackagesFolder = string.Empty;
 
     [ObservableProperty]
     private bool _watchStarted;
 
     [ObservableProperty]
     private int _count;
-
-    [ObservableProperty]
-    private bool _clearCacheOnCopy;
 
     /// <summary>
     /// Gets the command to start/stop watching for changes.
@@ -53,6 +50,11 @@ public partial class NugetLocalViewModel : PageViewModelBase
     /// </summary>
     public IAsyncRelayCommand<string> SelectFolderCommand { get; }
 
+    /// <summary>
+    /// Gets the command to register the watch folder as a NuGet source.
+    /// </summary>
+    public IAsyncRelayCommand RegisterSourceCommand { get; }
+
     public NugetLocalViewModel(ISettingsService settingsService)
     {
         _settingsService = settingsService;
@@ -60,6 +62,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
 
         WatchChangesCommand = new RelayCommand<object>(OnWatchChanges);
         SelectFolderCommand = new AsyncRelayCommand<string>(OnSelectFolderAsync);
+        RegisterSourceCommand = new AsyncRelayCommand(OnRegisterSourceAsync);
 
         _ = OnInitializeAsync();
     }
@@ -74,8 +77,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
             _nugetSettings = settings.NugetLocal ?? new NugetLocalSettings();
 
             WatchFolder = _nugetSettings.WatchFolder ?? string.Empty;
-            CopyFolder = _nugetSettings.CopyFolder ?? string.Empty;
-            ClearCacheOnCopy = _nugetSettings.ClearCacheOnCopy;
+            GlobalPackagesFolder = await GetGlobalPackagesFolderAsync();
         }
         finally
         {
@@ -89,17 +91,6 @@ public partial class NugetLocalViewModel : PageViewModelBase
         _ = SaveSettingAsync(() => _nugetSettings.WatchFolder = value);
     }
 
-    partial void OnCopyFolderChanged(string value)
-    {
-        if (_isInitializing) return;
-        _ = SaveSettingAsync(() => _nugetSettings.CopyFolder = value);
-    }
-
-    partial void OnClearCacheOnCopyChanged(bool value)
-    {
-        if (_isInitializing) return;
-        _ = SaveSettingAsync(() => _nugetSettings.ClearCacheOnCopy = value);
-    }
 
     private async Task SaveSettingAsync(Action updateAction)
     {
@@ -145,7 +136,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
         // Fallback to Win32 Common Item Dialog (more reliable in unpackaged apps)
         try
         {
-            var title = operation == "Watch" ? "Select Watch Folder" : "Select Copy Folder";
+            var title = "Select Watch Folder";
             var path = Helpers.FolderPickerHelper.PickFolder(hwnd, title);
 
             if (!string.IsNullOrEmpty(path))
@@ -166,10 +157,6 @@ public partial class NugetLocalViewModel : PageViewModelBase
         {
             WatchFolder = path;
         }
-        else
-        {
-            CopyFolder = path;
-        }
     }
 
     private void OnWatchChanges(object? started)
@@ -179,12 +166,6 @@ public partial class NugetLocalViewModel : PageViewModelBase
             if (string.IsNullOrEmpty(WatchFolder) || !Directory.Exists(WatchFolder))
             {
                 ShowError("Watch folder path is invalid or not set in settings.");
-                WatchStarted = false;
-                return;
-            }
-            if (string.IsNullOrEmpty(CopyFolder) || !Directory.Exists(CopyFolder))
-            {
-                ShowError("Copy folder path is invalid or not set in settings.");
                 WatchStarted = false;
                 return;
             }
@@ -211,30 +192,10 @@ public partial class NugetLocalViewModel : PageViewModelBase
     {
         _dispatcherQueue.TryEnqueue(async () =>
         {
-            await Task.Delay(_nugetSettings.FileCopyDelayMs);
-
-            if (!e.FullPath.Contains(CopyFolder, StringComparison.OrdinalIgnoreCase))
+            try
             {
-                try
-                {
-                    File.Copy(e.FullPath, Path.Combine(CopyFolder, Path.GetFileName(e.FullPath)), true);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error copying file {e.FullPath}: {ex.Message}");
-                    FileList.Insert(0, $"ERROR copying {e.FullPath}: {ex.Message}");
-                    return;
-                }
-
-                FileList.Insert(0, $"{e.FullPath} moved.");
-
-                // Clear NuGet cache for this package if enabled
-                if (ClearCacheOnCopy)
-                {
-                    await ClearPackageCacheAsync(e.FullPath);
-                }
-
-                Debug.WriteLine("File copied: " + e.FullPath);
+                // Always clear NuGet cache for this package
+                await ClearPackageCacheAsync(e.FullPath);
 
                 if (DateTime.Now < _lastChanges.AddSeconds(_nugetSettings.CountResetIntervalSeconds))
                 {
@@ -245,6 +206,11 @@ public partial class NugetLocalViewModel : PageViewModelBase
                     Count = 1;
                     _lastChanges = DateTime.Now;
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error processing file {e.FullPath}: {ex.Message}");
+                FileList.Insert(0, $"ERROR processing {e.FullPath}: {ex.Message}");
             }
         });
     }
@@ -261,7 +227,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
             }
 
             // Get global packages folder
-            var globalPackagesPath = await GetGlobalPackagesFolderAsync();
+            var globalPackagesPath = GlobalPackagesFolder;
             if (string.IsNullOrEmpty(globalPackagesPath))
             {
                 FileList.Insert(0, "  ⚠ Could not locate NuGet global packages folder");
@@ -348,6 +314,66 @@ public partial class NugetLocalViewModel : PageViewModelBase
         }
 
         return string.Empty;
+    }
+
+    private async Task OnRegisterSourceAsync()
+    {
+        if (string.IsNullOrEmpty(WatchFolder) || !Directory.Exists(WatchFolder))
+        {
+            ShowError("Please select a valid Watch Directory first.");
+            return;
+        }
+
+        try
+        {
+            var folderName = Path.GetFileName(WatchFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            var sourceName = $"{folderName}-local";
+
+            var startInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"nuget add source \"{WatchFolder}\" --name \"{sourceName}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null) return;
+
+            var output = await process.StandardOutput.ReadToEndAsync();
+            var error = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            // Distinguish between a successful add and the "already exists" message
+            if (process.ExitCode == 0)
+            {
+                ShowInfo("NuGet Source Registered", $"'{WatchFolder}' has been registered as '{sourceName}'.");
+                FileList.Insert(0, $"✓ Registered NuGet source '{sourceName}': {WatchFolder}");
+            }
+            else if (output.Contains("already been added", StringComparison.OrdinalIgnoreCase))
+            {
+                ShowInfo("NuGet Source Already Registered", $"'{WatchFolder}' is already registered as '{sourceName}'.");
+                FileList.Insert(0, $"ℹ NuGet source '{sourceName}' already registered: {WatchFolder}");
+            }
+            else
+            {
+                ShowError($"Failed to register source: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Execution error: {ex.Message}");
+        }
+    }
+
+    private void ShowInfo(string title, string message)
+    {
+        if (App.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.ShowInfoBar(title, message, InfoBarSeverity.Informational);
+        }
     }
 
     private void ShowError(string message)
