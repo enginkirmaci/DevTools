@@ -77,6 +77,7 @@ public sealed partial class TimerNotificationWindow : Window
         _focusTimerService.WindowVisibilityRequested += OnWindowVisibilityRequested;
         _focusTimerService.BreakNotificationTriggered += OnBreakNotificationTriggered;
         _focusTimerService.StateChanged += OnStateChanged;
+        _focusTimerService.SettingsChanged += OnSettingsChanged;
         Closed += OnWindowClosed;
 
         // Subscribe to IsPinned property changes to update pin icon
@@ -136,11 +137,25 @@ public sealed partial class TimerNotificationWindow : Window
         });
     }
 
+    private void OnSettingsChanged(object? sender, EventArgs e)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            // Update position from new settings
+            var position = (WindowCornerPosition)_focusTimerService.Settings.WindowCornerPosition;
+            if (_currentPosition != position)
+            {
+                UpdatePosition(position);
+            }
+        });
+    }
+
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _focusTimerService.WindowVisibilityRequested -= OnWindowVisibilityRequested;
         _focusTimerService.BreakNotificationTriggered -= OnBreakNotificationTriggered;
         _focusTimerService.StateChanged -= OnStateChanged;
+        _focusTimerService.SettingsChanged -= OnSettingsChanged;
     }
 
     private void OnPinToggle(object sender, RoutedEventArgs e)
