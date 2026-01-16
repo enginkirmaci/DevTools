@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "MsixPackage": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
