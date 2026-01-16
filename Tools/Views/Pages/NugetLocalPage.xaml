@@ -51,33 +51,65 @@
 									<FontIcon FontSize="16" Glyph="&#xE8B7;" />
 								</Button>
 
-								<Button
-									Grid.Column="2"
-									Height="32"
-									Command="{x:Bind ViewModel.RegisterSourceCommand}"
-									Style="{StaticResource DefaultButtonStyle}"
-									ToolTipService.ToolTip="Register this path in NuGet">
-									<StackPanel Orientation="Horizontal" Spacing="8">
-										<FontIcon FontSize="16" Glyph="&#xE78B;" />
-										<TextBlock Text="Register" />
-									</StackPanel>
-								</Button>
+
 							</Grid>
 						</StackPanel>
 
-						<!--  Global Cache Group  -->
-						<StackPanel Orientation="Horizontal" Spacing="8">
+
+						<Grid ColumnSpacing="8" RowSpacing="8">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="Auto" />
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="Auto" />
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition />
+								<RowDefinition />
+							</Grid.RowDefinitions>
+							<!--  NuGet Local Cache Display + Register Button  -->
 							<TextBlock
+								VerticalAlignment="Center"
+								FontSize="12"
+								Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+								Opacity="0.7"
+								Text="NuGet Local Cache" />
+
+							<TextBlock
+								Grid.Column="1"
+								VerticalAlignment="Center"
+								FontSize="12"
+								Text="{x:Bind ViewModel.ComputedCopyFolder, Mode=OneWay}"
+								TextWrapping="Wrap" />
+
+							<Button
+								Grid.Column="2"
+								Height="32"
+								VerticalAlignment="Center"
+								Command="{x:Bind ViewModel.RegisterSourceCommand}"
+								Style="{StaticResource DefaultButtonStyle}"
+								ToolTipService.ToolTip="Register this path in NuGet">
+								<StackPanel Orientation="Horizontal" Spacing="8">
+									<FontIcon FontSize="16" Glyph="&#xE78B;" />
+									<TextBlock Text="Register" />
+								</StackPanel>
+							</Button>
+
+
+							<!--  Global Cache Group  -->
+							<TextBlock
+								Grid.Row="1"
 								FontSize="12"
 								Foreground="{ThemeResource TextFillColorSecondaryBrush}"
 								Opacity="0.7"
 								Text="Nuget Global Cache" />
 
 							<TextBlock
+								Grid.Row="1"
+								Grid.Column="1"
 								FontSize="12"
 								Text="{x:Bind ViewModel.GlobalPackagesFolder, Mode=OneWay}"
 								TextWrapping="Wrap" />
-						</StackPanel>
+						</Grid>
 					</StackPanel>
 
 					<AppBarSeparator Grid.Column="1" />

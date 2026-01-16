@@ -32,6 +32,9 @@ public partial class NugetLocalViewModel : PageViewModelBase
     private string _watchFolder = string.Empty;
 
     [ObservableProperty]
+    private string _computedCopyFolder = string.Empty;
+
+    [ObservableProperty]
     private string _globalPackagesFolder = string.Empty;
 
     [ObservableProperty]
@@ -77,6 +80,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
             _nugetSettings = settings.NugetLocal ?? new NugetLocalSettings();
 
             WatchFolder = _nugetSettings.WatchFolder ?? string.Empty;
+            ComputedCopyFolder = ComputeCopyFolder(WatchFolder);
             GlobalPackagesFolder = await GetGlobalPackagesFolderAsync();
         }
         finally
@@ -89,6 +93,20 @@ public partial class NugetLocalViewModel : PageViewModelBase
     {
         if (_isInitializing) return;
         _ = SaveSettingAsync(() => _nugetSettings.WatchFolder = value);
+        ComputedCopyFolder = ComputeCopyFolder(value);
+    }
+
+    private string ComputeCopyFolder(string watchFolder)
+    {
+        if (string.IsNullOrWhiteSpace(watchFolder)) return string.Empty;
+        try
+        {
+            return Path.Combine(watchFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), "nugets");
+        }
+        catch
+        {
+            return string.Empty;
+        }
     }
 
 
@@ -206,6 +224,52 @@ public partial class NugetLocalViewModel : PageViewModelBase
                     Count = 1;
                     _lastChanges = DateTime.Now;
                 }
+
+                    // Auto-copy package to computed folder (<WatchFolder>\nugets)
+                    try
+                    {
+                        var targetDir = ComputedCopyFolder;
+                        if (string.IsNullOrEmpty(targetDir))
+                        {
+                            FileList.Insert(0, $"  ⚠ Copy skipped: target folder not available");
+                        }
+                        else
+                        {
+                            Directory.CreateDirectory(targetDir);
+                            var destPath = Path.Combine(targetDir, Path.GetFileName(e.FullPath));
+
+                            var attempts = 0;
+                            var copied = false;
+                            while (attempts < 3 && !copied)
+                            {
+                                try
+                                {
+                                    await Task.Delay(_nugetSettings.FileCopyDelayMs);
+                                    File.Copy(e.FullPath, destPath, true);
+                                    FileList.Insert(0, $"  ✓ Copied to {destPath}");
+                                    copied = true;
+                                }
+                                catch (Exception exCopy)
+                                {
+                                    attempts++;
+                                    if (attempts >= 3)
+                                    {
+                                        FileList.Insert(0, $"  ✗ Copy failed: {exCopy.Message}");
+                                        Debug.WriteLine($"Copy failed for {e.FullPath} -> {destPath}: {exCopy.Message}");
+                                    }
+                                    else
+                                    {
+                                        await Task.Delay(500);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception exCopyOuter)
+                    {
+                        Debug.WriteLine($"Auto-copy error: {exCopyOuter.Message}");
+                        FileList.Insert(0, $"  ✗ Auto-copy error: {exCopyOuter.Message}");
+                    }
             }
             catch (Exception ex)
             {
@@ -318,21 +382,34 @@ public partial class NugetLocalViewModel : PageViewModelBase
 
     private async Task OnRegisterSourceAsync()
     {
-        if (string.IsNullOrEmpty(WatchFolder) || !Directory.Exists(WatchFolder))
+        var folderToRegister = ComputedCopyFolder;
+        if (string.IsNullOrEmpty(folderToRegister))
         {
-            ShowError("Please select a valid Watch Directory first.");
+            ShowError("Computed NuGet local cache folder is not available. Ensure a valid Watch Directory is set.");
+            return;
+        }
+
+        // Ensure the folder exists (auto-create cache folder on register)
+        try
+        {
+            Directory.CreateDirectory(folderToRegister);
+            FileList.Insert(0, $"✓ Ensured cache folder exists: {folderToRegister}");
+        }
+        catch (Exception exCreate)
+        {
+            ShowError($"Failed to create cache folder: {exCreate.Message}");
             return;
         }
 
         try
         {
-            var folderName = Path.GetFileName(WatchFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            var folderName = Path.GetFileName(folderToRegister.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
             var sourceName = $"{folderName}-local";
 
             var startInfo = new System.Diagnostics.ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"nuget add source \"{WatchFolder}\" --name \"{sourceName}\"",
+                Arguments = $"nuget add source \"{folderToRegister}\" --name \"{sourceName}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -346,16 +423,15 @@ public partial class NugetLocalViewModel : PageViewModelBase
             var error = await process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync();
 
-            // Distinguish between a successful add and the "already exists" message
             if (process.ExitCode == 0)
             {
-                ShowInfo("NuGet Source Registered", $"'{WatchFolder}' has been registered as '{sourceName}'.");
-                FileList.Insert(0, $"✓ Registered NuGet source '{sourceName}': {WatchFolder}");
+                ShowInfo("NuGet Source Registered", $"'{folderToRegister}' has been registered as '{sourceName}'.");
+                FileList.Insert(0, $"✓ Registered NuGet source '{sourceName}': {folderToRegister}");
             }
             else if (output.Contains("already been added", StringComparison.OrdinalIgnoreCase))
             {
-                ShowInfo("NuGet Source Already Registered", $"'{WatchFolder}' is already registered as '{sourceName}'.");
-                FileList.Insert(0, $"ℹ NuGet source '{sourceName}' already registered: {WatchFolder}");
+                ShowInfo("NuGet Source Already Registered", $"'{folderToRegister}' is already registered as '{sourceName}'.");
+                FileList.Insert(0, $"ℹ NuGet source '{sourceName}' already registered: {folderToRegister}");
             }
             else
             {
