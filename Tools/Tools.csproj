@@ -13,7 +13,7 @@
 		<WindowsPackageType>None</WindowsPackageType>
 		<WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<EnableMsixTooling>true</EnableMsixTooling>
+		<EnableMsixTooling>false</EnableMsixTooling>
 	</PropertyGroup>
 
 
