@@ -12,19 +12,18 @@
 		<Platforms>x86;x64;arm64</Platforms>
 		<WindowsPackageType>None</WindowsPackageType>
 		<WindowsAppSDKSelfContained>false</WindowsAppSDKSelfContained>
-		<ApplicationManifest>app.manifest</ApplicationManifest> 
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<EnableMsixTooling>true</EnableMsixTooling>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <None Remove="Assets\folder.png" />
-	  <None Remove="Assets\terminal.png" />
-	  <None Remove="Assets\vs.png" />
-	  <None Remove="Assets\vscode.png" />
-	  <None Remove="settings.json" />
-	</ItemGroup>
 
- 
+	<ItemGroup>
+		<None Remove="Assets\folder.png" />
+		<None Remove="Assets\terminal.png" />
+		<None Remove="Assets\vs.png" />
+		<None Remove="Assets\vscode.png" />
+		<None Remove="settings.json" />
+	</ItemGroup>
 	 
 	<ItemGroup>
 		<ProjectReference Include="..\Tools.Library\Tools.Library.csproj" />
@@ -42,40 +41,38 @@
 		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Content Include="Assets\logo.ico">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
+	<ItemGroup> 
 		<Content Include="settings.json">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content> 
+		<None Include="Assets\logo.ico" />
+		<Content Update="Assets\bg.svg">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-	  <Content Update="Assets\bg.svg">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Assets\break.mp3">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Assets\focus.mp3">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Assets\folder.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Assets\logo.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Assets\logo.svg">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Assets\terminal.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Assets\vs.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Update="Assets\vscode.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
+		<Content Update="Assets\break.mp3">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\focus.mp3">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\folder.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\logo.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\logo.svg">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\terminal.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\vs.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="Assets\vscode.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 </Project>

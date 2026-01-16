@@ -20,7 +20,8 @@
 			BackRequested="TitleBar_BackRequested"
 			IsBackButtonVisible="True">
 			<TitleBar.IconSource>
-				<ImageIconSource ImageSource="ms-appx:///Assets/logo.ico" />
+				<!-- change: use the PNG for TitleBar ImageIconSource for reliable in-window icon -->
+				<ImageIconSource ImageSource="ms-appx:///Assets/logo.png" />
 			</TitleBar.IconSource>
 		</TitleBar>
 
