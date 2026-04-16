@@ -4,11 +4,9 @@
   },
   "NugetLocal": {
     "WatchFolder": "C:\\Repos\\CLEARING\\Clearing.Common",
-    "CopyFolder": "C:\\Repos\\CLEARING\\Clearing.Common\\nuget",
     "NugetPackageFilter": "*.nupkg",
     "FileCopyDelayMs": 2000,
-    "CountResetIntervalSeconds": 60,
-    "ClearCacheOnCopy": true
+    "CountResetIntervalSeconds": 60
   },
   "Workspaces": {
     "WorkspaceScanFolders": [

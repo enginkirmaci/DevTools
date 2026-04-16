@@ -32,16 +32,16 @@ public partial class NugetLocalViewModel : PageViewModelBase
     private string _watchFolder = string.Empty;
 
     [ObservableProperty]
-    private string _copyFolder = string.Empty;
+    private string _computedCopyFolder = string.Empty;
+
+    [ObservableProperty]
+    private string _globalPackagesFolder = string.Empty;
 
     [ObservableProperty]
     private bool _watchStarted;
 
     [ObservableProperty]
     private int _count;
-
-    [ObservableProperty]
-    private bool _clearCacheOnCopy;
 
     /// <summary>
     /// Gets the command to start/stop watching for changes.
@@ -53,6 +53,11 @@ public partial class NugetLocalViewModel : PageViewModelBase
     /// </summary>
     public IAsyncRelayCommand<string> SelectFolderCommand { get; }
 
+    /// <summary>
+    /// Gets the command to register the watch folder as a NuGet source.
+    /// </summary>
+    public IAsyncRelayCommand RegisterSourceCommand { get; }
+
     public NugetLocalViewModel(ISettingsService settingsService)
     {
         _settingsService = settingsService;
@@ -60,6 +65,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
 
         WatchChangesCommand = new RelayCommand<object>(OnWatchChanges);
         SelectFolderCommand = new AsyncRelayCommand<string>(OnSelectFolderAsync);
+        RegisterSourceCommand = new AsyncRelayCommand(OnRegisterSourceAsync);
 
         _ = OnInitializeAsync();
     }
@@ -74,8 +80,8 @@ public partial class NugetLocalViewModel : PageViewModelBase
             _nugetSettings = settings.NugetLocal ?? new NugetLocalSettings();
 
             WatchFolder = _nugetSettings.WatchFolder ?? string.Empty;
-            CopyFolder = _nugetSettings.CopyFolder ?? string.Empty;
-            ClearCacheOnCopy = _nugetSettings.ClearCacheOnCopy;
+            ComputedCopyFolder = ComputeCopyFolder(WatchFolder);
+            GlobalPackagesFolder = await GetGlobalPackagesFolderAsync();
         }
         finally
         {
@@ -87,19 +93,22 @@ public partial class NugetLocalViewModel : PageViewModelBase
     {
         if (_isInitializing) return;
         _ = SaveSettingAsync(() => _nugetSettings.WatchFolder = value);
+        ComputedCopyFolder = ComputeCopyFolder(value);
     }
 
-    partial void OnCopyFolderChanged(string value)
+    private string ComputeCopyFolder(string watchFolder)
     {
-        if (_isInitializing) return;
-        _ = SaveSettingAsync(() => _nugetSettings.CopyFolder = value);
+        if (string.IsNullOrWhiteSpace(watchFolder)) return string.Empty;
+        try
+        {
+            return Path.Combine(watchFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), "nugets");
+        }
+        catch
+        {
+            return string.Empty;
+        }
     }
 
-    partial void OnClearCacheOnCopyChanged(bool value)
-    {
-        if (_isInitializing) return;
-        _ = SaveSettingAsync(() => _nugetSettings.ClearCacheOnCopy = value);
-    }
 
     private async Task SaveSettingAsync(Action updateAction)
     {
@@ -145,7 +154,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
         // Fallback to Win32 Common Item Dialog (more reliable in unpackaged apps)
         try
         {
-            var title = operation == "Watch" ? "Select Watch Folder" : "Select Copy Folder";
+            var title = "Select Watch Folder";
             var path = Helpers.FolderPickerHelper.PickFolder(hwnd, title);
 
             if (!string.IsNullOrEmpty(path))
@@ -166,10 +175,6 @@ public partial class NugetLocalViewModel : PageViewModelBase
         {
             WatchFolder = path;
         }
-        else
-        {
-            CopyFolder = path;
-        }
     }
 
     private void OnWatchChanges(object? started)
@@ -179,12 +184,6 @@ public partial class NugetLocalViewModel : PageViewModelBase
             if (string.IsNullOrEmpty(WatchFolder) || !Directory.Exists(WatchFolder))
             {
                 ShowError("Watch folder path is invalid or not set in settings.");
-                WatchStarted = false;
-                return;
-            }
-            if (string.IsNullOrEmpty(CopyFolder) || !Directory.Exists(CopyFolder))
-            {
-                ShowError("Copy folder path is invalid or not set in settings.");
                 WatchStarted = false;
                 return;
             }
@@ -211,30 +210,10 @@ public partial class NugetLocalViewModel : PageViewModelBase
     {
         _dispatcherQueue.TryEnqueue(async () =>
         {
-            await Task.Delay(_nugetSettings.FileCopyDelayMs);
-
-            if (!e.FullPath.Contains(CopyFolder, StringComparison.OrdinalIgnoreCase))
+            try
             {
-                try
-                {
-                    File.Copy(e.FullPath, Path.Combine(CopyFolder, Path.GetFileName(e.FullPath)), true);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error copying file {e.FullPath}: {ex.Message}");
-                    FileList.Insert(0, $"ERROR copying {e.FullPath}: {ex.Message}");
-                    return;
-                }
-
-                FileList.Insert(0, $"{e.FullPath} moved.");
-
-                // Clear NuGet cache for this package if enabled
-                if (ClearCacheOnCopy)
-                {
-                    await ClearPackageCacheAsync(e.FullPath);
-                }
-
-                Debug.WriteLine("File copied: " + e.FullPath);
+                // Always clear NuGet cache for this package
+                await ClearPackageCacheAsync(e.FullPath);
 
                 if (DateTime.Now < _lastChanges.AddSeconds(_nugetSettings.CountResetIntervalSeconds))
                 {
@@ -245,6 +224,57 @@ public partial class NugetLocalViewModel : PageViewModelBase
                     Count = 1;
                     _lastChanges = DateTime.Now;
                 }
+
+                    // Auto-copy package to computed folder (<WatchFolder>\nugets)
+                    try
+                    {
+                        var targetDir = ComputedCopyFolder;
+                        if (string.IsNullOrEmpty(targetDir))
+                        {
+                            FileList.Insert(0, $"  ⚠ Copy skipped: target folder not available");
+                        }
+                        else
+                        {
+                            Directory.CreateDirectory(targetDir);
+                            var destPath = Path.Combine(targetDir, Path.GetFileName(e.FullPath));
+
+                            var attempts = 0;
+                            var copied = false;
+                            while (attempts < 3 && !copied)
+                            {
+                                try
+                                {
+                                    await Task.Delay(_nugetSettings.FileCopyDelayMs);
+                                    File.Copy(e.FullPath, destPath, true);
+                                    FileList.Insert(0, $"  ✓ Copied to {destPath}");
+                                    copied = true;
+                                }
+                                catch (Exception exCopy)
+                                {
+                                    attempts++;
+                                    if (attempts >= 3)
+                                    {
+                                        FileList.Insert(0, $"  ✗ Copy failed: {exCopy.Message}");
+                                        Debug.WriteLine($"Copy failed for {e.FullPath} -> {destPath}: {exCopy.Message}");
+                                    }
+                                    else
+                                    {
+                                        await Task.Delay(500);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception exCopyOuter)
+                    {
+                        Debug.WriteLine($"Auto-copy error: {exCopyOuter.Message}");
+                        FileList.Insert(0, $"  ✗ Auto-copy error: {exCopyOuter.Message}");
+                    }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error processing file {e.FullPath}: {ex.Message}");
+                FileList.Insert(0, $"ERROR processing {e.FullPath}: {ex.Message}");
             }
         });
     }
@@ -261,7 +291,7 @@ public partial class NugetLocalViewModel : PageViewModelBase
             }
 
             // Get global packages folder
-            var globalPackagesPath = await GetGlobalPackagesFolderAsync();
+            var globalPackagesPath = GlobalPackagesFolder;
             if (string.IsNullOrEmpty(globalPackagesPath))
             {
                 FileList.Insert(0, "  ⚠ Could not locate NuGet global packages folder");
@@ -348,6 +378,78 @@ public partial class NugetLocalViewModel : PageViewModelBase
         }
 
         return string.Empty;
+    }
+
+    private async Task OnRegisterSourceAsync()
+    {
+        var folderToRegister = ComputedCopyFolder;
+        if (string.IsNullOrEmpty(folderToRegister))
+        {
+            ShowError("Computed NuGet local cache folder is not available. Ensure a valid Watch Directory is set.");
+            return;
+        }
+
+        // Ensure the folder exists (auto-create cache folder on register)
+        try
+        {
+            Directory.CreateDirectory(folderToRegister);
+            FileList.Insert(0, $"✓ Ensured cache folder exists: {folderToRegister}");
+        }
+        catch (Exception exCreate)
+        {
+            ShowError($"Failed to create cache folder: {exCreate.Message}");
+            return;
+        }
+
+        try
+        {
+            var folderName = Path.GetFileName(folderToRegister.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+            var sourceName = $"{folderName}-local";
+
+            var startInfo = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "dotnet",
+                Arguments = $"nuget add source \"{folderToRegister}\" --name \"{sourceName}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null) return;
+
+            var output = await process.StandardOutput.ReadToEndAsync();
+            var error = await process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+
+            if (process.ExitCode == 0)
+            {
+                ShowInfo("NuGet Source Registered", $"'{folderToRegister}' has been registered as '{sourceName}'.");
+                FileList.Insert(0, $"✓ Registered NuGet source '{sourceName}': {folderToRegister}");
+            }
+            else if (output.Contains("already been added", StringComparison.OrdinalIgnoreCase))
+            {
+                ShowInfo("NuGet Source Already Registered", $"'{folderToRegister}' is already registered as '{sourceName}'.");
+                FileList.Insert(0, $"ℹ NuGet source '{sourceName}' already registered: {folderToRegister}");
+            }
+            else
+            {
+                ShowError($"Failed to register source: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Execution error: {ex.Message}");
+        }
+    }
+
+    private void ShowInfo(string title, string message)
+    {
+        if (App.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.ShowInfoBar(title, message, InfoBarSeverity.Informational);
+        }
     }
 
     private void ShowError(string message)

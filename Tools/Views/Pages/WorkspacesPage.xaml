@@ -5,6 +5,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	x:Name="PageRoot"
 	Background="Transparent"
 	mc:Ignorable="d">
 
@@ -98,59 +99,13 @@
 					<ItemsRepeater.ItemTemplate>
 						<DataTemplate>
 							<Border
-								Padding="12"
+								Padding="8"
 								Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
 								BorderBrush="Transparent"
 								BorderThickness="2"
 								CornerRadius="6">
 								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="*" />
-										<ColumnDefinition Width="Auto" />
-									</Grid.ColumnDefinitions>
-
-									<StackPanel
-										Grid.ColumnSpan="2"
-										Height="32"
-										Margin="-6"
-										HorizontalAlignment="Right"
-										VerticalAlignment="Top"
-										Opacity="0.8"
-										Orientation="Horizontal"
-										Spacing="4">
-										<Button
-											Padding="6"
-											Background="Transparent"
-											BorderBrush="Transparent"
-											Command="{Binding DataContext.OpenWithVSCodeCommand, ElementName=RootGrid}"
-											CommandParameter="{Binding FolderPath}"
-											ToolTipService.ToolTip="VS Code">
-											<Image Source="/Assets/vscode.png" />
-										</Button>
-										<Button
-											Padding="6"
-											Background="Transparent"
-											BorderBrush="Transparent"
-											Command="{Binding DataContext.OpenWithTerminalCommand, ElementName=RootGrid}"
-											CommandParameter="{Binding FolderPath}"
-											ToolTipService.ToolTip="Terminal">
-											<Image Source="/Assets/terminal.png" />
-										</Button>
-										<Button
-											Padding="6"
-											Background="Transparent"
-											BorderBrush="Transparent"
-											Command="{Binding DataContext.OpenFolderCommand, ElementName=RootGrid}"
-											CommandParameter="{Binding FolderPath}"
-											ToolTipService.ToolTip="Explorer">
-											<Image Source="/Assets/folder.png" />
-										</Button>
-									</StackPanel>
-
-									<StackPanel
-										Grid.Column="0"
-										Padding="6,0,0,0"
-										VerticalAlignment="Center">
+									<StackPanel Padding="6,0,0,0" VerticalAlignment="Center">
 										<TextBlock
 											FontSize="16"
 											FontWeight="Medium"
@@ -162,6 +117,36 @@
 											Text="{Binding FolderPath}"
 											TextWrapping="Wrap" />
 									</StackPanel>
+
+									<SplitButton
+										x:Name="PlatformSplitButton"
+										HorizontalAlignment="Right"
+										Background="Transparent"
+										BorderBrush="Transparent"
+										BorderThickness="0"
+										Command="{Binding DataContext.OpenWithVSCodeCommand, ElementName=RootGrid}"
+										CommandParameter="{Binding FolderPath}"
+										ToolTipService.ToolTip="Open with VS Code">
+										<Image
+											Width="20"
+											Height="20"
+											Source="ms-appx:///Assets/vscode.png" />
+										<SplitButton.Flyout>
+											<MenuFlyout Placement="BottomEdgeAlignedRight">
+												<MenuFlyoutItem Click="OnOpenWithTerminalClick" Text="Open in Terminal">
+													<MenuFlyoutItem.Icon>
+														<BitmapIcon ShowAsMonochrome="False" UriSource="ms-appx:///Assets/terminal.png" />
+													</MenuFlyoutItem.Icon>
+												</MenuFlyoutItem>
+												<MenuFlyoutItem Click="OnOpenFolderClick" Text="Show in Explorer">
+													<MenuFlyoutItem.Icon>
+														<BitmapIcon ShowAsMonochrome="False" UriSource="ms-appx:///Assets/folder.png" />
+													</MenuFlyoutItem.Icon>
+												</MenuFlyoutItem>
+											</MenuFlyout>
+										</SplitButton.Flyout>
+									</SplitButton>
+
 								</Grid>
 							</Border>
 						</DataTemplate>
@@ -197,62 +182,8 @@
 								BorderThickness="2"
 								CornerRadius="6">
 								<Grid>
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="*" />
-										<ColumnDefinition Width="Auto" />
-									</Grid.ColumnDefinitions>
 
-									<StackPanel
-										Grid.ColumnSpan="2"
-										Height="32"
-										Margin="-6"
-										HorizontalAlignment="Right"
-										VerticalAlignment="Top"
-										Opacity="0.8"
-										Orientation="Horizontal"
-										Spacing="4">
-										<Button
-											Padding="6"
-											Background="Transparent"
-											BorderBrush="Transparent"
-											Command="{Binding DataContext.OpenSolutionCommand, ElementName=RootGrid}"
-											CommandParameter="{Binding SolutionPath}"
-											ToolTipService.ToolTip="Visual Studio">
-											<Image Source="/Assets/vs.png" />
-										</Button>
-										<Button
-											Padding="6"
-											Background="Transparent"
-											BorderBrush="Transparent"
-											Command="{Binding DataContext.OpenWithVSCodeCommand, ElementName=RootGrid}"
-											CommandParameter="{Binding FolderPath}"
-											ToolTipService.ToolTip="VS Code">
-											<Image Source="/Assets/vscode.png" />
-										</Button>
-										<Button
-											Padding="6"
-											Background="Transparent"
-											BorderBrush="Transparent"
-											Command="{Binding DataContext.OpenWithTerminalCommand, ElementName=RootGrid}"
-											CommandParameter="{Binding FolderPath}"
-											ToolTipService.ToolTip="Terminal">
-											<Image Source="/Assets/terminal.png" />
-										</Button>
-										<Button
-											Padding="6"
-											Background="Transparent"
-											BorderBrush="Transparent"
-											Command="{Binding DataContext.OpenFolderCommand, ElementName=RootGrid}"
-											CommandParameter="{Binding FolderPath}"
-											ToolTipService.ToolTip="Explorer">
-											<Image Source="/Assets/folder.png" />
-										</Button>
-									</StackPanel>
-
-									<StackPanel
-										Grid.Column="0"
-										Padding="6,0,0,0"
-										VerticalAlignment="Center">
+									<StackPanel Padding="6,0,0,0" VerticalAlignment="Center">
 										<TextBlock
 											FontSize="16"
 											FontWeight="Medium"
@@ -264,6 +195,41 @@
 											Text="{Binding FolderPath}"
 											TextWrapping="Wrap" />
 									</StackPanel>
+
+									<SplitButton
+										x:Name="ProjectSplitButton"
+										HorizontalAlignment="Right"
+										Background="Transparent"
+										BorderBrush="Transparent"
+										BorderThickness="0"
+										Command="{Binding DataContext.OpenSolutionCommand, ElementName=RootGrid}"
+										CommandParameter="{Binding SolutionPath}"
+										ToolTipService.ToolTip="Open with Visual Studio">
+										<Image
+											Width="20"
+											Height="20"
+											IsHitTestVisible="False"
+											Source="ms-appx:///Assets/vs.png" />
+										<SplitButton.Flyout>
+											<MenuFlyout Placement="BottomEdgeAlignedRight">
+												<MenuFlyoutItem Click="OnOpenWithVSCodeClick" Text="Open with VS Code">
+													<MenuFlyoutItem.Icon>
+														<BitmapIcon ShowAsMonochrome="False" UriSource="ms-appx:///Assets/vscode.png" />
+													</MenuFlyoutItem.Icon>
+												</MenuFlyoutItem>
+												<MenuFlyoutItem Click="OnOpenWithTerminalClick" Text="Open in Terminal">
+													<MenuFlyoutItem.Icon>
+														<BitmapIcon ShowAsMonochrome="False" UriSource="ms-appx:///Assets/terminal.png" />
+													</MenuFlyoutItem.Icon>
+												</MenuFlyoutItem>
+												<MenuFlyoutItem Click="OnOpenFolderClick" Text="Show in Explorer">
+													<MenuFlyoutItem.Icon>
+														<BitmapIcon ShowAsMonochrome="False" UriSource="ms-appx:///Assets/folder.png" />
+													</MenuFlyoutItem.Icon>
+												</MenuFlyoutItem>
+											</MenuFlyout>
+										</SplitButton.Flyout>
+									</SplitButton>
 								</Grid>
 							</Border>
 						</DataTemplate>
