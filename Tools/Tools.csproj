@@ -47,7 +47,6 @@
 	<ItemGroup> 
 		<Content Include="settings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<Link>settings\settings.json</Link>
 		</Content> 
 		<None Include="Assets\logo.ico" />
 		<Content Update="Assets\bg.svg">
