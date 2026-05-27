@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+	x:Class="Tools.Views.Pages.SnapItSettingsPage"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	Background="Transparent"
+	mc:Ignorable="d">
+
+	<ScrollViewer VerticalScrollBarVisibility="Auto">
+		<StackPanel Margin="0" Spacing="16">
+
+			<Border
+				Padding="24"
+				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+				CornerRadius="8">
+				<StackPanel Spacing="12">
+					<TextBlock
+						FontSize="18"
+						FontWeight="SemiBold"
+						Text="Startup" />
+
+					<ToggleSwitch
+						Header="Auto-start SnapIt with Dev Tools"
+						IsOn="{x:Bind ViewModel.AutoStart, Mode=TwoWay}"
+						OffContent="Disabled"
+						OnContent="Enabled" />
+				</StackPanel>
+			</Border>
+
+			<Border
+				Padding="24"
+				Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+				CornerRadius="8">
+				<StackPanel Spacing="12">
+					<TextBlock
+						FontSize="18"
+						FontWeight="SemiBold"
+						Text="SnapIt Status" />
+
+					<Grid ColumnSpacing="8">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+
+						<Border
+							Width="12"
+							Height="12"
+							VerticalAlignment="Center"
+							CornerRadius="6">
+							<Border.Background>
+								<SolidColorBrush Color="{x:Bind ViewModel.StatusColor, Mode=OneWay}" />
+							</Border.Background>
+						</Border>
+
+						<TextBlock
+							Grid.Column="1"
+							VerticalAlignment="Center"
+							FontWeight="SemiBold"
+							Text="{x:Bind ViewModel.StatusText, Mode=OneWay}" />
+					</Grid>
+
+					<StackPanel Orientation="Horizontal" Spacing="8">
+						<Button
+							Command="{x:Bind ViewModel.ToggleSnapItCommand}"
+							Content="{x:Bind ViewModel.ToggleButtonText, Mode=OneWay}" />
+					</StackPanel>
+				</StackPanel>
+			</Border>
+
+		</StackPanel>
+	</ScrollViewer>
+</Page>

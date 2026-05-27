@@ -79,6 +79,7 @@ public partial class App : Application
         RegisterPageWithViewModel<ClipboardPasswordPage, ClipboardPasswordPageViewModel>(services);
         RegisterPageWithViewModel<HostFileProxyPage, HostFileProxyViewModel>(services);
         RegisterPageWithViewModel<FocusTimerSettingsPage, FocusTimerSettingsViewModel>(services);
+        RegisterPageWithViewModel<SnapItSettingsPage, SnapItSettingsViewModel>(services);
     }
 
     private static void RegisterPageWithViewModel<TPage, TViewModel>(IServiceCollection services)
@@ -97,6 +98,9 @@ public partial class App : Application
         _mainWindow = Services.GetRequiredService<MainWindow>();
         _mainWindow.Activate();
 
+        // Auto-start SnapIt if configured
+        _ = InitializeSnapItAsync();
+
         // Initialize the timer notification window (but don't show it yet)
         // This ensures event handlers are set up before the timer service fires events
         //_ = Services.GetRequiredService<TimerNotificationWindow>();
@@ -108,4 +112,22 @@ public partial class App : Application
     }
 
     public static Window MainWindow => ((App)Current)._mainWindow!;
+
+    private static async Task InitializeSnapItAsync()
+    {
+        try
+        {
+            var settingsService = Services.GetRequiredService<ISettingsService>();
+            var appSettings = await settingsService.GetSettingsAsync();
+            if (appSettings.SnapIt?.AutoStart == true)
+            {
+                var snapItService = Services.GetRequiredService<ISnapItService>();
+                await snapItService.StartAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Logger.Error(ex, "Failed to auto-start SnapIt");
+        }
+    }
 }

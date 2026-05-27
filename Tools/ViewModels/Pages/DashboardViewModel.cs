@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Tools.Library.Converters;
 using Tools.Library.Entities;
 using Tools.Library.Mvvm;
@@ -7,28 +8,35 @@ using Tools.Library.Services.Abstractions;
 
 namespace Tools.ViewModels.Pages;
 
-/// <summary>
-/// ViewModel for the Dashboard page.
-/// </summary>
 public partial class DashboardViewModel : PageViewModelBase
 {
     private readonly INavigationService _navigationService;
+    private readonly ISnapItService _snapItService;
 
-    /// <summary>
-    /// Gets the command for card click actions.
-    /// </summary>
+    [ObservableProperty]
+    private bool _snapItRunning;
+
+    [ObservableProperty]
+    private string _snapItStatusText = "Checking...";
+
+    [ObservableProperty]
+    private string _snapItToggleText = "Start";
+
     public IRelayCommand<string> CardClickCommand { get; }
+    public IRelayCommand ToggleSnapItCommand { get; }
 
-    /// <summary>
-    /// Gets the collection of dashboard navigation cards.
-    /// </summary>
     public IReadOnlyCollection<NavigationItem> DashboardCards { get; }
 
-    public DashboardViewModel(INavigationService navigationService)
+    public DashboardViewModel(INavigationService navigationService, ISnapItService snapItService)
     {
         _navigationService = navigationService;
+        _snapItService = snapItService;
         CardClickCommand = new RelayCommand<string>(OnCardClick);
+        ToggleSnapItCommand = new RelayCommand(OnToggleSnapIt);
         DashboardCards = NavigationProvider.GetDashboardItems(CardClickCommand);
+
+        _snapItService.RunningChanged += OnSnapItRunningChanged;
+        UpdateSnapItStatus(_snapItService.IsRunning);
     }
 
     private void OnCardClick(string? parameter)
@@ -45,5 +53,29 @@ public partial class DashboardViewModel : PageViewModelBase
         }
 
         _navigationService.Navigate(pageType);
+    }
+
+    private async void OnToggleSnapIt()
+    {
+        if (_snapItService.IsRunning)
+        {
+            _snapItService.Stop();
+        }
+        else
+        {
+            await _snapItService.StartAsync();
+        }
+    }
+
+    private void OnSnapItRunningChanged(object? sender, bool isRunning)
+    {
+        UpdateSnapItStatus(isRunning);
+    }
+
+    private void UpdateSnapItStatus(bool isRunning)
+    {
+        SnapItRunning = isRunning;
+        SnapItStatusText = isRunning ? "Running" : "Stopped";
+        SnapItToggleText = isRunning ? "Stop" : "Start";
     }
 }

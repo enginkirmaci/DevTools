@@ -22,6 +22,7 @@
 			<conv:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
 			<conv:StringNullOrEmptyToVisibilityConverter x:Key="StringNullOrEmptyToVisibilityConverter" />
 			<conv:InverseBoolConverter x:Key="InverseBoolConverter" />
+			<conv:BoolToColorConverter x:Key="BoolToColorConverter" />
 		</ResourceDictionary>
 	</Application.Resources>
 </Application>

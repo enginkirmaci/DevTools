@@ -31,6 +31,7 @@ public sealed partial class MainWindow : Window
 
     private readonly INavigationService _navigationService;
     private readonly IClipboardPasswordService _clipboardPasswordService;
+    private readonly ISnapItService _snapItService;
     private readonly WindowMessageHandler _messageHandler;
     private readonly WindowConfigurator _windowConfigurator;
     private readonly InfoBarManager _infoBarManager;
@@ -58,11 +59,13 @@ public sealed partial class MainWindow : Window
     public MainWindow(
         MainWindowViewModel viewModel,
         INavigationService navigationService,
-        IClipboardPasswordService clipboardPasswordService)
+        IClipboardPasswordService clipboardPasswordService,
+        ISnapItService snapItService)
     {
         ViewModel = viewModel;
         _navigationService = navigationService;
         _clipboardPasswordService = clipboardPasswordService;
+        _snapItService = snapItService;
 
         // Initialize helper classes (Dependency Inversion Principle)
         _messageHandler = new WindowMessageHandler(clipboardPasswordService);
@@ -249,6 +252,8 @@ public sealed partial class MainWindow : Window
         ContentFrame.Navigated -= OnContentFrameNavigated;
 
         _messageHandler.Uninstall(_windowConfigurator.WindowHandle);
+
+        _snapItService.Stop();
     }
 
     /// <summary>

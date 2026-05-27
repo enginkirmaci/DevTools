@@ -19,7 +19,8 @@ public static class PageNavigationMapper
         typeof(ClipboardPasswordPage),
         typeof(EFToolsPage),
         typeof(CodeExecutePage),
-        typeof(FocusTimerSettingsPage)
+        typeof(FocusTimerSettingsPage),
+        typeof(SnapItSettingsPage)
     ];
 
     #endregion Private Fields
