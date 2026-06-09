@@ -28,7 +28,7 @@
     "HighlightColor": "#C8000000",
     "OverlayColor": "#32FFFFFF",
     "BorderColor": "#C8969696",
-    "BorderThickness": "1",
-    "Opacity": "0.6"
+    "BorderThickness": 1,
+    "Opacity": 0.6
   }
 }
