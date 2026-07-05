@@ -12,8 +12,8 @@
     "FileCopyDelayMs": 2000,
     "CountResetIntervalSeconds": 60
   },
-  "Workspaces": {
-    "WorkspaceScanFolders": [
+  "Repos": {
+    "RepoScanFolders": [
       "C:\\Repos\\CLEARING"
     ],
     "GitFolderPattern": ".git",
@@ -21,6 +21,7 @@
     "PlatformFolderName": "platform",
     "VSCodeExecutable": "code",
     "TerminalExecutable": "wt",
+    "OpenCodeExecutable": "opencode",
     "ExcludedFolders": []
   },
   "ClipboardPassword": {
