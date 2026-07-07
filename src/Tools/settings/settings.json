@@ -1,0 +1,30 @@
+{
+  "General": {
+    "StartMinimized": false,
+    "StartAtBoot": false
+  },
+  "EFToolsPage": {
+    "RepositoryTemplate": "\npublic class {TABLENAME}Repository : QueryableRepository\u003C{TABLENAME}, DbContext\u003E, I{TABLENAME}Repository\n{\n    public {TABLENAME}Repository(DbContext context) : base(context)\n    {\n    }\n}\n\npublic interface I{TABLENAME}Repository : IQueryableRepository\u003C{TABLENAME}\u003E\n{\n}"
+  },
+  "NugetLocal": {
+    "WatchFolder": "C:\\Repos\\CLEARING\\Clearing.Common",
+    "NugetPackageFilter": "*.nupkg",
+    "FileCopyDelayMs": 2000,
+    "CountResetIntervalSeconds": 60
+  },
+  "Repos": {
+    "RepoScanFolders": [
+      "C:\\Repos\\CLEARING"
+    ],
+    "GitFolderPattern": ".git",
+    "SolutionFilePattern": "*.sln",
+    "PlatformFolderName": "platform",
+    "VSCodeExecutable": "code",
+    "TerminalExecutable": "wt",
+    "OpenCodeExecutable": "opencode",
+    "ExcludedFolders": []
+  },
+  "ClipboardPassword": {
+    "EncryptedPassword": ""
+  }
+}
