@@ -1,0 +1,5 @@
+{
+  "name": "Develop",
+  "description": "Feature development workflow: plan, implement, verify.",
+  "prompt": "We are starting a development task. First, explore the codebase to understand the relevant components and existing patterns. Then propose a brief implementation plan. After I confirm, implement the change following the surrounding code style, and finally verify it builds and the relevant tests pass. Summarize what you changed when done."
+}
