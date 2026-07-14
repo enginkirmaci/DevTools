@@ -24,5 +24,13 @@
   "ClipboardPassword": {
     "EncryptedPassword": "",
     "HideFromGui": false
+  },
+  "OpenCode": {
+    "AutoConnect": true,
+    "Host": "127.0.0.1",
+    "Port": 4096,
+    "AuthToken": null,
+    "AutoApprove": false,
+    "OpenCodeExecutable": "opencode"
   }
 }
