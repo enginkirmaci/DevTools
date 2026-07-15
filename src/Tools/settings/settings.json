@@ -14,7 +14,7 @@
       "C:\\Repos\\CLEARING"
     ],
     "GitFolderPattern": ".git",
-    "SolutionFilePattern": "*.sln",
+    "SolutionFilePattern": "*.sln,*.slnx",
     "PlatformFolderName": "platform",
     "VSCodeExecutable": "code",
     "TerminalExecutable": "wt",
@@ -23,7 +23,7 @@
   },
   "ClipboardPassword": {
     "EncryptedPassword": "",
-    "HideFromGui": true
+    "HideFromGui": false
   },
   "OpenCode": {
     "AutoConnect": true,
