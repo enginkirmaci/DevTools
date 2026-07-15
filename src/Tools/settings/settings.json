@@ -23,7 +23,7 @@
   },
   "ClipboardPassword": {
     "EncryptedPassword": "",
-    "HideFromGui": false
+    "HideFromGui": true
   },
   "OpenCode": {
     "AutoConnect": true,
