@@ -1,9 +1,0 @@
-{
-  "defaultModel": "Model-Garden/glm-5.2-fp8",
-  "models": [
-    "Model-Garden/glm-5.2-fp8",
-    "Model-Garden/minimax-2.5-230b-awq-garden",
-    "Model-Garden/qwen3.5-397b-a17b-awq",
-    "Model-Garden/qwen3.6-35b-a3b"
-  ]
-}
