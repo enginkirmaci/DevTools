@@ -26,6 +26,7 @@
     "HideFromGui": false
   },
   "OpenCode": {
+    "Enabled": false,
     "AutoConnect": true,
     "Host": "127.0.0.1",
     "Port": 4096,
