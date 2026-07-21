@@ -17,6 +17,7 @@
     "SolutionFilePattern": "*.sln,*.slnx",
     "PlatformFolderName": "platform",
     "VSCodeExecutable": "code",
+    "VSCodeProfile": "",
     "TerminalExecutable": "wt",
     "OpenCodeExecutable": "opencode",
     "ExcludedFolders": []
@@ -26,12 +27,6 @@
     "HideFromGui": false
   },
   "OpenCode": {
-    "Enabled": false,
-    "AutoConnect": true,
-    "Host": "127.0.0.1",
-    "Port": 4096,
-    "AuthToken": null,
-    "AutoApprove": false,
-    "OpenCodeExecutable": "opencode"
+    "Enabled": false
   }
 }
