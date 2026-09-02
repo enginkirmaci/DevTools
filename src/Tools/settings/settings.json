@@ -27,6 +27,7 @@
     "HideFromGui": false
   },
   "OpenCode": {
-    "Enabled": false
+    "Enabled": false,
+    "DefaultModel": ""
   }
 }
