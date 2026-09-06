@@ -28,6 +28,7 @@
   },
   "OpenCode": {
     "Enabled": false,
-    "DefaultModel": ""
+    "DefaultModel": null,
+    "CommitModel": null
   }
 }
