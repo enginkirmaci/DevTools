@@ -24,10 +24,10 @@
   },
   "ClipboardPassword": {
     "EncryptedPassword": "",
-    "HideFromGui": false
+    "EnableClipboardPassword": true
   },
   "OpenCode": {
-    "Enabled": false,
+    "EnableOpenCode": false,
     "DefaultModel": null,
     "CommitModel": null
   }
